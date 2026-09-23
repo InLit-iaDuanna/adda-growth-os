@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "model": "deepseek-v4.1-flash",
+  "requests_used_this_run": 1,
+  "tracked_requests_reserved": 4,
+  "manual_exploratory_attempts_upper_bound": 3,
+  "request_limit": 10000,
+  "input": "synthetic approved facts only",
+  "copy": {
+    "en": "Campus Adda with ADDA TEA — tea, talk and campus vibes.",
+    "bn": "ক্যাম্পাস আড্ডায় ADDA TEA — আড্ডা আর চা।"
+  },
+  "checks": [
+    "valid_json",
+    "en_and_bn",
+    "brand_mentioned",
+    "bengali_script",
+    "length_under_100",
+    "no_unverified_price_or_discount"
+  ],
+  "tested_at": "2026-09-23T06:46:08.040Z"
+}

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ActionProposal",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "store_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_metric": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observation": {
+      "type": "string"
+    },
+    "hypothesis": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "proposed_action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "due_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "budget_minor": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]+$"
+    },
+    "currency": {
+      "const": "BDT"
+    },
+    "expected_effect": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "brand_fact",
+              "metric_snapshot",
+              "campaign_revision",
+              "feedback",
+              "verified_context"
+            ]
+          },
+          "excerpt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "revision_id",
+          "kind",
+          "excerpt"
+        ]
+      }
+    },
+    "guardrails": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "needs_input": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "requires_approval": {
+      "const": true
+    }
+  },
+  "required": [
+    "id",
+    "store_id",
+    "target_metric",
+    "observation",
+    "hypothesis",
+    "proposed_action",
+    "owner_role",
+    "due_at",
+    "budget_minor",
+    "currency",
+    "expected_effect",
+    "evidence",
+    "guardrails",
+    "needs_input",
+    "requires_approval"
+  ]
+}

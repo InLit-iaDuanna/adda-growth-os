@@ -1,0 +1,4 @@
+tenant_id,store_id,source,external_adjustment_id,external_order_id,occurred_at,amount_minor
+DEMO_TENANT_ADDA,DEMO_STORE_001,demo_pos,R001,O007,2026-08-21T10:00:00+06:00,20000
+DEMO_TENANT_ADDA,DEMO_STORE_001,demo_pos,R002,O009,2026-09-13T10:00:00+06:00,2000
+DEMO_TENANT_ADDA,DEMO_STORE_001,demo_pos,R001,O007,2026-08-21T10:00:00+06:00,20000

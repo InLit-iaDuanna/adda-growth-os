@@ -1,0 +1,6 @@
+G03 evidence recorded 2026-09-22 (UTC)
+
+npm run typecheck -> exit 0
+npm run test:g03  -> exit 0 (6 passed, 0 failed)
+
+The test suite exercises source-link creation/public H5 view, member registration/independent consent, test-only verification, coupon issue, 20 concurrent reservations, authoritative POS matching and refund-safe attribution.

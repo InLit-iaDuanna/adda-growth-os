@@ -1,0 +1,9 @@
+{
+  "status": "missing_or_provisional",
+  "observations": [],
+  "hypotheses": ["数据截止或完整性尚未确认，以下仅为待验证假设。"],
+  "tasks_max": 3,
+  "weather": "unavailable",
+  "campus_calendar": "unavailable",
+  "source_refs": []
+}

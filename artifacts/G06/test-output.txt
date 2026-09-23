@@ -1,0 +1,6 @@
+G06 automated result summary (2026-09-22 UTC)
+
+A28/A37 passed — opt-in is explicit; rule preview uses member/order/consent facts and returns redacted samples without contact fields.
+A38/A40 passed — frozen snapshot keeps stable holdout; post-freeze member is absent; revoked member is skipped at dispatch; report includes holdout and not-sent population.
+A39 passed — unapproved template, budget exhaustion, local send window and frequency cap are server-side blocks, including manual export policy path.
+A40/A48 passed — test outbox is deterministic/idempotent; production/no connector produces external_blocked rather than fake delivery.

@@ -1,0 +1,20 @@
+{
+  "net_revenue_minor": 210000,
+  "qualified_order_count": 10,
+  "average_order_value_minor": 21000,
+  "linked_order_count": 9,
+  "identity_coverage": 0.9,
+  "member_revenue_minor": 195000,
+  "member_revenue_share": 0.9285714285714286,
+  "mature_30d_cohort_count": 3,
+  "repeat_30d_count": 1,
+  "repeat_30d_rate": 0.3333333333333333,
+  "mature_7d_registration_cohort_count": 5,
+  "converted_7d_count": 4,
+  "conversion_7d_rate": 0.8,
+  "primary_attributed_revenue_minor": {
+    "CMP_CAMPUS_01": 40000,
+    "CMP_EVENT_01": 48000,
+    "unknown": 122000
+  }
+}

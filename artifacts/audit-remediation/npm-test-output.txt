@@ -1,0 +1,250 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test
+> npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:unit
+> node --test --import tsx tests/unit.test.ts
+
+✔ production is the safe default and rejects a missing session secret (1.180095ms)
+✔ CASHIER cannot export, edit budget, approve or manage channels (0.853657ms)
+✔ real domain metric code reproduces the golden fixture (15.633882ms)
+✔ demo seed is idempotent and production refuses it (162.027049ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 483.25571
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g01
+> node --test --import tsx tests/g01.test.ts
+
+✔ A06: empty Brand Brain exposes needs_input and does not invent prices or launch date (240.774247ms)
+✔ A07: only an approved, current revision is returned by default (32.286076ms)
+✔ A08: changing a price version marks an old brand reference stale (29.324625ms)
+✔ A13: publish check blocks missing/expired rights and unapproved prices (17.118951ms)
+✔ expired brand revisions cannot be approved (10.102545ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 666.794048
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g02
+> node --test --import tsx tests/g02.test.ts
+
+✔ A15: importing the same CSV twice is idempotent (272.680917ms)
+✔ A16: a changed order is a correction, not a second active sale (32.196653ms)
+✔ A17: malformed rows and over-refunds are isolated with stable row errors (20.921835ms)
+✔ A18/A19/A21/A22/A23: code-calculated golden metrics match expected values (78.207941ms)
+✔ A20: business-day comparisons use the store timezone, not server timezone (0.581321ms)
+✔ A64: missing source watermark is explicitly provisional (180.720322ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 876.262232
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g03
+> node --test --import tsx tests/g03.test.ts
+
+✔ A24/A25/A27: opaque source link records touch without treating it as an order (284.59699ms)
+✔ A28/A29: registration works without marketing opt-in; verification is explicit (12.088261ms)
+✔ A30/A31: coupon reservation is not revenue and 20 concurrent requests yield one success (103.233687ms)
+✔ A30: reservation cannot match until authoritative POS import exists (26.437924ms)
+✔ A32: expired and wrong-store coupons are rejected with stable errors (13.324616ms)
+✔ production verification does not fake a verified contact (9.448403ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 710.356785
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g04
+> node --test --import tsx tests/g04.test.ts
+
+✔ A09: deterministic provider produces editable zh-CN/en/bn package with shots, subtitles and sources (315.671302ms)
+✔ A10: bn review is required before submit/approval (15.312634ms)
+✔ A11/A47: approval binds content hash and valid approved citations (20.25856ms)
+✔ A12: manual export is not published; operator evidence is separate (55.643969ms)
+✔ A13/A14/A46: missing rights/unsafe instructions fail closed with manual edit path (31.019395ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 727.9825
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g05
+> node --test --import tsx tests/g05.test.ts
+
+✔ A33: partner/KOC requires a source and starts as identified (284.730537ms)
+✔ A34: event capacity, registration and check-in counts are separate and idempotent (43.59398ms)
+✔ A35/A36: referral qualification excludes self/duplicates/prior buyers and rewards stay manual (46.521525ms)
+✔ A35: existing buyer and full refund make referral not payable (57.243963ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 716.119632
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g06
+> node --test --import tsx tests/g06.test.ts
+
+✔ A28/A37: segment rules use real behavior and preview never returns contacts (243.453621ms)
+✔ A38/A40: frozen audience keeps stable holdout, excludes post-freeze opt-out and new members (64.28602ms)
+✔ A39: template, budget, quiet hours and frequency cap are server-side policies (114.208517ms)
+✔ A40/A48: production dispatch does not fake delivery (27.511708ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 745.109256
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:g07-g10
+> node --test --import tsx tests/g07-g10.test.ts
+
+✔ G07 feedback risk escalation, dedupe, correction, reply approval and manual task (293.869171ms)
+✔ G08 router blocks prompt injection and daily report is versioned with at most three tasks (197.566604ms)
+✔ G09 webhook signature, idempotency, monotonic status and kill switch are enforced (308.839261ms)
+✔ G07 ordinary case cannot close before manual reply task evidence (201.368421ms)
+✔ G09 adapter blocks live writes by default and maps provider references (1.191644ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1278.308389
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:metrics-remediation
+> node --test --import tsx tests/metrics-remediation.test.ts
+
+✔ R10: same external member id in different stores remains two canonical members (226.333541ms)
+✔ R10: an order carrying an internal member id resolves to that member only (0.35069ms)
+✔ R10: ambiguous external ids are left unlinked instead of merged (0.310626ms)
+✔ R11: a watermark older than as_of is provisional in the shared quality model (0.738895ms)
+✔ R11: /api/metrics does not label stale complete_through as verified (34.29805ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 547.697459
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:whatsapp-remediation
+> node --test --import tsx tests/whatsapp-remediation.test.ts
+
+✔ R05: real WhatsApp nested status envelopes normalize as a stable batch (2.220217ms)
+✔ R05: unknown provider status remains unknown_delivery and does not look successful (0.215079ms)
+✔ R06: verify-token challenge is independent from operator authentication (189.025774ms)
+✔ R05: POST accepts signed nested payloads and records each status without external send (150.941185ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 602.257922
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:jobs-cookie-remediation
+> node --test --import tsx tests/jobs-cookie-remediation.test.ts
+
+✔ production login and logout cookies include Secure (144.437995ms)
+✔ running jobs are protected by owner leases and only expired leases recover (13.434395ms)
+✔ legacy running jobs without lease metadata are recovered once (5.993003ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 427.788415
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:audit-remediation-p0
+> node --test --import tsx tests/audit-remediation-p0.test.ts
+
+✔ R01: tenant owner cannot change the platform-wide kill switch (241.566858ms)
+✔ R02: reviewer cannot smuggle an unauthorized campaign edit with approval status (235.169058ms)
+✔ R07/R08: dispatch preview and intent creation share contact and holdout policy (213.404985ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 961.033286
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:integration
+> node --test --import tsx tests/integration.test.ts
+
+✔ A02: authenticated campaign creation persists to disk (353.003602ms)
+✔ A02: campaign survives a web server restart (114.403401ms)
+✔ A03: another tenant cannot read or enumerate the first tenant campaign (87.277336ms)
+✔ A04: same-tenant ungranted store is hidden (8.305754ms)
+✔ A05: CASHIER is blocked from sensitive operations (11.965281ms)
+✔ writes require the session CSRF token (41.20289ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 896.039152
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> adda-growth-os@0.1.0 test:e2e
+> node --test --import tsx tests/e2e.test.ts
+
+✔ A01: a fresh production database shows onboarding and no demo business data (54.092314ms)
+✔ A57: admin and consumer shells expose required language choices and mobile viewport (160.171328ms)
+✔ health and readiness are explicit and connectors remain unconfigured (135.080059ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 623.94879

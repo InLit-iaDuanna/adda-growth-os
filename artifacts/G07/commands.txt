@@ -1,0 +1,3 @@
+npm run test:g07-g10
+exit 0
+5 tests passed: feedback risk escalation/dedupe/correction/reply task; router injection/report; webhook signature/idempotency/kill switch; ordinary case manual evidence closure; adapter blocked/live transport mapping (offline fake transport).

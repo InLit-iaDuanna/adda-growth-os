@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MetricResult",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "metric_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "formula_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tenant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "store_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "tenant_id",
+        "store_id"
+      ]
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "value": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "unit": {
+      "enum": [
+        "count",
+        "ratio",
+        "minor_units",
+        "platform_defined"
+      ]
+    },
+    "numerator": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "denominator": {
+      "type": [
+        "number",
+        "string",
+        "null"
+      ]
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "complete_through": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "quality": {
+      "enum": [
+        "verified",
+        "observed",
+        "provisional",
+        "insufficient",
+        "unavailable"
+      ]
+    },
+    "coverage": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "brand_fact",
+              "metric_snapshot",
+              "campaign_revision",
+              "feedback",
+              "verified_context"
+            ]
+          },
+          "excerpt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "revision_id",
+          "kind",
+          "excerpt"
+        ]
+      }
+    },
+    "missing_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "metric_key",
+    "formula_version",
+    "scope",
+    "period_start",
+    "period_end",
+    "value",
+    "unit",
+    "numerator",
+    "denominator",
+    "as_of",
+    "complete_through",
+    "quality",
+    "coverage",
+    "source_refs",
+    "missing_reason"
+  ]
+}

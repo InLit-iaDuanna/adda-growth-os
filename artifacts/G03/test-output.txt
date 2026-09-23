@@ -1,0 +1,9 @@
+G03 automated result summary (2026-09-22 UTC)
+
+A24/A25/A27 passed — opaque source token, touch event and no URL PII; touch is not an order
+A28/A29 passed — marketing opt-in defaults off; explicit test verification; production verification external_blocked
+A30/A31 passed — reservation has no revenue effect; 20 concurrent requests produce one success/19 stable rejects
+A30 POS match passed — no match before authoritative import; match and duplicate callback are idempotent
+A32 passed — expired offer and invalid states reject with stable errors; revoke writes suppression
+
+All data is synthetic/offline. No real customer, POS, messaging channel or payment was contacted.

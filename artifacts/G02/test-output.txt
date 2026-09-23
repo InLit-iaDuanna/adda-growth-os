@@ -1,0 +1,14 @@
+G02 automated result summary (2026-09-22 UTC)
+
+A15  passed — duplicate CSV/file and order keys do not add active sales
+A16  passed — changed order creates correction history and one active revision
+A17  passed — invalid date/negative amount and over-refund are row-level errors
+A18  passed — code-computed golden net/order/AOV values match expected
+A19  passed — full refund removes qualification; partial refund reduces net
+A20  passed — Dhaka business-date boundary is independent of server timezone
+A21  passed — mature 30-day cohort=3 and cross-day repeat=1; same-day orders excluded
+A22  passed — mature 7-day registration cohort=5 and converted=4
+A23  passed — identity coverage=9/10; anonymous order remains in sales only
+A64  passed — missing source watermark returns provisional quality and reason
+
+All data is synthetic and stored in the offline file-dev repository.

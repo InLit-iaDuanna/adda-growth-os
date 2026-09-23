@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-22",
+  "original_tests": { "count": 48, "passed": 48, "failed": 0, "exit_code": 0 },
+  "current_tests": { "count": 63, "passed": 63, "failed": 0, "exit_code": 0 },
+  "remediation": {
+    "R01": "fixed_and_regressed",
+    "R02": "fixed_and_regressed",
+    "R03": "fixed_and_regressed",
+    "R04": "fixed_and_regressed",
+    "R05": "offline_protocol_fixed_and_regressed",
+    "R06": "offline_challenge_fixed_and_regressed",
+    "R07": "fixed_and_regressed",
+    "R08": "fixed_and_regressed",
+    "R09": "lease_fencing_fixed_and_regressed",
+    "R10": "fixed_and_regressed",
+    "R11": "fixed_and_regressed",
+    "R12": "fixed_and_regressed"
+  },
+  "external_blocked": [
+    "postgresql_and_production_migrations",
+    "real_model_evaluation",
+    "real_waba_send_and_provider_receipt",
+    "browser_customer_uat",
+    "client_approval_and_signoff"
+  ]
+}

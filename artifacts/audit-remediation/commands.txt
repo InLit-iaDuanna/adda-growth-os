@@ -1,0 +1,43 @@
+2026-09-22T00:00:00Z (UTC)
+
+npm test
+exit_code=0
+63 tests passed, 0 failed (original 48 + remediation suites)
+
+Original chain:
+npm run test:unit
+npm run test:g01
+npm run test:g02
+npm run test:g03
+npm run test:g04
+npm run test:g05
+npm run test:g06
+npm run test:g07-g10
+npm run test:integration
+npm run test:e2e
+exit_code=0
+48 tests passed, 0 failed
+
+npm run typecheck
+exit_code=0
+
+npm run build
+exit_code=0
+
+npm run security:scan
+exit_code=0 (54 files, 0 findings)
+
+npm run test:ai
+exit_code=0 (30 synthetic cases)
+
+npm run fixtures:verify
+exit_code=0
+
+npm run performance
+exit_code=0 (100,000 synthetic orders; p95 recorded in artifacts/G10/performance-latest.json)
+
+Targeted remediation suites:
+npm run test:audit-remediation-p0     # R01/R02/R07/R08: 3 passed
+npm run test:metrics-remediation      # R10/R11: 5 passed
+npm run test:whatsapp-remediation     # R05/R06: 4 passed
+npm run test:jobs-cookie-remediation  # R09/R12: 3 passed

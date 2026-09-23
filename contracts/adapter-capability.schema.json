@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AdapterCapability",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "provider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "capability": {
+      "enum": [
+        "read_metrics",
+        "read_comments",
+        "reply",
+        "publish",
+        "send_template",
+        "verify_contact"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "demo",
+        "manual",
+        "live"
+      ]
+    },
+    "status": {
+      "enum": [
+        "unconfigured",
+        "sandbox",
+        "pending_approval",
+        "active",
+        "limited",
+        "revoked",
+        "failed"
+      ]
+    },
+    "checked_at": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "provider",
+    "capability",
+    "mode",
+    "status",
+    "checked_at",
+    "reason",
+    "evidence_ref"
+  ]
+}

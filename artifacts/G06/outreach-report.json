@@ -1,0 +1,8 @@
+{
+  "assigned_count": 3,
+  "treatment": { "assigned": 2, "sent": 1, "statuses": { "sent_test": 1, "skipped_suppressed": 1 } },
+  "holdout": { "assigned": 1, "sent": 0, "statuses": { "skipped_holdout": 1 } },
+  "exploratory": true,
+  "analysis_population": "all_frozen_assignments_including_holdout_and_not_sent",
+  "production_delivery": "external_blocked"
+}

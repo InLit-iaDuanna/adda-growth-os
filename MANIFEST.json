@@ -1,0 +1,264 @@
+{
+  "name": "ADDA Growth OS Codex specification pack",
+  "version": "1.0",
+  "created_on": "2026-09-22",
+  "artifact_type": "specification_plus_offline_application_slices_and_test_fixtures",
+  "execution_note": "G00–G10 offline implementation and regression evidence are present in this workspace; production adapters, real channel acceptance and customer UAT remain blocked. File hashes below describe the original specification-pack files, not generated runtime directories.",
+  "files": [
+    {
+      "path": ".agent/PLANS.md",
+      "bytes": 1001,
+      "sha256": "ba52f9805efb6c6286c11b94abcc9588b5c9be89ef2681cc260da9f8f8981072"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 4967,
+      "sha256": "2f42e726d5e33072d6dd625fbc5a74799c598cbf2d1d7efa9440ed06fa796a71"
+    },
+    {
+      "path": "CODEX_START.md",
+      "bytes": 2050,
+      "sha256": "5d2b9e211e76ca119da3b7e9a8ac463fd567d7d2a41c42402a8ac2f0c144c1de"
+    },
+    {
+      "path": "GOAL.md",
+      "bytes": 6102,
+      "sha256": "0d71bedf33f19548c3072b0325045ca1bf0dff31571dcb6fdc3c1486872c3d21"
+    },
+    {
+      "path": "PACK_VALIDATION.md",
+      "bytes": 767,
+      "sha256": "cb0df8a5cae04f5022af90354fb64c6333b6b747d40d240cbddd6cf07ad55805"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2390,
+      "sha256": "5b412e216aa9a8ea73e9ce48c178ec2c65a720002b80c9c74a5737176f2724ea"
+    },
+    {
+      "path": "TASKS.json",
+      "bytes": 4940,
+      "sha256": "89c43c0c78f2c1e5d3f367562653593b6cd1c62edc9311d3377d03841b1fcab5"
+    },
+    {
+      "path": "contracts/action-proposal.schema.json",
+      "bytes": 2390,
+      "sha256": "29d14cf54bf0f021a14c9f429a2a81d51774d91978b2b6aa2d7aec13622f7fa2"
+    },
+    {
+      "path": "contracts/adapter-capability.schema.json",
+      "bytes": 1123,
+      "sha256": "ab7442b6206d7dd2659b198316a0303ab6e73f30f69120b25f35b03a86fa7a83"
+    },
+    {
+      "path": "contracts/approval-snapshot.schema.json",
+      "bytes": 1444,
+      "sha256": "d12e289c11a1fa6ecbd2a4236c26e2da9cdae3b90d4c7552f2cd6047ba9af9e8"
+    },
+    {
+      "path": "contracts/content-package.schema.json",
+      "bytes": 4463,
+      "sha256": "63c4dc6c6b2add27521b12d76f311800162baa21cbece247035c5abec4251023"
+    },
+    {
+      "path": "contracts/metric-result.schema.json",
+      "bytes": 2895,
+      "sha256": "48411f6e8d480c665ca64d1291571ebb068cefd43126d2fa7eae3d8966280d34"
+    },
+    {
+      "path": "contracts/provider-event.schema.json",
+      "bytes": 1062,
+      "sha256": "886ecab80636f524672dacc1aee148f467a76af80a94869710dd776e61e872a0"
+    },
+    {
+      "path": "docs/BLOCKERS.md",
+      "bytes": 576,
+      "sha256": "f45e64a9bc54815f22dc1e1e2979a70c8a0b2134b00186c3edb21a232ccb45bf"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "bytes": 606,
+      "sha256": "7e10da7aa01a23f9a3b45278fea1d866d1777c54552af2f72ff7a9d850fdb21c"
+    },
+    {
+      "path": "docs/完整交付方案.md",
+      "bytes": 14895,
+      "sha256": "9511366d111beb9c1e27eb321011f382d7d87fc605f3e3854cf7e7db1fa5c274"
+    },
+    {
+      "path": "fixtures/README.md",
+      "bytes": 934,
+      "sha256": "741bf0f6688b881ce493ba0b13803f75f4d405afb21f9815ae9f22c3f0e3537c"
+    },
+    {
+      "path": "fixtures/ai_eval_cases.json",
+      "bytes": 6389,
+      "sha256": "f94f4bf2fbcec70d9ade3a2de593ef0ba8b349874d5d8b54b588c867ec122547"
+    },
+    {
+      "path": "fixtures/expected_metrics.json",
+      "bytes": 558,
+      "sha256": "15dd2f9c7a9ec69de57dbb74938e1937eeaa874d65d577cba04e3ea03c1af90b"
+    },
+    {
+      "path": "fixtures/golden_dataset.json",
+      "bytes": 7803,
+      "sha256": "6b74be219592da6b3b75bbf8f894a93a5d69d1c825dcefe84305611465af8faa"
+    },
+    {
+      "path": "fixtures/members.csv",
+      "bytes": 727,
+      "sha256": "cd1d75be3c7da7d2dc97140d4e86a69434b94b7afa627facbba628ea3a4f0c22"
+    },
+    {
+      "path": "fixtures/orders.csv",
+      "bytes": 1208,
+      "sha256": "5a1132f1771996e7bec1777f26d14a64084eaaea16c79f0a757b0c970a7524c2"
+    },
+    {
+      "path": "fixtures/refunds.csv",
+      "bytes": 343,
+      "sha256": "10769981c72f535c9ad8037e9f8c91fcf63fc71cc4a6e79055412cb4a0f73a8e"
+    },
+    {
+      "path": "fixtures/verification-output.txt",
+      "bytes": 717,
+      "sha256": "6259721a7a78ea59d9159deb0c60df6f1810ca50316821c2bad4e408e8d86260"
+    },
+    {
+      "path": "goals/G00.md",
+      "bytes": 1552,
+      "sha256": "f04d2a1e5b187a3a9af002c91f14fa1b9e80960571700d9ea47717e7f384a667"
+    },
+    {
+      "path": "goals/G01.md",
+      "bytes": 1507,
+      "sha256": "c0e5918986e0564115ac45e2474c0c283f7c8805535e7204bf8a879ce3d65d93"
+    },
+    {
+      "path": "goals/G02.md",
+      "bytes": 1578,
+      "sha256": "19e4052c7c218cf02aa1c542e209c4de0a5b7c33023dce3078b2287626fdade9"
+    },
+    {
+      "path": "goals/G03.md",
+      "bytes": 1590,
+      "sha256": "54544e1dc0c1be5d44438cba9b20b254150aa15679d4155cef0b7c9835495cae"
+    },
+    {
+      "path": "goals/G04.md",
+      "bytes": 1538,
+      "sha256": "8188d203ac59067b0828f6d299218cf76b471795f435f83a7d7e4c544697d28f"
+    },
+    {
+      "path": "goals/G05.md",
+      "bytes": 1506,
+      "sha256": "a2d1169636b28db6da2fda09afef293296115e5a373380fcb2b7d5510156d8cf"
+    },
+    {
+      "path": "goals/G06.md",
+      "bytes": 1502,
+      "sha256": "36dde208be883861d9309df80277247f1691ba1cb436f8c9f5df0c1c3618e44d"
+    },
+    {
+      "path": "goals/G07.md",
+      "bytes": 1485,
+      "sha256": "3f994ee2e1c9c99ce2d97d7fdeea2f6e6874710e679ccf93ab90467422693862"
+    },
+    {
+      "path": "goals/G08.md",
+      "bytes": 1561,
+      "sha256": "e204e79fd56329a2444b09b769d7affe6be1d2b162522e6173808f4167fe7f43"
+    },
+    {
+      "path": "goals/G09.md",
+      "bytes": 1629,
+      "sha256": "c3e7bea601ea9a1006b56e3d21ba75ed3c1b96e8940bbc7d5ded2b6553e989e8"
+    },
+    {
+      "path": "goals/G10.md",
+      "bytes": 1738,
+      "sha256": "151b71ea61df8c84e32d0d54d53b3d5e57a4853433df11c06dca1d2555e15110"
+    },
+    {
+      "path": "references/SOURCES.md",
+      "bytes": 3718,
+      "sha256": "bb727c306992d438bef8764eb4cd5b97b728c1993f9abbd01d6cdc37795844ec"
+    },
+    {
+      "path": "references/sources.json",
+      "bytes": 3129,
+      "sha256": "3aa4ae6279ae18269b32c01cd892d5de36df1ea8a3462788967dc6f75e3ab986"
+    },
+    {
+      "path": "scripts/verify-fixtures.mjs",
+      "bytes": 4464,
+      "sha256": "4236f583fe894dbb8108af231b1e688aac8f2b65d327b16f39d1b820c7162ec1"
+    },
+    {
+      "path": "spec/ACCEPTANCE.md",
+      "bytes": 9021,
+      "sha256": "5cd6cc8d521f859d67d5748a3fc5914abdb68d58e34ff1d1bcf28902b68c7fa4"
+    },
+    {
+      "path": "spec/AI_CONTRACTS.md",
+      "bytes": 4439,
+      "sha256": "54fc48a5dad74609c94146eb4ef79eeb2b11bbc04dea28a4819f47e075bdde17"
+    },
+    {
+      "path": "spec/ARCHITECTURE.md",
+      "bytes": 5598,
+      "sha256": "4363dab79e3f106395cc4327ac22526c91fc26bf305b65d45162ac9dd357af07"
+    },
+    {
+      "path": "spec/DATA_MODEL.md",
+      "bytes": 7608,
+      "sha256": "ed4be7e93e20cff7221aa644e85cf3546fab3cf398e641d114471c1da5993e24"
+    },
+    {
+      "path": "spec/DELIVERY.md",
+      "bytes": 3765,
+      "sha256": "da5f114a4135bceb88246443350e4856385a7d73fb9fc594fa8f1b4aca012d1e"
+    },
+    {
+      "path": "spec/INTEGRATIONS.md",
+      "bytes": 4320,
+      "sha256": "26d98c1687ff3b77e87694b97172b6e7eafe1320da28273b7e310f1a7a4f9340"
+    },
+    {
+      "path": "spec/METRICS.md",
+      "bytes": 5733,
+      "sha256": "34d668dc6c1df1f25bd28d6c4a16751b242bc8e635dfbce24ce15f16f9cd55e3"
+    },
+    {
+      "path": "spec/PRODUCT.md",
+      "bytes": 7079,
+      "sha256": "6c0e1af996c41b1b421dc59f11d087e4d90a94c9d35749539167187736df3298"
+    },
+    {
+      "path": "spec/SECURITY.md",
+      "bytes": 4096,
+      "sha256": "c6fb1e8723503fba04dcf81c0a5018c083eee17e1f096985c3f2ad9f080d297d"
+    },
+    {
+      "path": "templates/CLIENT_INPUTS.md",
+      "bytes": 1920,
+      "sha256": "fed948f051ee811ae99ab525ace6433956ae3e786ab0a71cd03a245b4c59ab60"
+    },
+    {
+      "path": "templates/GOAL_EVIDENCE.md",
+      "bytes": 423,
+      "sha256": "a846cd293be4ba35e8fc10893f2c05530d1aaa4ffd7198f88c2552e031ccb0d9"
+    },
+    {
+      "path": "templates/UAT_SIGNOFF.md",
+      "bytes": 619,
+      "sha256": "217c240f9533312e85f285c4912825c15f522899e42962bd8675e970c6641d11"
+    },
+    {
+      "path": "templates/brand_brain.template.json",
+      "bytes": 1443,
+      "sha256": "e7d54670ae6da5b0e4db9844675f95d709ae4e22cb170296f84f1cf516f94c83"
+    }
+  ]
+}

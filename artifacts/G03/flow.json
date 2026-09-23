@@ -1,0 +1,10 @@
+{
+  "source_token": "opaque high-entropy token (raw token never persisted)",
+  "touch": "view/click event only",
+  "registration": "member + independent marketing consent event",
+  "coupon": "issued -> pending_pos_verification -> redeemed",
+  "revenue": "zero until authoritative POS import and order match",
+  "concurrency": { "attempts": 20, "success": 1, "rejected": 19 },
+  "attribution": "verified_coupon primary evidence; unknown remains separate",
+  "evidence_level": "DEMO_READY synthetic repository/API test"
+}

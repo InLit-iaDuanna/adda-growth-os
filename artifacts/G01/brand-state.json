@@ -1,0 +1,8 @@
+{
+  "tenant": "ten_demo_01",
+  "mode": "synthetic_test_only",
+  "initial_needs_input": ["approved_brand_facts", "launch_date", "menu_prices", "approved_assets"],
+  "approved_fact_example": { "key": "brand_name", "value": "ADDA TEA", "status": "approved" },
+  "unapproved_sources_hidden": true,
+  "invented_price_or_launch_date": false
+}

@@ -1,0 +1,7 @@
+{
+  "scenario": "CASHIER attempts member export",
+  "status": 403,
+  "error_code": "member_export_forbidden",
+  "retryable": false,
+  "assertion": "passed; no contact data returned"
+}

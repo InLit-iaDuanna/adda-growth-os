@@ -1,0 +1,5 @@
+{
+  "name": "@adda/worker",
+  "private": true,
+  "type": "commonjs"
+}

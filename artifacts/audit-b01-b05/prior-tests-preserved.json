@@ -1,0 +1,21 @@
+{
+  "baseline_zip_sha256": "96979c71b5343d2c10cc5bb5b56e5ca8fb318ecf3deb412877dae1a8742d852f",
+  "unchanged_previous_test_files": [
+    "tests/audit-n01-n08.test.ts",
+    "tests/audit-remediation-p0.test.ts",
+    "tests/e2e.test.ts",
+    "tests/g01.test.ts",
+    "tests/g02.test.ts",
+    "tests/g03.test.ts",
+    "tests/g04.test.ts",
+    "tests/g05.test.ts",
+    "tests/g06.test.ts",
+    "tests/g07-g10.test.ts",
+    "tests/integration.test.ts",
+    "tests/jobs-cookie-remediation.test.ts",
+    "tests/metrics-remediation.test.ts",
+    "tests/unit.test.ts",
+    "tests/whatsapp-remediation.test.ts"
+  ],
+  "changed_or_missing_previous_test_files": []
+}

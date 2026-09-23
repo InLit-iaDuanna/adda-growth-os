@@ -1,0 +1,16 @@
+{
+  "generated_orders": 100000,
+  "generated_members": 20000,
+  "runs_ms": [
+    202.98958600000014,
+    208.6887119999999,
+    222.98857899999996,
+    276.9336569999999,
+    305.39539
+  ],
+  "p95_ms": 305.39539,
+  "environment": {
+    "node": "v24.19.0",
+    "note": "synthetic single-process metric-engine measurement; not the 4vCPU/8GiB/20-user service benchmark"
+  }
+}

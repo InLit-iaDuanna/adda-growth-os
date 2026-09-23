@@ -1,0 +1,13 @@
+{
+  "provider": "whatsapp",
+  "mode": "offline_fake_transport_only",
+  "invalid_signature": "rejected",
+  "duplicate_event": "idempotent",
+  "delivered_then_accepted": "remains_delivered",
+  "timeout": "unknown_delivery; retry_allowed=false",
+  "kill_switch": "new_intents_blocked",
+  "nested_status_envelope": "normalized_as_batch_with_stable_event_ids",
+  "verify_token_challenge": "accepted_without_operator_login_when_configured",
+  "unknown_provider_status": "unknown_delivery",
+  "live_acceptance": "external_blocked"
+}

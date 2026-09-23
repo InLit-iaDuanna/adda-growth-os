@@ -1,0 +1,8 @@
+{
+  "after_bn_review": "pending_approval",
+  "after_approval": "approved",
+  "after_content_edit": "stale",
+  "manual_export": "manual_ready",
+  "published_flag_on_export": false,
+  "manual_attestation": "operator_attested"
+}

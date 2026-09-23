@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ApprovalSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "action_intent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resource_revision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload_hash": {
+      "type": "string",
+      "minLength": 1
+    },
+    "audience_snapshot_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "type": "string",
+      "minLength": 1
+    },
+    "budget_minor": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]+$"
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "enum": [
+        "approved",
+        "revoked",
+        "expired",
+        "stale"
+      ]
+    }
+  },
+  "required": [
+    "action_intent_id",
+    "resource_revision_id",
+    "payload_hash",
+    "audience_snapshot_id",
+    "channel",
+    "language",
+    "budget_minor",
+    "policy_version",
+    "approved_by",
+    "approved_at",
+    "expires_at",
+    "status"
+  ]
+}

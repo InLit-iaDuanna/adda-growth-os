@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ContentPackage",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "brief_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "campaign_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "brand_revision_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "target_metric": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content_pillar": {
+      "enum": [
+        "ADDA People",
+        "Today’s Adda",
+        "SHAPLI Daily",
+        "Dhaka Youth Life",
+        "Tea Story",
+        "Campus Adda"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "minLength": 1
+    },
+    "product_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "hook_variants": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "shot_list": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "index": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "duration_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "visual": {
+            "type": "string",
+            "minLength": 1
+          },
+          "spoken_line": {
+            "type": "string"
+          },
+          "onscreen_text": {
+            "type": "string"
+          },
+          "rights_needed": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "index",
+          "duration_seconds",
+          "visual",
+          "spoken_line",
+          "onscreen_text",
+          "rights_needed"
+        ]
+      }
+    },
+    "operator_notes_zh": {
+      "type": "string"
+    },
+    "variants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "locale": {
+            "enum": [
+              "zh-CN",
+              "en",
+              "bn"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "subtitle_srt": {
+            "type": "string"
+          },
+          "cta": {
+            "type": "string"
+          },
+          "review_status": {
+            "enum": [
+              "draft",
+              "needs_local_review",
+              "reviewed",
+              "rejected"
+            ]
+          },
+          "reviewer_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "locale",
+          "title",
+          "caption",
+          "subtitle_srt",
+          "cta",
+          "review_status",
+          "reviewer_id"
+        ]
+      }
+    },
+    "source_link_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "revision_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "brand_fact",
+              "metric_snapshot",
+              "campaign_revision",
+              "feedback",
+              "verified_context"
+            ]
+          },
+          "excerpt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_id",
+          "revision_id",
+          "kind",
+          "excerpt"
+        ]
+      }
+    },
+    "needs_input": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "brief_id",
+    "campaign_id",
+    "brand_revision_id",
+    "target_metric",
+    "content_pillar",
+    "channel",
+    "product_refs",
+    "hook_variants",
+    "shot_list",
+    "operator_notes_zh",
+    "variants",
+    "source_link_id",
+    "sources",
+    "needs_input",
+    "risk_flags"
+  ]
+}

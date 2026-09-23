@@ -1,0 +1,8 @@
+timestamp_utc=2026-09-22T04:26:40Z
+node=v24.19.0
+npm=11.9.0
+docker=unavailable (command not found)
+postgres=not_started; production adapter status=external_blocked
+local_database_adapter=file-dev JSON repository
+demo_seed=explicit only via APP_MODE=demo or APP_MODE=test
+external_writes=disabled by default

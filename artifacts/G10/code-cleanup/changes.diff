@@ -1,0 +1,512 @@
+--- before/README.md
++++ after/README.md
+@@ -1,65 +1,49 @@
+-# ADDA Growth OS — Codex 交付执行包
++# ADDA Growth OS
+ 
+-版本：1.0 / 2026-09-22。当前目录同时包含产品规格、可运行的 TypeScript 离线切片和合成验收数据。
+-当前交付覆盖 DEMO_READY 的 G00–G06，以及已通过自动回归的 G07–G10 离线能力；正式验收仍受真实数据、渠道、审核人和基础设施阻塞，不宣称 CORE_ACCEPTED、真实平台授权、真人孟语验收或 PRODUCTION_READY。
++面向门店的增长管理原型，包含订单与退款、会员、优惠券、内容审批、触达意图、反馈工单和指标报表。
+ 
+-## 开始
++当前实现使用 TypeScript、`node:http` 和 JSON 文件仓储。可用于本地演示和离线回归，尚不具备生产交付条件。`spec/` 中的 Next.js、PostgreSQL/Prisma 和 pg-boss 是目标架构，尚未落地。
+ 
+-将本目录内容放到目标仓库根目录。已有仓库先建立分支并合并文件，不覆盖原有 AGENTS.md 或业务代码。
+-在 Codex 中使用 `CODEX_START.md` 的启动指令。先实施 G00，再按 `TASKS.json` 的依赖逐项执行。
+-`AGENTS.md` 是仓库操作规则；`GOAL.md` 是目标与范围；`goals/` 是独立里程碑；`spec/` 是详细产品合同。
+-`docs/完整交付方案.md` 适合项目负责人和甲方阅读。
++## 本地运行
+ 
+-## 文件索引
+-
+-| 文件/目录 | 用途 |
+-|---|---|
+-| GOAL.md | 首版目标、业务闭环、完成定义、非目标 |
+-| AGENTS.md | Codex 工作纪律、安全规则、证据要求 |
+-| CODEX_START.md | 第一轮、续跑、独立审查提示词 |
+-| .agent/PLANS.md | 执行计划格式与检查点 |
+-| TASKS.json、goals/ | G00–G10 开发目标、依赖、验收 |
+-| spec/PRODUCT.md | 页面、用户旅程、能力边界 |
+-| spec/ARCHITECTURE.md | 固定技术路线、后台任务、适配器 |
+-| spec/DATA_MODEL.md | 核心实体、约束、身份与订单连接 |
+-| spec/METRICS.md | 六项指标及营收、归因、复购口径 |
+-| spec/INTEGRATIONS.md | 平台限制、降级模式、联调门槛 |
+-| spec/AI_CONTRACTS.md | 总控与七个技能、引用、品牌与本地化 |
+-| spec/SECURITY.md | 权限、审批、隐私、幂等、故障安全 |
+-| spec/ACCEPTANCE.md | 自动化、人工、真实渠道验收用例 |
+-| spec/DELIVERY.md | 部署、交付物、职责、上线与费用边界 |
+-| contracts/ | JSON Schema 结构化输出合同 |
+-| fixtures/ | 明确标注为合成数据的指标与边界用例 |
+-| scripts/verify-fixtures.mjs | 无第三方依赖的夹具自校验，不是产品测试 |
+-| templates/ | 甲方资料清单、品牌档案、验收模板 |
+-| references/SOURCES.md | 官方文档和已核对项目，含许可注意点 |
+-
+-本包自身的数值夹具可用 `node scripts/verify-fixtures.mjs` 检查。G00–G06 有可运行的 JSON repository 纵向切片；G07 增加反馈分类/风险升级/客服回复人工闭环，G08 增加白名单问数和版本化日报，G09 增加 WhatsApp 能力状态、签名 webhook、幂等和 unknown_delivery 台账，G10 增加备份恢复、秘密扫描和性能测量脚本。生产 PostgreSQL/Prisma、真实 WABA、真人孟语检查与 UAT 仍是阻塞项。
+-
+-## G00 本地运行
++需要 Node.js 20 或以上版本。
+ 
+ ```bash
+-npm install
+-npm run typecheck
+-npm run test
+-npm run build
+-
+-# 空生产库（必须显式提供会话密钥）
+-APP_MODE=production SESSION_SECRET='至少32位的随机字符串' npm run db:migrate
+-APP_MODE=production SESSION_SECRET='至少32位的随机字符串' npm run dev
+-
+-# 明确标记的合成 DEMO（不会在 production 自动出现）
++npm ci
+ APP_MODE=demo npm run db:migrate
+ APP_MODE=demo npm run db:seed:demo
+ APP_MODE=demo npm run dev
+ ```
+ 
+-DEMO 登录账号由 `db:seed:demo` 命令输出，密码仅为 `demo-only-password`，不能用于生产。`npm run test:ai` 只检查合成结构化边界夹具，不代表真实模型或孟语质量验收；`npm run fixtures:verify` 也不代表产品已经通过全部验收。
++打开 <http://127.0.0.1:3000>。种子命令输出登录账号，演示密码为 `demo-only-password`。演示数据均为合成数据，生产模式禁止导入。
+ 
+-当前环境没有 Docker/PostgreSQL，因此 G00 的 `file-dev` 适配器用于离线验证。生产部署必须接入 PostgreSQL/Prisma、配置真实密钥、完成备份恢复和真实渠道验收；不得将 DEMO 顾客、订单、菜单、指标或预置密码导入真实甲方环境。
++```bash
++npm run typecheck
++npm test
++npm run build
++```
+ 
+-G06 的 `test` 模式只写入本地 test outbox；生产或无授权连接器时触达结果为 `external_blocked`，不会伪造短信、邮件或 WhatsApp 回执。真实发送仍需 G09 的授权模板、凭据和明确许可测试接收人。
++`npm test` 包含业务、集成及审查回归测试。`npm run test:ai` 检查结构化输出契约和合成用例；`npm run fixtures:verify` 校验数值夹具。两者都不评估真实模型质量。现有 e2e 测试通过 HTTP 检查页面与接口，浏览器操作验收仍待完成。
+ 
+-G07–G10 离线门禁：`npm run test:g07-g10`、`npm run test:metrics-remediation`、`npm run test:whatsapp-remediation`、`npm run test:ai`、`npm run fixtures:verify`、`npm run security:scan`、`npm run performance -- 100000`、`npm run backup`、`npm run restore`。性能脚本的结果是单进程指标引擎测量，不能替代约定硬件和并发服务基准。
++## 配置与边界
+ 
+-G09 的回调切片同时覆盖真实 WhatsApp Cloud API 的 `entry → changes → value.statuses` 批量归一化和 GET verify-token/challenge 握手。配置 `WHATSAPP_VERIFY_TOKEN` 后，`GET /api/connectors/whatsapp/webhook?hub.mode=subscribe&hub.verify_token=...&hub.challenge=...` 可在未登录状态下完成离线握手；真实 WABA 部署、凭据、发送和回执仍保持 `external_blocked`，不会由测试数据伪造。
++- 配置从环境变量读取，参见 `.env.example`。`APP_MODE` 支持 `demo`、`test`、`production`，默认 `production`；数据文件默认为 `data/<mode>-db.json`，可通过 `ADDA_DATA_FILE` 指定。
++- 生产模式要求至少 32 字符的 `SESSION_SECRET`。会话 Cookie 带 `Secure`，部署需提供 HTTPS。当前没有生产 OWNER 初始化或邀请流程。
++- PostgreSQL 适配器未实现；设置 `DATABASE_URL` 会报错。`db:migrate` 目前只迁移 JSON 数据结构。
++- AI 内容生成使用确定性实现，尚未连接真实模型，也未完成真人孟语评审。
++- 真实外发默认关闭。WhatsApp 已实现本地 webhook 验签、状态解析和验证握手；配置密钥不等于完成发送接入，真实 WABA 联调仍待完成。
++- `npm run worker` 目前只处理 `maintenance` 任务；其他任务返回 `worker_handler_unimplemented`。发送与回执对账处理器尚未实现。
++- `test` 模式可使用本地 outbox；人工导出不代表平台发布。真实渠道、生产部署及客户 UAT 均需单独验收。
++
++## 目录
++
++| 路径 | 内容 |
++|---|---|
++| `apps/web`、`apps/worker` | HTTP 应用与后台任务入口 |
++| `packages/domain` | 业务规则、审批、触达政策和指标计算 |
++| `packages/db`、`packages/adapters` | JSON 仓储、配置和渠道协议 |
++| `tests`、`fixtures` | 自动化测试与合成数据 |
++| `scripts` | 数据迁移、备份恢复、安全扫描和性能测量 |
++| `spec`、`goals`、`TASKS.json` | 产品规格、里程碑和进度 |
++| `docs/BLOCKERS.md`、`docs/DECISIONS.md` | 未完成事项与技术决策 |
++| `artifacts/audit-remediation` | 审查修复记录与验证证据 |
+--- before/apps/web/src/server.ts
++++ after/apps/web/src/server.ts
+@@ -1,5 +1,5 @@
+ import http, { type IncomingMessage, type Server, type ServerResponse } from 'node:http';
+-import { createHash, createHmac, randomBytes, randomUUID } from 'node:crypto';
++import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+ import { URL } from 'node:url';
+ import { readConfig, validateConfig, connectorSnapshot, type AppConfig } from '../../../packages/adapters/src/config';
+ import { normalizeWhatsAppWebhookEvents, verifyWhatsAppWebhookChallenge } from '../../../packages/adapters/src/whatsapp';
+@@ -10,32 +10,28 @@
+   parseCookies,
+   safeActor,
+   signCookie,
+-  verifyCookie,
+-  type Permission
++  verifyCookie
+ } from '../../../packages/domain/src/auth';
+-import type { ActorContext, Campaign, Role } from '../../../packages/domain/src/types';
++import type { ActorContext, Campaign } from '../../../packages/domain/src/types';
+ import type { BrandDocument, BrandRevision, SourceType } from '../../../packages/domain/src/brand';
+ import type { SourceLink } from '../../../packages/domain/src/growth';
+ import type { ContentPackageData } from '../../../packages/domain/src/content';
+ import type { OutreachCampaign, SegmentRule } from '../../../packages/domain/src/crm';
+ import { generateDeterministicContent } from '../../../packages/domain/src/content-provider';
+ import { JsonRepository, verifyPassword, nowIso } from '../../../packages/db/src/repository';
+-import { parseMembersCsv, parseOrdersCsv, parseRefundsCsv, rowHash, type ImportKind } from '../../../packages/domain/src/imports';
++import { parseMembersCsv, parseOrdersCsv, parseRefundsCsv, type ImportKind } from '../../../packages/domain/src/imports';
+ import { computeMetricBundle } from '../../../packages/domain/src/metric-engine';
+ import { assessMetricQuality } from '../../../packages/domain/src/metric-quality';
+-import { ALLOWED_METRICS, SKILL_NAMES, type MetricEvidence, type RouterRequest, type SkillName } from '../../../packages/domain/src/control';
+-import { runDeterministicRouter, validateRouterRequest } from '../../../packages/domain/src/control-runtime';
++import type { RouterRequest } from '../../../packages/domain/src/control';
++import { runDeterministicRouter } from '../../../packages/domain/src/control-runtime';
+ import { orderCompleteThrough, queryMetrics, runControl } from '../../../packages/domain/src/control-service';
+-import { createHmac as createHmacForWebhook, timingSafeEqual } from 'node:crypto';
+-import { DomainError, explicitTimestamp } from '../../../packages/domain/src/validation';
++import { DomainError } from '../../../packages/domain/src/validation';
+ import { renderAdminPage, renderConsumerPage } from './ui';
+ 
+ const MAX_BODY_BYTES = 256 * 1024;
+ 
+ function sessionCookie(config: AppConfig, value: string, maxAge: number): string {
+-  // Session cookies must never be sent over cleartext HTTP in production.
+-  // Local/demo/test modes intentionally omit Secure so their HTTP test server
+-  // remains usable; production deployments are expected to terminate HTTPS.
++  // Production requires HTTPS; local modes support HTTP.
+   const secure = config.mode === 'production' ? '; Secure' : '';
+   return `adda_session=${encodeURIComponent(value)}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${maxAge}${secure}`;
+ }
+@@ -101,9 +97,7 @@
+     return;
+   }
+ 
+-  // A web process and the local worker may share the file-dev adapter. Reload
+-  // the atomically replaced snapshot at request boundaries so read routes do
+-  // not serve a stale tenant, kill-switch or delivery state.
++  // Reload changes written by another web process or worker.
+   await repository.load();
+ 
+   if (pathname === '/api/healthz' && method === 'GET') {
+@@ -152,8 +146,7 @@
+     return;
+   }
+ 
+-  // Public registration and consent endpoints deliberately carry only the
+-  // opaque source token; no member id or contact is placed in the URL.
++  // Public URLs carry opaque tokens, not contact details.
+   if (pathname === '/api/members/register' && method === 'POST') {
+     const body = await readJson(req);
+     const sourceToken = typeof body.source_token === 'string' ? body.source_token : '';
+@@ -266,9 +259,7 @@
+     return;
+   }
+ 
+-  // Meta's webhook verification handshake is intentionally unauthenticated:
+-  // the provider proves control of the configured verify token by echoing the
+-  // challenge. It must remain independent from an operator login session.
++  // Provider verification uses a token, independent of operator login.
+   if (pathname === '/api/connectors/whatsapp/webhook' && method === 'GET') {
+     const challenge = verifyWhatsAppWebhookChallenge({ mode: parsed.searchParams.get('hub.mode'), token: parsed.searchParams.get('hub.verify_token'), challenge: parsed.searchParams.get('hub.challenge') }, config.whatsappVerifyToken || '');
+     if (challenge === null) {
+@@ -280,8 +271,7 @@
+     return;
+   }
+ 
+-  // Provider webhooks are intentionally unauthenticated but are accepted only
+-  // after a provider signature check. They never create a send on their own.
++  // Provider callbacks require a signature, not an operator session.
+   if (pathname === '/api/connectors/whatsapp/webhook' && method === 'POST') {
+     const raw = await readRawBody(req);
+     const signature = String(req.headers['x-hub-signature-256'] || '');
+@@ -1688,28 +1678,6 @@
+   return { id: item.id, tenant_id: item.tenantId, store_id: item.storeId, store_ids: item.storeIds, version: item.version, as_of: item.asOf, complete_through: item.completeThrough, status: item.status, metrics: item.metrics, data_hash: item.dataHash, observations: item.observations, hypotheses: item.hypotheses, advice: item.advice, task_ids: item.taskIds, source_refs: item.sourceRefs, restated_from: item.restatedFrom, created_by: item.createdBy, created_at: item.createdAt };
+ }
+ 
+-function metricEvidenceForQueries(repository: JsonRepository, tenantId: string, storeIds: string[], queries: Array<{ metricKey: string; storeId?: string | null; asOf?: string }>, asOf: string): MetricEvidence[] {
+-  const scopedStoreIds = storeIds;
+-  const state = repository.snapshot();
+-  const orders = repository.listOrders(tenantId, scopedStoreIds);
+-  const completeThrough = orderCompleteThrough(state, tenantId, scopedStoreIds);
+-  const stores = scopedStoreIds.map((id) => state.stores.find((store) => store.id === id)).filter(Boolean);
+-  const bundle = computeMetricBundle({ orders, refunds: repository.listRefunds(tenantId, scopedStoreIds), members: repository.listMembers(tenantId, scopedStoreIds), attribution: repository.listAttribution(tenantId, scopedStoreIds), asOf, completeThrough, timezone: stores[0]?.timezone || 'Asia/Dhaka' });
+-  const sourceRefs = state.imports.filter((item) => item.tenantId === tenantId && scopedStoreIds.includes(item.storeId) && item.status === 'committed').map((item) => item.id);
+-  const byKey = new Map(bundle.results.map((item) => [item.metric_key, item]));
+-  const aliases: Record<string, string> = { orders_count: 'qualified_order_count', revenue_minor: 'net_revenue_minor', aov_minor: 'average_order_value_minor', repeat_purchase_rate: 'repeat_30d_rate', mature_30d_repeat_rate: 'repeat_30d_rate' };
+-  return queries.map((query) => {
+-    const key = aliases[query.metricKey] || query.metricKey;
+-    const found = byKey.get(key);
+-    const value = found && typeof found.value === 'number' ? found.value : null;
+-    const hasImport = state.imports.some((item) => item.tenantId === tenantId && scopedStoreIds.includes(item.storeId) && item.kind === 'orders' && item.status === 'committed');
+-    const freshness = assessMetricQuality({ hasData: orders.length > 0, hasImport, asOf, completeThrough });
+-    const quality: MetricEvidence['quality'] = freshness.quality;
+-    const evidence = { metricKey: query.metricKey, value: quality === 'missing' ? null : value, numerator: quality === 'missing' ? null : found?.numerator ?? null, denominator: quality === 'missing' ? null : found?.denominator ?? null, asOf, completeThrough, quality, sourceRefs: sourceRefs.length ? sourceRefs : [], id: `metric_${createHash('sha256').update(`${tenantId}|${storeIds.join(',')}|${query.metricKey}|${asOf}`).digest('hex').slice(0, 24)}`, storeIds, formulaVersion: 'metric-engine-v2-scoped', missingReason: freshness.missingReason, recordRefs: { orders: orders.map(item => item.id), refunds: [], members: [] } };
+-    return evidence;
+-  });
+-}
+-
+ async function readRawBody(req: IncomingMessage): Promise<Buffer> {
+   const chunks: Buffer[] = [];
+   let length = 0;
+@@ -1719,7 +1687,7 @@
+ 
+ function verifyWebhookSignature(raw: Buffer, signature: string, secret: string): boolean {
+   if (!/^sha256=[a-f0-9]{64}$/i.test(signature)) return false;
+-  const expected = createHmacForWebhook('sha256', secret).update(raw).digest('hex');
++  const expected = createHmac('sha256', secret).update(raw).digest('hex');
+   const provided = signature.slice('sha256='.length);
+   const a = Buffer.from(provided, 'hex'); const b = Buffer.from(expected, 'hex');
+   return a.length === b.length && timingSafeEqual(a, b);
+--- before/apps/worker/src/index.ts
++++ after/apps/worker/src/index.ts
+@@ -10,8 +10,7 @@
+   await repository.ensure();
+   await repository.migrate();
+   const instanceId = `worker-${randomUUID()}`;
+-  // A lease is deliberately longer than one heartbeat interval so a brief
+-  // scheduling delay does not cause another worker to steal live work.
++  // Allow missed heartbeats before another worker can recover the job.
+   const leaseSeconds = Math.max(config.workerHeartbeatSeconds * 3, 30);
+   await repository.heartbeat(instanceId);
+   const recoveredJobs = await repository.recoverInterruptedJobs();
+--- before/packages/db/src/repository.ts
++++ after/packages/db/src/repository.ts
+@@ -35,8 +35,7 @@
+   ParsedMember,
+   ParsedOrder,
+   ParsedRefund,
+-  RefundRecord,
+-  SourceWatermark
++  RefundRecord
+ } from '../../domain/src/imports';
+ import type {
+   ConsentEvent,
+@@ -50,7 +49,7 @@
+ import { validateContentPackage, type ContentApproval, type ContentBrief, type ContentRevision, type PublicationIntent, type PublicationReceipt } from '../../domain/src/content';
+ import { defaultEventTemplates, type EventCheckin, type EventRecord, type EventRegistration, type EventTemplate, type PartnerRecord, type ReferralRecord, type RewardLedgerEntry } from '../../domain/src/campus';
+ import type { AudienceSnapshot, MessageAttempt, OutreachCampaign, SegmentDefinition, SegmentRule } from '../../domain/src/crm';
+-import type { FeedbackRecord, FeedbackClassification, SupportCase, ReplyRevision, VoiceTask } from '../../domain/src/voice';
++import type { FeedbackRecord, SupportCase, ReplyRevision, VoiceTask } from '../../domain/src/voice';
+ import { classifyFeedback, hashFeedbackCustomer, redactFeedbackText } from '../../domain/src/voice';
+ import type { ConnectorState, DeliveryIntent, WebhookEvent, DeliveryStatus } from '../../domain/src/connectors';
+ import { canAdvanceDelivery } from '../../domain/src/connectors';
+@@ -157,10 +156,7 @@
+   }
+ }
+ 
+-/**
+- * File repository used by local/test mode. The interface intentionally mirrors
+- * the transaction boundary needed by the future Prisma/PostgreSQL adapter.
+- */
++/** JSON storage for local development and tests. */
+ export class JsonRepository {
+   private state: DatabaseState | null = null;
+   private writeQueue: Promise<void> = Promise.resolve();
+@@ -800,7 +796,7 @@
+   }
+   findContentRevision(id: string): ContentRevision | undefined { return this.requireState().contentRevisions.find((item) => item.id === id); }
+   listContentRevisions(tenantId: string, storeIds: string[]): ContentRevision[] { return this.requireState().contentRevisions.filter((item) => item.tenantId === tenantId && this.requireState().contentBriefs.some((brief) => brief.id === item.briefId && storeIds.includes(brief.storeId))); }
+-  async updateContentRevision(id: string, packageData: ContentRevision['packageData'], actorUserId: string): Promise<ContentRevision | undefined> {
++  async updateContentRevision(id: string, packageData: ContentRevision['packageData'], _actorUserId: string): Promise<ContentRevision | undefined> {
+     return this.mutate((state) => {
+       if (validateContentPackage(packageData).length) throw new Error('content_schema_invalid');
+       const current = state.contentRevisions.find((item) => item.id === id);
+@@ -1047,9 +1043,7 @@
+       const holdoutPercent = Number.isFinite(input.holdoutPercent) ? Math.max(0, Math.min(100, Math.round(input.holdoutPercent as number))) : 10;
+       const seed = input.seed?.trim() || hashOpaque(`${input.tenantId}:${segment.id}:holdout-v1`);
+       const sortedMemberIds = [...preview.memberIds].sort();
+-      // A repeated preview with the same frozen member set/seed reuses the
+-      // snapshot even if the request timestamp differs by a few milliseconds.
+-      // This is what makes retries idempotent and keeps holdout assignments stable.
++      // Reuse the frozen audience on retries, regardless of request time.
+       const existing = state.audienceSnapshots.find((item) => item.tenantId === input.tenantId && item.segmentId === segment.id && item.seed === seed && item.holdoutPercent === holdoutPercent && item.storeId === (input.storeId || null) && item.memberIds.length === sortedMemberIds.length && item.memberIds.every((memberId, index) => memberId === sortedMemberIds[index]));
+       if (existing) return { snapshot: existing, preview };
+       const assignments: Record<string, 'treatment' | 'holdout'> = {};
+@@ -1125,27 +1119,14 @@
+     const expectedHash = outreachApprovalHash(campaign, snapshot, segment.version);
+     if (!campaign.approvalHash || campaign.approvalHash !== expectedHash) throw new Error('stale_outreach_approval');
+     const dispatchTime = this.mode === 'test' && input.now && Number.isFinite(Date.parse(input.now)) ? input.now : nowIso();
+-    const quiet = isOutsideAllowedWindow(dispatchTime, campaign.quietStartLocal, campaign.quietEndLocal, state.stores.find((store) => store.id === campaign.storeId)?.timezone || 'Asia/Dhaka');
+-    let spent = state.messageAttempts.filter((item) => item.outreachId === campaign.id && ['sent_test', 'queued'].includes(item.status)).reduce((sum) => sum + campaign.costPerAttemptMinor, 0);
++    const quiet = outsideOutreachWindow(state, campaign, dispatchTime);
++    let spent = outreachSpend(state, campaign);
+     const items: Array<{ memberId: string; assignment: 'treatment' | 'holdout'; status: MessageAttempt['status'] | 'eligible'; reason: string | null }> = [];
+     for (const memberId of snapshot.memberIds) {
+       const assignment = snapshot.assignments[memberId] || 'treatment';
+-      const member = state.members.find((item) => item.id === memberId && item.tenantId === input.tenantId && item.storeId === campaign.storeId);
+-      const decision = evaluateDispatchPolicy({
+-        assignment,
+-        hasContact: Boolean(member?.contactHmac),
+-        contactVerified: Boolean(member?.contactVerified),
+-        verificationExpiresAt: member?.verificationExpiresAt,
+-        consentGranted: member ? marketingConsentForChannel(state, input.tenantId, member.id, campaign.channel) : false,
+-        frequencyLimited: member ? hasRecentMessage(state, input.tenantId, member.id, campaign.frequencyCapDays, Date.parse(dispatchTime), campaign.id) : false,
+-        outsideQuietHours: quiet,
+-        budgetAvailable: spent + campaign.costPerAttemptMinor <= campaign.budgetMinor,
+-        now: dispatchTime
+-      });
+-      const status: MessageAttempt['status'] | 'eligible' = decision.status;
+-      const reason = decision.reason;
++      const decision = evaluateMemberDispatch(state, campaign, { memberId, assignment, now: dispatchTime, quiet, spent });
+       if (decision.status === 'eligible') spent += campaign.costPerAttemptMinor;
+-      items.push({ memberId, assignment, status, reason });
++      items.push({ memberId, assignment, ...decision });
+     }
+     return { items, blockedCount: items.filter((item) => item.status !== 'eligible').length };
+   }
+@@ -1193,35 +1174,23 @@
+       const dispatchTime = this.mode === 'test' && input.now && Number.isFinite(Date.parse(input.now)) ? input.now : nowIso();
+       const dispatchKey = input.idempotencyKey || `${campaign.id}:${snapshot.policyHash}`;
+       const attempts: MessageAttempt[] = [];
+-      let spent = state.messageAttempts.filter((item) => item.outreachId === campaign.id && ['sent_test', 'queued'].includes(item.status)).reduce((sum) => sum + campaign.costPerAttemptMinor, 0);
+-      const quiet = isOutsideAllowedWindow(dispatchTime, campaign.quietStartLocal, campaign.quietEndLocal, state.stores.find((store) => store.id === campaign.storeId)?.timezone || 'Asia/Dhaka');
+-      const assignedIds = [...snapshot.memberIds];
+-      for (const memberId of assignedIds) {
++      let spent = outreachSpend(state, campaign);
++      const quiet = outsideOutreachWindow(state, campaign, dispatchTime);
++      for (const memberId of snapshot.memberIds) {
+         const assignment = snapshot.assignments[memberId] || 'treatment';
+         const previous = state.messageAttempts.find((item) => item.outreachId === campaign.id && item.memberId === memberId && item.status !== 'failed');
+         if (previous) { attempts.push(previous); continue; }
+-        const member = state.members.find((item) => item.id === memberId && item.tenantId === input.tenantId && item.storeId === campaign.storeId);
+         let status: MessageAttempt['status'] = 'queued';
+         let reason: string | null = null;
+         let providerReference: string | null = null;
+-        const decision = evaluateDispatchPolicy({
+-          assignment,
+-          hasContact: Boolean(member?.contactHmac),
+-          contactVerified: Boolean(member?.contactVerified),
+-          verificationExpiresAt: member?.verificationExpiresAt,
+-          consentGranted: member ? marketingConsentForChannel(state, input.tenantId, member.id, campaign.channel) : false,
+-          frequencyLimited: member ? hasRecentMessage(state, input.tenantId, member.id, campaign.frequencyCapDays, Date.parse(dispatchTime), campaign.id) : false,
+-          outsideQuietHours: quiet,
+-          budgetAvailable: spent + campaign.costPerAttemptMinor <= campaign.budgetMinor,
+-          now: dispatchTime
+-        });
++        const decision = evaluateMemberDispatch(state, campaign, { memberId, assignment, now: dispatchTime, quiet, spent });
+         if (decision.status !== 'eligible') {
+           status = decision.status;
+           reason = decision.reason;
+         } else if (!input.allowTestOutbox) {
+           status = 'external_blocked'; reason = 'live_connector_unconfigured';
+         } else {
+-          status = 'sent_test'; reason = 'test_outbox_only'; providerReference = `test-outbox:${hashOpaque(dispatchKey).slice(0, 16)}:${hashOpaque(member?.id || memberId).slice(0, 16)}`;
++          status = 'sent_test'; reason = 'test_outbox_only'; providerReference = `test-outbox:${hashOpaque(dispatchKey).slice(0, 16)}:${hashOpaque(memberId).slice(0, 16)}`;
+           spent += campaign.costPerAttemptMinor;
+         }
+         const attempt: MessageAttempt = { id: randomUUID(), tenantId: input.tenantId, outreachId: campaign.id, memberId, assignment, status, reason, providerReference, createdAt: dispatchTime };
+@@ -1268,9 +1237,6 @@
+       };
+       state.feedback.push(feedback);
+       state.feedbackClassifications.push({ id: randomUUID(), tenantId: input.tenantId, feedbackId: feedback.id, tags: feedback.tags, evidence: classified.evidence, method: 'rule', actorUserId: input.createdBy || null, createdAt: nowIso() });
+-      // Every feedback item has an owned, SLA-bound case. Urgent risks use the
+-      // shorter SLA and safety escalation task; ordinary records remain in the
+-      // same auditable loop instead of disappearing into a tag-only inbox.
+       const supportCase: SupportCase = createSupportCaseInState(state, feedback, input.createdBy || null);
+       return { feedback, supportCase, deduplicated: false };
+     });
+@@ -1395,21 +1361,14 @@
+         const snapshot = state.audienceSnapshots.find((item) => item.id === campaign.audienceSnapshotId && item.tenantId === campaign.tenantId);
+         return Boolean(snapshot?.memberIds.includes(input.memberId));
+       });
+-      requireCondition(Boolean(approvedOutreach), 'approved_outreach_required', 409);
+-      const snapshot = state.audienceSnapshots.find((item) => item.id === approvedOutreach!.audienceSnapshotId && item.tenantId === input.tenantId);
+-      const member = state.members.find((item) => item.id === input.memberId && item.tenantId === input.tenantId && item.storeId === input.storeId);
++      requireCondition(approvedOutreach, 'approved_outreach_required', 409);
++      const snapshot = state.audienceSnapshots.find((item) => item.id === approvedOutreach.audienceSnapshotId && item.tenantId === input.tenantId);
+       const dispatchTime = nowIso();
+-      const quiet = isOutsideAllowedWindow(dispatchTime, approvedOutreach!.quietStartLocal, approvedOutreach!.quietEndLocal, state.stores.find((store) => store.id === input.storeId)?.timezone || 'Asia/Dhaka');
+-      const spent = state.messageAttempts.filter((item) => item.outreachId === approvedOutreach!.id && ['sent_test', 'queued'].includes(item.status)).reduce((sum, item) => sum + approvedOutreach!.costPerAttemptMinor, 0);
+-      const policy = evaluateDispatchPolicy({
++      const policy = evaluateMemberDispatch(state, approvedOutreach, {
++        memberId: input.memberId,
+         assignment: snapshot?.assignments[input.memberId] || 'treatment',
+-        hasContact: Boolean(member?.contactHmac),
+-        contactVerified: Boolean(member?.contactVerified),
+-        verificationExpiresAt: member?.verificationExpiresAt,
+-        consentGranted: member ? marketingConsentForChannel(state, input.tenantId, member.id, approvedOutreach!.channel) : false,
+-        frequencyLimited: member ? hasRecentMessage(state, input.tenantId, member.id, approvedOutreach!.frequencyCapDays, Date.parse(dispatchTime), approvedOutreach!.id) : false,
+-        outsideQuietHours: quiet,
+-        budgetAvailable: spent + approvedOutreach!.costPerAttemptMinor <= approvedOutreach!.budgetMinor,
++        quiet: outsideOutreachWindow(state, approvedOutreach, dispatchTime),
++        spent: outreachSpend(state, approvedOutreach),
+         now: dispatchTime
+       });
+       const connector = state.connectorStates.find((item) => item.tenantId === input.tenantId && item.provider === input.provider);
+@@ -1489,12 +1448,7 @@
+     return this.requireState().jobs.filter((job) => tenantId === undefined || job.tenantId === tenantId);
+   }
+ 
+-  /**
+-   * Requeue only jobs whose worker lease has expired. The previous
+-   * implementation requeued every running job, which allowed a second worker
+-   * to take work away from a live worker. Jobs written before leases existed
+-   * are deliberately treated as stale and recovered once.
+-   */
++  /** Recover expired leases and legacy jobs without lease metadata. */
+   async recoverInterruptedJobs(now: string | Date = new Date()): Promise<number> {
+     return this.mutate((state) => {
+       const nowMs = typeof now === 'string' ? Date.parse(now) : now.getTime();
+@@ -1503,8 +1457,6 @@
+       for (const job of state.jobs) {
+         if (job.status !== 'running') continue;
+         const leaseMs = job.leaseExpiresAt ? Date.parse(job.leaseExpiresAt) : Number.NaN;
+-        // A running job without a lease is a legacy/interrupted record. A
+-        // valid future lease belongs to a worker that may still be processing.
+         if (Number.isFinite(leaseMs) && leaseMs > cutoff) continue;
+         job.status = 'queued';
+         job.lastError = 'worker_interrupted_requeued';
+@@ -1551,11 +1503,7 @@
+     });
+   }
+ 
+-  /**
+-   * Complete a job only when the caller still owns its lease. This prevents a
+-   * stale worker from completing a job that has already been recovered and
+-   * claimed by another worker.
+-   */
++  /** A stale worker cannot finish a job claimed by another worker. */
+   async finishJob(id: string, status: 'succeeded' | 'failed', lastError: string | null = null, workerId?: string, leaseToken?: string): Promise<Job | undefined> {
+     return this.mutate((state) => {
+       const job = state.jobs.find((item) => item.id === id);
+@@ -1635,18 +1583,48 @@
+ }
+ 
+ function currentMarketingConsent(state: RepositoryState, tenantId: string, memberId: string): boolean {
+-  const events = state.consentEvents.filter((event) => event.tenantId === tenantId && event.memberId === memberId && event.purpose === 'marketing').sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
++  return marketingConsentForChannel(state, tenantId, memberId, 'manual');
++}
++
++function marketingConsentForChannel(state: RepositoryState, tenantId: string, memberId: string, channel: OutreachCampaign['channel']): boolean {
++  const applies = (event: ConsentEvent | SuppressionEntry) =>
++    event.tenantId === tenantId && event.memberId === memberId && event.purpose === 'marketing' &&
++    (channel === 'manual' || event.channel === channel || event.channel === 'unknown');
++  const events = state.consentEvents.filter(applies).sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
+   const latest = events[0];
+   if (!latest?.granted) return false;
+-  return !state.suppressionEntries.some((entry) => entry.tenantId === tenantId && entry.memberId === memberId && entry.purpose === 'marketing' && Date.parse(entry.occurredAt) >= Date.parse(latest.occurredAt));
+-}
+-
+-function marketingConsentForChannel(state: RepositoryState, tenantId: string, memberId: string, channel: OutreachCampaign['channel']): boolean {
+-  if (channel === 'manual') return currentMarketingConsent(state, tenantId, memberId);
+-  const events = state.consentEvents.filter((event) => event.tenantId === tenantId && event.memberId === memberId && event.purpose === 'marketing' && (event.channel === channel || event.channel === 'unknown')).sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
+-  const latest = events[0];
+-  if (!latest?.granted) return false;
+-  return !state.suppressionEntries.some((entry) => entry.tenantId === tenantId && entry.memberId === memberId && entry.purpose === 'marketing' && (entry.channel === channel || entry.channel === 'unknown') && Date.parse(entry.occurredAt) >= Date.parse(latest.occurredAt));
++  return !state.suppressionEntries.some((entry) => applies(entry) && Date.parse(entry.occurredAt) >= Date.parse(latest.occurredAt));
++}
++
++function outreachSpend(state: RepositoryState, campaign: OutreachCampaign): number {
++  return state.messageAttempts
++    .filter((item) => item.outreachId === campaign.id && ['sent_test', 'queued'].includes(item.status))
++    .reduce((sum) => sum + campaign.costPerAttemptMinor, 0);
++}
++
++function outsideOutreachWindow(state: RepositoryState, campaign: OutreachCampaign, now: string): boolean {
++  const timezone = state.stores.find((store) => store.id === campaign.storeId)?.timezone || 'Asia/Dhaka';
++  return isOutsideAllowedWindow(now, campaign.quietStartLocal, campaign.quietEndLocal, timezone);
++}
++
++function evaluateMemberDispatch(
++  state: RepositoryState,
++  campaign: OutreachCampaign,
++  input: { memberId: string; assignment: 'treatment' | 'holdout'; now: string; quiet: boolean; spent: number }
++) {
++  const { tenantId, storeId } = campaign;
++  const member = state.members.find((item) => item.id === input.memberId && item.tenantId === tenantId && item.storeId === storeId);
++  return evaluateDispatchPolicy({
++    assignment: input.assignment,
++    hasContact: Boolean(member?.contactHmac),
++    contactVerified: Boolean(member?.contactVerified),
++    verificationExpiresAt: member?.verificationExpiresAt,
++    consentGranted: member ? marketingConsentForChannel(state, tenantId, member.id, campaign.channel) : false,
++    frequencyLimited: member ? hasRecentMessage(state, tenantId, member.id, campaign.frequencyCapDays, Date.parse(input.now), campaign.id) : false,
++    outsideQuietHours: input.quiet,
++    budgetAvailable: input.spent + campaign.costPerAttemptMinor <= campaign.budgetMinor,
++    now: input.now
++  });
+ }
+ 
+ function segmentRuleMatches(state: RepositoryState, member: MemberRecord, rule: SegmentRule, asOf: string, eventId: string | null): { ok: boolean; reason: string } {
+--- before/packages/domain/src/metric-engine.ts
++++ after/packages/domain/src/metric-engine.ts
+@@ -37,7 +37,6 @@
+   try { return new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(value)); }
+   catch { return value.slice(0, 10); }
+ }
+-function daysBetween(later: string, earlier: string): number { return (dateMs(later) - dateMs(earlier)) / 86_400_000; }
+ 
+ export function computeMetricBundle(input: MetricEngineInput): MetricBundle {
+   const asOfMs = dateMs(input.asOf);

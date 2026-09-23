@@ -1,0 +1,56 @@
+{
+  "name": "adda-growth-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ADDA Growth OS \u2014 executable G00-G10 offline vertical slices",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "dev": "node --import tsx apps/web/src/server.ts",
+    "start": "node dist/apps/web/src/server.js",
+    "worker": "node --import tsx apps/worker/src/index.ts",
+    "test:unit": "node --test --import tsx tests/unit.test.ts",
+    "test:g01": "node --test --import tsx tests/g01.test.ts",
+    "test:g02": "node --test --import tsx tests/g02.test.ts",
+    "test:g03": "node --test --import tsx tests/g03.test.ts",
+    "test:g04": "node --test --import tsx tests/g04.test.ts",
+    "test:g05": "node --test --import tsx tests/g05.test.ts",
+    "test:g06": "node --test --import tsx tests/g06.test.ts",
+    "test:g07-g10": "node --test --import tsx tests/g07-g10.test.ts",
+    "test:metrics-remediation": "node --test --import tsx tests/metrics-remediation.test.ts",
+    "test:whatsapp-remediation": "node --test --import tsx tests/whatsapp-remediation.test.ts",
+    "test:jobs-cookie-remediation": "node --test --import tsx tests/jobs-cookie-remediation.test.ts",
+    "test:audit-remediation-p0": "node --test --import tsx tests/audit-remediation-p0.test.ts",
+    "test:integration": "node --test --import tsx tests/integration.test.ts",
+    "test:e2e": "node --test --import tsx tests/e2e.test.ts",
+    "test:ai": "node scripts/test-ai-contracts.mjs",
+    "test": "npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e && npm run test:audit-n01-n08 && npm run test:audit-b01-b05 && npm run test:validation-evidence && npm run test:usability-regressions",
+    "db:migrate": "node --import tsx scripts/migrate.ts",
+    "db:seed:demo": "node --import tsx scripts/seed-demo.ts",
+    "fixtures:verify": "node scripts/verify-fixtures.mjs",
+    "backup": "node --import tsx scripts/backup.ts",
+    "restore": "node --import tsx scripts/restore.ts",
+    "security:scan": "node scripts/security-scan.mjs",
+    "performance": "node --import tsx scripts/performance.ts",
+    "test:audit-n01-n08": "node --test --import tsx tests/audit-n01-n08.test.ts",
+    "validate:release": "node scripts/validate-release.mjs",
+    "capabilities": "node scripts/capabilities.mjs",
+    "test:audit-b01-b05": "node --test --import tsx tests/audit-b01-b05.test.ts",
+    "test:validation-evidence": "node --test tests/validation-evidence.test.mjs",
+    "test:usability-regressions": "node --test --import tsx tests/usability-regressions.test.ts",
+    "test:codebuddy-ai": "node scripts/test-codebuddy-ai.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

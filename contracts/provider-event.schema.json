@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProviderEvent",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "provider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "external_event_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "external_object_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "state": {
+      "enum": [
+        "accepted",
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "revoked",
+        "opted_out",
+        "unknown"
+      ]
+    },
+    "payload_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "signature_verified": {
+      "const": true
+    }
+  },
+  "required": [
+    "provider",
+    "external_event_id",
+    "external_object_id",
+    "occurred_at",
+    "received_at",
+    "state",
+    "payload_ref",
+    "signature_verified"
+  ]
+}

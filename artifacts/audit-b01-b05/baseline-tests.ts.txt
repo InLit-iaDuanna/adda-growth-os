@@ -1,0 +1,115 @@
+import test, { type TestContext } from 'node:test';
+import assert from 'node:assert/strict';
+import { startTestApp, TestClient } from '../packages/testing/src/http';
+
+const tenantId = 'ten_demo_01';
+const storeId = 'sto_demo_01';
+const asOf = '2026-03-01T00:00:00Z';
+const post = (client: TestClient, url: string, body = {}) => client.request(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+
+async function setup(t: TestContext) {
+  const app = await startTestApp({ seedDemo: true });
+  t.after(() => app.close());
+  const owner = new TestClient(app.baseUrl);
+  assert.equal((await owner.login('owner@demo.adda.local')).response.status, 200);
+  return { app, owner };
+}
+
+async function importOrders(owner: TestClient, source: string, paidAt: string, amount = 1000) {
+  const content = `tenant_id,store_id,source,external_order_id,member_id,paid_at,currency,amount_paid_minor,status\n${tenantId},${storeId},${source},ORDER-001,MEMBER-001,${paidAt},BDT,${amount},paid`;
+  const preview = await post(owner, '/api/imports/preview', { kind: 'orders', content, source, store_id: storeId, complete_through: asOf });
+  assert.equal(preview.response.status, 201, JSON.stringify(preview.body));
+  assert.equal(preview.body.preview.valid_row_count, 1);
+  const committed = await post(owner, `/api/imports/${preview.body.import.id}/commit`);
+  assert.equal(committed.response.status, 200);
+  return committed;
+}
+
+const metrics = (owner: TestClient) => owner.request(`/api/metrics?store_id=${storeId}&as_of=${asOf}`);
+const touch = (owner: TestClient, occurredAt: string, extra = {}) => post(owner, '/api/attribution/evidence', { store_id: storeId, order_external_id: 'ORDER-001', campaign_id: 'synthetic-campaign', method: 'linked_first_party_touch', occurred_at: occurredAt, ...extra });
+
+async function createProduct(owner: TestClient) {
+  const result = await post(owner, '/api/products', { store_id: storeId, external_sku: 'THIRD-AUDIT', names: { en: 'Milk Tea' } });
+  assert.equal(result.response.status, 201);
+  return result.body.item.id as string;
+}
+
+async function content(owner: TestClient, expiresAt: string | null = null) {
+  const brand = await post(owner, '/api/brand/documents', { source_type: 'form', source_label: 'synthetic third audit', content: JSON.stringify({ brand_name: 'ADDA TEA' }) });
+  assert.equal((await post(owner, `/api/brand/revisions/${brand.body.revision.id}/approve`)).response.status, 200);
+  const productId = await createProduct(owner);
+  const price = await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, status: 'approved', valid_from: '2025-01-01T00:00:00Z', valid_to: null });
+  assert.equal(price.response.status, 201);
+  const asset = await post(owner, '/api/media-assets', { store_id: storeId, storage_key: 'synthetic/third-audit.jpg', checksum: 'third-audit', rights_status: 'approved', allowed_uses: ['organic_social'], expires_at: expiresAt });
+  assert.equal(asset.response.status, 201);
+  const campaign = await post(owner, '/api/campaigns', { name: 'Third audit', objective: 'orders', store_id: storeId, product_ids: [productId], asset_ids: [asset.body.item.id] });
+  assert.equal(campaign.response.status, 201);
+  const generated = await post(owner, '/api/content/generate', { campaign_id: campaign.body.item.id });
+  assert.equal(generated.response.status, 201);
+  const revisionId = generated.body.revision.id as string;
+  assert.equal((await post(owner, `/api/content/${revisionId}/review-bn`)).response.status, 200);
+  return { revisionId, productId, priceId: price.body.item.id as string, assetId: asset.body.item.id as string, brandId: brand.body.revision.id as string, campaignId: campaign.body.item.id as string };
+}
+
+test('B01: source-scoped order numbers count as distinct cross-day purchases', async t => {
+  const { app, owner } = await setup(t);
+  await app.repository.createMember({ tenantId, storeId, externalMemberId: 'MEMBER-001', displayName: null, registeredAt: '2025-12-01T00:00:00Z', language: 'en', contact: null, contactHmac: null, publicAccessTokenHash: null, isSynthetic: true });
+  await importOrders(owner, 'pos', '2026-01-01T10:00:00Z');
+  await importOrders(owner, 'delivery', '2026-01-02T10:00:00Z');
+  const { body } = await metrics(owner);
+  assert.equal(body.summary.qualified_order_count, 2);
+  assert.equal(body.summary.mature_30d_cohort_count, 1);
+  assert.equal(body.summary.repeat_30d_count, 1);
+  assert.equal(body.summary.repeat_30d_rate, 1);
+});
+
+test('B02: a first-party touch 31 days before purchase stays unknown', async t => {
+  const { owner } = await setup(t);
+  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
+  assert.equal((await touch(owner, '2026-01-01T10:00:00Z')).response.status, 201);
+  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 1000 });
+});
+
+test('B03: ambiguous external order references are rejected without attribution writes', async t => {
+  const { app, owner } = await setup(t);
+  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z', 1000);
+  await importOrders(owner, 'delivery', '2026-02-01T11:00:00Z', 9000);
+  const result = await touch(owner, '2026-01-31T10:00:00Z');
+  assert.equal(result.response.status, 409);
+  assert.equal(result.body.error_code, 'order_reference_ambiguous');
+  assert.equal(app.repository.snapshot().attributionEvidence.length, 0);
+  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 10000 });
+});
+
+test('B04: malformed price dates are rejected before creating a version', async t => {
+  const { app, owner } = await setup(t);
+  const productId = await createProduct(owner);
+  const result = await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, status: 'approved', valid_from: 'not-a-date', valid_to: 'not-a-date' });
+  assert.equal(result.response.status, 400);
+  assert.equal(app.repository.snapshot().priceVersions.length, 0);
+  assert.equal(app.repository.findProduct(productId)!.currentPriceVersionId, null);
+});
+
+test('B05: malformed asset expiry is rejected before creating an asset', async t => {
+  const { app, owner } = await setup(t);
+  const result = await post(owner, '/api/media-assets', { store_id: storeId, storage_key: 'synthetic/bad.jpg', checksum: 'bad-expiry', rights_status: 'approved', allowed_uses: ['organic_social'], expires_at: 'not-a-date' });
+  assert.equal(result.response.status, 400);
+  assert.equal(app.repository.snapshot().mediaAssets.length, 0);
+});
+
+test('B02 control: a touch two days before purchase is attributed', async t => {
+  const { owner } = await setup(t);
+  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
+  assert.equal((await touch(owner, '2026-01-30T10:00:00Z')).response.status, 201);
+  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 0, 'synthetic-campaign': 1000 });
+});
+
+test('B05 control: a valid but expired asset blocks submission and export', async t => {
+  const { app, owner } = await setup(t);
+  const { revisionId } = await content(owner, '2020-01-01T00:00:00Z');
+  const submit = await post(owner, '/api/content/submit', { revision_id: revisionId });
+  assert.equal(submit.response.status, 409);
+  assert.equal(submit.body.error_code, 'asset_rights_expired');
+  assert.equal((await post(owner, '/api/content/export', { revision_id: revisionId })).response.status, 404); // No approval exists after rejected submission.
+  assert.equal(app.repository.snapshot().publicationIntents.length, 0);
+});

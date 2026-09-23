@@ -1,0 +1,1622 @@
+--- a/apps/web/src/server.ts
++++ b/apps/web/src/server.ts
+@@ -25,7 +25,8 @@
+ import type { RouterRequest } from '../../../packages/domain/src/control';
+ import { runDeterministicRouter } from '../../../packages/domain/src/control-runtime';
+ import { queryMetrics, runControl } from '../../../packages/domain/src/control-service';
+-import { DomainError } from '../../../packages/domain/src/validation';
++import { ATTRIBUTION_MODEL } from '../../../packages/domain/src/attribution-policy';
++import { DomainError, timestampInput, requireTimeRange } from '../../../packages/domain/src/validation';
+ import { renderAdminPage, renderConsumerPage } from './ui';
+ 
+ const MAX_BODY_BYTES = 256 * 1024;
+@@ -744,8 +745,8 @@
+     const campaignId = typeof body.campaign_id === 'string' ? body.campaign_id : '';
+     const campaign = repository.findCampaign(campaignId);
+     if (!campaign || campaign.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(campaign.storeId)) return notFound(res, requestId);
+-    const validFrom = typeof body.valid_from === 'string' && Number.isFinite(Date.parse(body.valid_from)) ? body.valid_from : nowIso();
+-    const validTo = typeof body.valid_to === 'string' && Number.isFinite(Date.parse(body.valid_to)) ? body.valid_to : new Date(Date.now() + 86_400_000).toISOString();
++    const validFrom = timestampInput(body.valid_from, 'valid_from', nowIso());
++    const validTo = timestampInput(body.valid_to, 'valid_to', new Date(Date.now() + 86_400_000).toISOString());
+     if (Date.parse(validTo) <= Date.parse(validFrom)) return badRequest(res, requestId, 'invalid_offer_window');
+     const offer = await repository.createOffer({ tenantId: context.actor.tenantId, storeId: campaign.storeId, campaignId, name: typeof body.name === 'string' ? body.name.slice(0, 120) : 'approved offer', terms: typeof body.terms === 'string' ? body.terms : 'Terms require operator confirmation', validFrom, validTo, maxRedemptions: Number.isSafeInteger(body.max_redemptions) && body.max_redemptions > 0 ? body.max_redemptions : null, createdBy: context.actor.userId });
+     sendJson(res, 201, { item: publicOffer(offer) });
+@@ -778,7 +779,7 @@
+     const body = await readJson(req);
+     const storeId = typeof body.store_id === 'string' ? body.store_id : '';
+     if (!context.actor.storeIds.includes(storeId)) return notFound(res, requestId);
+-    const result = await repository.matchCoupon(decodeURIComponent(couponMatch[1]), context.actor.tenantId, storeId, typeof body.pos_order_ref === 'string' ? body.pos_order_ref : '');
++    const result = await repository.matchCoupon(decodeURIComponent(couponMatch[1]), context.actor.tenantId, storeId, typeof body.pos_order_ref === 'string' ? body.pos_order_ref : '', body.order_source, body.order_id);
+     if (!result.coupon) { sendJson(res, 409, { error_code: result.errorCode || 'pos_match_failed', message: 'POS 订单尚未核验 / POS match failed', retryable: false }); return; }
+     sendJson(res, 200, { coupon: publicCoupon(result.coupon), revenue_effect: 'eligible_after_authoritative_pos_import' });
+     return;
+@@ -879,7 +880,7 @@
+     if (!revision || !brief || revision.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(brief.storeId)) return notFound(res, requestId);
+     if (revision.packageData.needs_input.length) { sendJson(res, 409, { error_code: 'content_needs_input', message: '内容仍缺少批准资料', retryable: false, needs_input: revision.packageData.needs_input }); return; }
+     if (revision.packageData.variants.some((variant) => variant.locale === 'bn' && variant.review_status !== 'reviewed')) { sendJson(res, 409, { error_code: 'bn_review_required', message: '孟语版本需要本地人工复核', retryable: false }); return; }
+-    const approval = await repository.createContentApproval({ tenantId: context.actor.tenantId, resourceRevisionId: revision.id, payloadHash: revision.contentHash, expiresAt: typeof body.expires_at === 'string' ? body.expires_at : new Date(Date.now() + 7 * 86_400_000).toISOString() });
++    const approval = await repository.createContentApproval({ tenantId: context.actor.tenantId, resourceRevisionId: revision.id, payloadHash: revision.contentHash, expiresAt: timestampInput(body.expires_at, 'expires_at', new Date(Date.now() + 7 * 86_400_000).toISOString()) });
+     sendJson(res, 201, { approval: publicContentApproval(approval) });
+     return;
+   }
+@@ -1120,8 +1121,8 @@
+     const result = await repository.createBrandDocument({
+       tenantId: context.actor.tenantId, storeId, sourceType, sourceLabel: typeof body.source_label === 'string' ? body.source_label : 'operator_input',
+       sourceUri: typeof body.source_uri === 'string' ? body.source_uri : null, checksum, createdBy: context.actor.userId, content,
+-      effectiveFrom: typeof body.effective_from === 'string' ? body.effective_from : null,
+-      effectiveTo: typeof body.effective_to === 'string' ? body.effective_to : null, conflictKeys
++      effectiveFrom: timestampInput(body.effective_from, 'effective_from', null),
++      effectiveTo: timestampInput(body.effective_to, 'effective_to', null), conflictKeys
+     });
+     await repository.audit({ tenantId: context.actor.tenantId, storeId, actorUserId: context.actor.userId, action: 'brand.document.created', resourceType: 'brand_revision', resourceId: result.revision.id, metadata: { status: result.revision.status, checksum } });
+     sendJson(res, 201, { document: publicDocument(result.document), revision: publicRevision(result.revision), facts: result.facts.map(publicFact) });
+@@ -1179,9 +1180,12 @@
+     const needsInput: string[] = [];
+     if (!Object.values(names).some((value) => typeof value === 'string' && value.trim())) needsInput.push('product_name');
+     if (body.price_minor === undefined || body.price_minor === null) needsInput.push('price');
++    const validFrom = timestampInput(body.valid_from, 'valid_from', nowIso());
++    const validTo = timestampInput(body.valid_to, 'valid_to', null);
++    requireTimeRange(validFrom, validTo, 'invalid_price_validity', true);
+     const product = await repository.createProduct({ tenantId: context.actor.tenantId, storeId, externalSku: sku, names, status: body.status === 'inactive' ? 'inactive' : 'active', needsInput });
+     if (Number.isSafeInteger(body.price_minor) && body.price_minor >= 0) {
+-      const price = await repository.addPriceVersion({ tenantId: context.actor.tenantId, productId: product.id, currency: typeof body.currency === 'string' ? body.currency : 'BDT', amountMinor: body.price_minor, validFrom: typeof body.valid_from === 'string' ? body.valid_from : nowIso(), validTo: typeof body.valid_to === 'string' ? body.valid_to : null, status: 'draft', sourceCitation: 'operator_input', createdBy: context.actor.userId });
++      const price = await repository.addPriceVersion({ tenantId: context.actor.tenantId, productId: product.id, currency: typeof body.currency === 'string' ? body.currency : 'BDT', amountMinor: body.price_minor, validFrom, validTo, status: 'draft', sourceCitation: 'operator_input', createdBy: context.actor.userId });
+       product.currentPriceVersionId = price.id;
+     }
+     sendJson(res, 201, { item: publicProduct(repository.findProduct(product.id) || product), needs_input: needsInput });
+@@ -1196,7 +1200,7 @@
+     if (!product || product.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(product.storeId)) return notFound(res, requestId);
+     const body = await readJson(req);
+     if (body.amount_minor !== null && (!Number.isSafeInteger(body.amount_minor) || body.amount_minor < 0)) return badRequest(res, requestId, 'invalid_price_minor');
+-    const price = await repository.addPriceVersion({ tenantId: context.actor.tenantId, productId: product.id, currency: typeof body.currency === 'string' ? body.currency : 'BDT', amountMinor: body.amount_minor ?? null, validFrom: typeof body.valid_from === 'string' ? body.valid_from : nowIso(), validTo: typeof body.valid_to === 'string' ? body.valid_to : null, status: body.status === 'approved' ? 'approved' : 'draft', sourceCitation: typeof body.source_citation === 'string' ? body.source_citation : 'operator_input', createdBy: context.actor.userId });
++    const price = await repository.addPriceVersion({ tenantId: context.actor.tenantId, productId: product.id, currency: typeof body.currency === 'string' ? body.currency : 'BDT', amountMinor: body.amount_minor ?? null, validFrom: timestampInput(body.valid_from, 'valid_from', nowIso()), validTo: timestampInput(body.valid_to, 'valid_to', null), status: body.status === 'approved' ? 'approved' : 'draft', sourceCitation: typeof body.source_citation === 'string' ? body.source_citation : 'operator_input', createdBy: context.actor.userId });
+     await repository.audit({ tenantId: context.actor.tenantId, storeId: product.storeId, actorUserId: context.actor.userId, action: 'product.price_version.created', resourceType: 'price_version', resourceId: price.id, metadata: { version: price.version, amount_minor: price.amountMinor } });
+     sendJson(res, 201, { item: price, stale_references: repository.snapshot().brandReferences.filter((item) => item.status === 'stale').map((item) => item.id) });
+     return;
+@@ -1211,7 +1215,7 @@
+     const storageKey = typeof body.storage_key === 'string' ? body.storage_key.trim() : '';
+     const checksum = typeof body.checksum === 'string' ? body.checksum.trim() : '';
+     if (!storageKey || !checksum) return badRequest(res, requestId, 'asset_checksum_required');
+-    const asset = await repository.createMediaAsset({ tenantId: context.actor.tenantId, storeId, storageKey, checksum, mimeType: typeof body.mime_type === 'string' ? body.mime_type : 'application/octet-stream', rightsStatus: ['approved', 'expired', 'rejected'].includes(body.rights_status) ? body.rights_status : 'unknown', allowedUses: Array.isArray(body.allowed_uses) ? body.allowed_uses.filter((item: unknown): item is string => typeof item === 'string') : [], expiresAt: typeof body.expires_at === 'string' ? body.expires_at : null, sourceCitation: typeof body.source_citation === 'string' ? body.source_citation : null, createdBy: context.actor.userId });
++    const asset = await repository.createMediaAsset({ tenantId: context.actor.tenantId, storeId, storageKey, checksum, mimeType: typeof body.mime_type === 'string' ? body.mime_type : 'application/octet-stream', rightsStatus: ['approved', 'expired', 'rejected'].includes(body.rights_status) ? body.rights_status : 'unknown', allowedUses: Array.isArray(body.allowed_uses) ? body.allowed_uses.filter((item: unknown): item is string => typeof item === 'string') : [], expiresAt: timestampInput(body.expires_at, 'expires_at', null), sourceCitation: typeof body.source_citation === 'string' ? body.source_citation : null, createdBy: context.actor.userId });
+     sendJson(res, 201, { item: publicAsset(asset) });
+     return;
+   }
+@@ -1305,9 +1309,9 @@
+     const body = await readJson(req);
+     const storeId = typeof body.store_id === 'string' ? body.store_id : '';
+     if (!context.actor.storeIds.includes(storeId)) return notFound(res, requestId);
+-    if (typeof body.order_external_id !== 'string' || typeof body.campaign_id !== 'string' || !['verified_coupon', 'linked_first_party_touch', 'declared_source'].includes(body.method)) return badRequest(res, requestId, 'invalid_attribution_evidence');
+-    const occurredAt = typeof body.occurred_at === 'string' && Number.isFinite(Date.parse(body.occurred_at)) ? body.occurred_at : nowIso();
+-    const evidence = await repository.addAttributionEvidence({ tenantId: context.actor.tenantId, storeId, orderExternalId: body.order_external_id, campaignId: body.campaign_id, method: body.method, occurredAt });
++    if ((!body.order_id && typeof body.order_external_id !== 'string') || typeof body.campaign_id !== 'string' || !body.campaign_id.trim() || !['verified_coupon', 'linked_first_party_touch', 'declared_source'].includes(body.method)) return badRequest(res, requestId, 'invalid_attribution_evidence');
++    const occurredAt = timestampInput(body.occurred_at, 'occurred_at', nowIso());
++    const evidence = await repository.addAttributionEvidence({ tenantId: context.actor.tenantId, storeId, orderExternalId: body.order_external_id, orderSource: body.order_source, orderId: body.order_id, campaignId: body.campaign_id, method: body.method, occurredAt });
+     sendJson(res, 201, { item: evidence });
+     return;
+   }
+@@ -1334,10 +1338,8 @@
+     const objective = typeof body.objective === 'string' && body.objective.trim() ? body.objective.trim() : null;
+     const budget = body.budget_minor === undefined || body.budget_minor === null ? null : body.budget_minor;
+     if (budget !== null && (!Number.isSafeInteger(budget) || budget < 0)) return badRequest(res, requestId, 'invalid_budget_minor');
+-    const startAt = body.start_at === undefined || body.start_at === null ? null : String(body.start_at);
+-    const endAt = body.end_at === undefined || body.end_at === null ? null : String(body.end_at);
+-    if (startAt && !Number.isFinite(Date.parse(startAt))) return badRequest(res, requestId, 'invalid_start_at');
+-    if (endAt && !Number.isFinite(Date.parse(endAt))) return badRequest(res, requestId, 'invalid_end_at');
++    const startAt = timestampInput(body.start_at, 'start_at', null);
++    const endAt = timestampInput(body.end_at, 'end_at', null);
+     const productIds = Array.isArray(body.product_ids) ? body.product_ids.filter((item: unknown): item is string => typeof item === 'string') : [];
+     const assetIds = Array.isArray(body.asset_ids) ? body.asset_ids.filter((item: unknown): item is string => typeof item === 'string') : [];
+     const needsInput = [] as string[];
+@@ -1385,8 +1387,8 @@
+       if (body.objective !== undefined) { if (body.objective !== null && typeof body.objective !== 'string') return badRequest(res, requestId, 'invalid_objective'); patch.objective = body.objective; }
+       if (body.budget_minor !== undefined) { if (body.budget_minor !== null && (!Number.isSafeInteger(body.budget_minor) || body.budget_minor < 0)) return badRequest(res, requestId, 'invalid_budget_minor'); patch.budgetMinor = body.budget_minor; }
+       if (body.status !== undefined) { if (!['draft', 'needs_input', 'pending_approval', 'approved', 'archived'].includes(body.status)) return badRequest(res, requestId, 'invalid_campaign_status'); patch.status = body.status; }
+-      if (body.start_at !== undefined) patch.startAt = body.start_at === null ? null : String(body.start_at);
+-      if (body.end_at !== undefined) patch.endAt = body.end_at === null ? null : String(body.end_at);
++      if (body.start_at !== undefined) patch.startAt = timestampInput(body.start_at, 'start_at', null);
++      if (body.end_at !== undefined) patch.endAt = timestampInput(body.end_at, 'end_at', null);
+       if (body.product_ids !== undefined) patch.productIds = Array.isArray(body.product_ids) ? body.product_ids.filter((item: unknown): item is string => typeof item === 'string') : [];
+       if (body.asset_ids !== undefined) patch.assetIds = Array.isArray(body.asset_ids) ? body.asset_ids.filter((item: unknown): item is string => typeof item === 'string') : [];
+       const needsInput = patch.objective === null ? ['objective'] : patch.objective ? [] : campaign.needsInput;
+@@ -1456,7 +1458,7 @@
+       source_refs: sourceRefs,
+       missing_reason: freshness.missingReason
+     }));
+-    const attributionItems = Object.entries(bundle.summary.primary_attributed_revenue_minor as Record<string, number>).map(([campaignId, value]) => ({ metric_key: `primary_attributed_revenue_minor:${campaignId}`, formula_version: 'primary_source_v1', scope, period_start: periodStart, period_end: asOf, value, unit: 'minor_units', numerator: null, denominator: null, as_of: asOf, complete_through: completeThrough, quality, coverage: null, source_refs: sourceRefs, missing_reason: freshness.missingReason }));
++    const attributionItems = Object.entries(bundle.summary.primary_attributed_revenue_minor as Record<string, number>).map(([campaignId, value]) => ({ metric_key: `primary_attributed_revenue_minor:${campaignId}`, formula_version: ATTRIBUTION_MODEL.version, attribution_model: ATTRIBUTION_MODEL, scope, period_start: periodStart, period_end: asOf, value, unit: 'minor_units', numerator: null, denominator: null, as_of: asOf, complete_through: completeThrough, quality, coverage: null, source_refs: sourceRefs, missing_reason: freshness.missingReason }));
+     sendJson(res, 200, { items: [...contractItems, ...attributionItems], summary: { ...bundle.summary, scope, source_coverage: sourceCoverage, complete_through: completeThrough, quality, missing_reason: freshness.missingReason } });
+     return;
+   }
+@@ -1559,7 +1561,7 @@
+ }
+ 
+ function publicCoupon(coupon: any): Record<string, unknown> {
+-  return { id: coupon.id, tenant_id: coupon.tenantId, store_id: coupon.storeId, offer_id: coupon.offerId, campaign_id: coupon.campaignId, member_id: coupon.memberId, status: coupon.status, issued_at: coupon.issuedAt, reserved_at: coupon.reservedAt, pos_order_ref: coupon.posOrderRef, redeemed_at: coupon.redeemedAt };
++  return { id: coupon.id, tenant_id: coupon.tenantId, store_id: coupon.storeId, offer_id: coupon.offerId, campaign_id: coupon.campaignId, member_id: coupon.memberId, status: coupon.status, issued_at: coupon.issuedAt, reserved_at: coupon.reservedAt, pos_order_ref: coupon.posOrderRef, order_source: coupon.posOrderSource ?? null, order_id: coupon.posOrderId ?? null, redeemed_at: coupon.redeemedAt };
+ }
+ 
+ function publicContentBrief(brief: any): Record<string, unknown> {
+--- a/docs/capabilities.json
++++ b/docs/capabilities.json
+@@ -1,13 +1,127 @@
+ [
+-  { "name": "报表与任务门店权限", "status": "离线回归通过", "evidence": ["tests/audit-n01-n08.test.ts", "packages/domain/src/report-policy.ts"], "limit": "已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。" },
+-  { "name": "生成事实、审批、导出", "status": "离线回归通过", "evidence": ["tests/audit-n01-n08.test.ts", "packages/domain/src/content-policy.ts"], "limit": "人工导出；不证明真人文案质量或真实发布。" },
+-  { "name": "指标范围与完整性", "status": "离线回归通过", "evidence": ["tests/metrics-remediation.test.ts", "packages/domain/src/metric-service.ts"], "limit": "来源以门店 orderSources 配置和已知导入/订单为准；无法发现从未登记的外部系统。" },
+-  { "name": "触达预算、去重、重试", "status": "离线回归通过", "evidence": ["tests/audit-n01-n08.test.ts", "packages/domain/src/outreach-ledger.ts"], "limit": "待发额度预留及 test outbox；未知/失败结果保留额度，尚无人工对账释放界面。" },
+-  { "name": "任务租约与生产 Cookie", "status": "离线回归通过", "evidence": ["tests/jobs-cookie-remediation.test.ts"], "limit": "不等于实际业务 worker 或生产认证系统已交付。" },
+-  { "name": "WhatsApp 协议", "status": "本地协议测试通过", "evidence": ["tests/whatsapp-remediation.test.ts", "tests/g07-g10.test.ts"], "limit": "无真实 WABA 联调；发送适配器未接入业务 worker。" },
+-  { "name": "生产数据库", "status": "内部未实现", "evidence": ["packages/adapters/src/config.ts"], "limit": "当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。" },
+-  { "name": "发送与对账 worker", "status": "内部未实现", "evidence": ["apps/worker/src/index.ts"], "limit": "只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。" },
+-  { "name": "真实模型技能", "status": "内部未实现", "evidence": ["packages/domain/src/content-provider.ts"], "limit": "使用确定性生成；缺 provider 接入、成本记录及真人评测。" },
+-  { "name": "生产初始化与客户界面", "status": "部分实现", "evidence": ["apps/web/src/ui.ts", "tests/e2e.test.ts"], "limit": "缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。" },
+-  { "name": "真实渠道与客户验收", "status": "内部开发及外部条件均待完成", "evidence": ["docs/BLOCKERS.md"], "limit": "需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。" }
++  {
++    "name": "报表与任务门店权限",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/audit-n01-n08.test.ts",
++      "packages/domain/src/report-policy.ts"
++    ],
++    "limit": "已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。"
++  },
++  {
++    "name": "生成事实、审批、导出",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/audit-n01-n08.test.ts",
++      "packages/domain/src/content-policy.ts",
++      "tests/audit-b01-b05.test.ts"
++    ],
++    "limit": "人工导出；不证明真人文案质量或真实发布。"
++  },
++  {
++    "name": "指标范围与完整性",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/metrics-remediation.test.ts",
++      "packages/domain/src/metric-service.ts",
++      "tests/audit-b01-b05.test.ts"
++    ],
++    "limit": "来源以门店 orderSources 配置和已知导入/订单为准；无法发现从未登记的外部系统。"
++  },
++  {
++    "name": "订单身份、复购与归因",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/audit-b01-b05.test.ts",
++      "packages/domain/src/order-identity.ts",
++      "packages/domain/src/attribution-policy.ts"
++    ],
++    "limit": "历史歧义引用保留 unknown；新模型固定七天，尚无窗口配置或历史证据修复界面。"
++  },
++  {
++    "name": "日期保存与执行检查",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/audit-b01-b05.test.ts",
++      "packages/domain/src/validation.ts",
++      "packages/domain/src/content-policy.ts"
++    ],
++    "limit": "覆盖价格、素材、品牌、活动和相关输入；不代表所有领域字段已做全面数据治理。"
++  },
++  {
++    "name": "验收记录新鲜度",
++    "status": "自动化回归通过",
++    "evidence": [
++      "tests/validation-evidence.test.mjs",
++      "scripts/validation-evidence.mjs"
++    ],
++    "limit": "完整文件集合、内容、工具链、命令和日志检查；不替代干净安装、可复现构建或签名。"
++  },
++  {
++    "name": "触达预算、去重、重试",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/audit-n01-n08.test.ts",
++      "packages/domain/src/outreach-ledger.ts"
++    ],
++    "limit": "待发额度预留及 test outbox；未知/失败结果保留额度，尚无人工对账释放界面。"
++  },
++  {
++    "name": "任务租约与生产 Cookie",
++    "status": "离线回归通过",
++    "evidence": [
++      "tests/jobs-cookie-remediation.test.ts"
++    ],
++    "limit": "不等于实际业务 worker 或生产认证系统已交付。"
++  },
++  {
++    "name": "WhatsApp 协议",
++    "status": "本地协议测试通过",
++    "evidence": [
++      "tests/whatsapp-remediation.test.ts",
++      "tests/g07-g10.test.ts"
++    ],
++    "limit": "无真实 WABA 联调；发送适配器未接入业务 worker。"
++  },
++  {
++    "name": "生产数据库",
++    "status": "内部未实现",
++    "evidence": [
++      "packages/adapters/src/config.ts"
++    ],
++    "limit": "当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。"
++  },
++  {
++    "name": "发送与对账 worker",
++    "status": "内部未实现",
++    "evidence": [
++      "apps/worker/src/index.ts"
++    ],
++    "limit": "只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。"
++  },
++  {
++    "name": "真实模型技能",
++    "status": "内部未实现",
++    "evidence": [
++      "packages/domain/src/content-provider.ts"
++    ],
++    "limit": "使用确定性生成；缺 provider 接入、成本记录及真人评测。"
++  },
++  {
++    "name": "生产初始化与客户界面",
++    "status": "部分实现",
++    "evidence": [
++      "apps/web/src/ui.ts",
++      "tests/e2e.test.ts"
++    ],
++    "limit": "缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。"
++  },
++  {
++    "name": "真实渠道与客户验收",
++    "status": "内部开发及外部条件均待完成",
++    "evidence": [
++      "docs/BLOCKERS.md"
++    ],
++    "limit": "需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。"
++  }
+ ]
+--- a/package.json
++++ b/package.json
+@@ -32,7 +32,7 @@
+     "test:integration": "node --test --import tsx tests/integration.test.ts",
+     "test:e2e": "node --test --import tsx tests/e2e.test.ts",
+     "test:ai": "node scripts/test-ai-contracts.mjs",
+-    "test": "npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e && npm run test:audit-n01-n08",
++    "test": "npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e && npm run test:audit-n01-n08 && npm run test:audit-b01-b05 && npm run test:validation-evidence",
+     "db:migrate": "node --import tsx scripts/migrate.ts",
+     "db:seed:demo": "node --import tsx scripts/seed-demo.ts",
+     "fixtures:verify": "node scripts/verify-fixtures.mjs",
+@@ -42,7 +42,9 @@
+     "performance": "node --import tsx scripts/performance.ts",
+     "test:audit-n01-n08": "node --test --import tsx tests/audit-n01-n08.test.ts",
+     "validate:release": "node scripts/validate-release.mjs",
+-    "capabilities": "node scripts/capabilities.mjs"
++    "capabilities": "node scripts/capabilities.mjs",
++    "test:audit-b01-b05": "node --test --import tsx tests/audit-b01-b05.test.ts",
++    "test:validation-evidence": "node --test tests/validation-evidence.test.mjs"
+   },
+   "devDependencies": {
+     "@types/node": "^22.10.2",
+--- a/packages/db/src/repository.ts
++++ b/packages/db/src/repository.ts
+@@ -54,7 +54,8 @@
+ import { canAdvanceDelivery } from '../../domain/src/connectors';
+ import { canReadDailyReport, canReadControlTask } from '../../domain/src/report-policy';
+ import type { DailyReport, ControlTask } from '../../domain/src/control';
+-import { explicitTimestamp, requireCondition } from '../../domain/src/validation';
++import { orderKey, resolveOrder, currentOrders } from '../../domain/src/order-identity';
++import { activeDuring, DomainError, explicitTimestamp, nullableTimestamp, requireCondition, requireTimeRange, validTimeRange } from '../../domain/src/validation';
+ import { approvedOutreachContext, marketingConsentForChannel, outreachApprovalHash, outsideOutreachWindow, evaluateMemberDispatch } from '../../domain/src/outreach-policy';
+ import { existingDelivery, outreachBudget, outreachSpend, outreachLedger, refreshOutreachStatus, refreshDeliveryCampaign } from '../../domain/src/outreach-ledger';
+ import type { AppMode } from '../../adapters/src/config';
+@@ -406,8 +407,11 @@
+ 
+   async createCampaign(input: Omit<Campaign, 'id' | 'createdAt' | 'updatedAt' | 'revision'>): Promise<Campaign> {
+     return this.mutate((state) => {
++      const dates = { startAt: input.startAt ?? null, endAt: input.endAt ?? null };
++      requireTimeRange(dates.startAt, dates.endAt, 'invalid_campaign_window');
+       const campaign: Campaign = {
+         ...input,
++        ...dates,
+         id: randomUUID(),
+         createdAt: nowIso(),
+         updatedAt: nowIso(),
+@@ -432,6 +436,7 @@
+     conflictKeys?: string[];
+   }): Promise<{ document: BrandDocument; revision: BrandRevision; facts: BrandFact[] }> {
+     return this.mutate((state) => {
++      requireTimeRange(input.effectiveFrom, input.effectiveTo, 'invalid_brand_validity');
+       const existing = state.brandDocuments.find((item) => item.tenantId === input.tenantId && item.checksum === input.checksum && (item.storeId || null) === (input.storeId || null));
+       if (existing) {
+         const revision = state.brandRevisions.find((item) => item.documentId === existing.id)!;
+@@ -470,7 +475,8 @@
+       const revision = state.brandRevisions.find((item) => item.id === id);
+       if (!revision) throw new Error('brand_revision_not_found');
+       if (revision.conflictKeys.length) throw new Error('brand_revision_conflict');
+-      if (revision.effectiveTo && Date.parse(revision.effectiveTo) < Date.now()) throw new Error('brand_revision_expired');
++      requireTimeRange(revision.effectiveFrom, revision.effectiveTo, 'invalid_brand_validity');
++      if (revision.effectiveTo && Date.parse(revision.effectiveTo) <= Date.now()) throw new Error('brand_revision_expired');
+       const prior = state.brandRevisions.find((item) => item.documentId === revision.documentId && item.status === 'approved' && item.id !== id);
+       if (prior) {
+         prior.status = 'expired';
+@@ -496,6 +502,7 @@
+ 
+   async addPriceVersion(input: Omit<PriceVersion, 'id' | 'version' | 'createdAt'>): Promise<PriceVersion> {
+     return this.mutate((state) => {
++      requireTimeRange(input.validFrom, input.validTo, 'invalid_price_validity', true);
+       const product = state.products.find((item) => item.id === input.productId && item.tenantId === input.tenantId);
+       if (!product) throw new Error('product_not_found');
+       const versions = state.priceVersions.filter((item) => item.productId === input.productId).sort((a, b) => b.version - a.version);
+@@ -518,6 +525,7 @@
+ 
+   async createMediaAsset(input: Omit<MediaAsset, 'id' | 'createdAt'>): Promise<MediaAsset> {
+     return this.mutate((state) => {
++      requireCondition(nullableTimestamp(input.expiresAt), 'invalid_expires_at', 400);
+       const existing = state.mediaAssets.find((item) => item.tenantId === input.tenantId && item.checksum === input.checksum && (item.storeId || null) === (input.storeId || null));
+       if (existing) return existing;
+       const asset: MediaAsset = { ...input, id: randomUUID(), createdAt: nowIso() };
+@@ -580,7 +588,7 @@
+         if (row.value) {
+           const value = row.value as any;
+           if (value.tenantId !== input.tenantId || value.storeId !== input.storeId) rowErrors.push({ code: 'scope_mismatch', message: 'tenant_id/store_id does not match authenticated import scope' });
+-          const key = input.kind === 'orders' ? `${value.source}|${value.externalOrderId}` : input.kind === 'refunds' ? `${value.source}|${value.externalAdjustmentId}` : value.externalMemberId;
++          const key = input.kind === 'orders' ? orderKey(value) : input.kind === 'refunds' ? JSON.stringify([value.tenantId, value.storeId, value.source, value.externalAdjustmentId]) : value.externalMemberId;
+           const rawHash = hashOpaque(JSON.stringify(row.raw));
+           if (seenKeys.has(key) && seenKeys.get(key) !== rawHash) rowErrors.push({ code: 'conflicting_duplicate', message: 'duplicate key has different values in same file' });
+           else seenKeys.set(key, rawHash);
+@@ -610,7 +618,7 @@
+       for (const row of staged) {
+         if (row.kind === 'orders') {
+           const value = row.value as ParsedOrder;
+-          const existing = state.orders.filter((item) => item.tenantId === batch.tenantId && item.storeId === batch.storeId && item.source === value.source && item.externalOrderId === value.externalOrderId && item.active).sort((a, b) => b.revision - a.revision)[0];
++          const existing = state.orders.filter((item) => orderKey(item) === orderKey(value) && item.active).sort((a, b) => b.revision - a.revision)[0];
+           const sourceRowHash = hashOpaque(JSON.stringify(row.raw));
+           if (existing && existing.sourceRowHash === sourceRowHash) { deduplicated += 1; continue; }
+           if (existing) { existing.active = false; corrections += 1; }
+@@ -620,9 +628,9 @@
+           const value = row.value as ParsedRefund;
+           const duplicate = state.refunds.find((item) => item.tenantId === batch.tenantId && item.storeId === batch.storeId && item.source === value.source && item.externalAdjustmentId === value.externalAdjustmentId);
+           if (duplicate) { deduplicated += 1; continue; }
+-          const order = state.orders.filter((item) => item.tenantId === batch.tenantId && item.storeId === batch.storeId && item.source === value.source && item.externalOrderId === value.externalOrderId && item.active).sort((a, b) => b.revision - a.revision)[0];
++          const order = state.orders.filter((item) => orderKey(item) === orderKey(value) && item.active).sort((a, b) => b.revision - a.revision)[0];
+           if (!order) { rejected.push({ id: randomUUID(), importId: id, rowNumber: row.rowNumber, code: 'order_not_found', message: 'refund references an unknown order', rawRow: row.raw }); continue; }
+-          const refunded = state.refunds.filter((item) => item.tenantId === batch.tenantId && item.storeId === batch.storeId && item.source === value.source && item.externalOrderId === value.externalOrderId).reduce((sum, item) => sum + item.amountMinor, 0);
++          const refunded = state.refunds.filter((item) => orderKey(item) === orderKey(value)).reduce((sum, item) => sum + item.amountMinor, 0);
+           if (refunded + value.amountMinor > order.amountPaidMinor) { rejected.push({ id: randomUUID(), importId: id, rowNumber: row.rowNumber, code: 'refund_exceeds_order', message: 'cumulative refunds exceed order amount', rawRow: row.raw }); continue; }
+           const refund: RefundRecord = { id: randomUUID(), ...value, sourceRowHash: hashOpaque(JSON.stringify(row.raw)), createdAt: nowIso() };
+           state.refunds.push(refund); inserted += 1;
+@@ -660,11 +668,17 @@
+   listMembers(tenantId: string, storeIds: string[]): MemberRecord[] { return this.requireState().members.filter((item) => item.tenantId === tenantId && storeIds.includes(item.storeId)); }
+   listAttribution(tenantId: string, storeIds: string[]): AttributionEvidenceRecord[] { return this.requireState().attributionEvidence.filter((item) => item.tenantId === tenantId && storeIds.includes(item.storeId)); }
+ 
+-  async addAttributionEvidence(input: Omit<AttributionEvidenceRecord, 'id'>): Promise<AttributionEvidenceRecord> {
++  async addAttributionEvidence(input: Omit<AttributionEvidenceRecord, 'id' | 'orderExternalId'> & { orderExternalId?: string }): Promise<AttributionEvidenceRecord> {
+     return this.mutate((state) => {
+       // campaignId may be an external/imported campaign key; tenant/store on
+       // the evidence row are the authority boundary for metric aggregation.
+-      const evidence: AttributionEvidenceRecord = { ...input, id: randomUUID() }; state.attributionEvidence.push(evidence); return evidence;
++      requireCondition(explicitTimestamp(input.occurredAt), 'invalid_occurred_at', 400);
++      const resolved = resolveOrder(state.orders, input);
++      if (!resolved.ok) throw new DomainError(resolved.errorCode);
++      const order = resolved.order;
++      const evidence: AttributionEvidenceRecord = { ...input, id: randomUUID(), orderId: order.id, orderSource: order.source, orderExternalId: order.externalOrderId };
++      state.attributionEvidence.push(evidence);
++      return evidence;
+     });
+   }
+ 
+@@ -712,6 +726,8 @@
+ 
+   async createOffer(input: Omit<Offer, 'id' | 'issuedCount' | 'createdAt' | 'status'>): Promise<Offer> {
+     return this.mutate((state) => {
++      requireTimeRange(input.validFrom, input.validTo, 'invalid_offer_validity', true);
++      requireCondition(explicitTimestamp(input.validTo), 'invalid_valid_to', 400);
+       requireCondition(state.campaigns.some((campaign) => campaign.id === input.campaignId && campaign.tenantId === input.tenantId && campaign.storeId === input.storeId), 'campaign_not_found', 404);
+       const offer: Offer = { ...input, id: randomUUID(), status: 'active', issuedCount: 0, createdAt: nowIso() }; state.offers.push(offer); return offer;
+     });
+@@ -720,7 +736,7 @@
+   async issueCoupon(input: { tenantId: string; storeId: string; offerId: string; memberId: string; sourceLinkId: string | null; tokenHash: string }): Promise<IssuedCoupon> {
+     return this.mutate((state) => {
+       const offer = state.offers.find((item) => item.id === input.offerId && item.tenantId === input.tenantId && item.storeId === input.storeId);
+-      if (!offer || offer.status !== 'active' || Date.parse(offer.validTo) < Date.now() || (offer.maxRedemptions !== null && offer.issuedCount >= offer.maxRedemptions)) throw new Error('offer_unavailable');
++      if (!offer || offer.status !== 'active' || !activeDuring(nowIso(), offer.validFrom, offer.validTo) || (offer.maxRedemptions !== null && offer.issuedCount >= offer.maxRedemptions)) throw new Error('offer_unavailable');
+       const member = state.members.find((item) => item.id === input.memberId && item.tenantId === input.tenantId && item.storeId === input.storeId);
+       if (!member) throw new Error('member_not_found');
+       if (input.sourceLinkId) requireCondition(state.sourceLinks.some((link) => link.id === input.sourceLinkId && link.tenantId === input.tenantId && link.storeId === input.storeId && link.campaignId === offer.campaignId && link.status === 'active'), 'source_link_not_found', 404);
+@@ -740,25 +756,32 @@
+       if (coupon.tenantId !== input.tenantId || coupon.storeId !== input.storeId) return fail('wrong_store');
+       const offer = state.offers.find((item) => item.id === coupon.offerId);
+       if (!offer || offer.status !== 'active') return fail('offer_cancelled');
+-      if (Date.parse(offer.validTo) < Date.now()) { coupon.status = 'expired'; return fail('coupon_expired'); }
++      if (!validTimeRange(offer.validFrom, offer.validTo, true) || !explicitTimestamp(offer.validTo)) return fail('offer_validity_invalid');
++      if (Date.parse(offer.validFrom) > Date.now()) return fail('offer_not_started');
++      if (!activeDuring(nowIso(), offer.validFrom, offer.validTo)) { coupon.status = 'expired'; return fail('coupon_expired'); }
+       if (coupon.status !== 'issued') return fail(coupon.status === 'cancelled' ? 'coupon_cancelled' : 'coupon_already_reserved');
+       coupon.status = 'pending_pos_verification'; coupon.reservedAt = nowIso(); coupon.posOrderRef = input.posOrderRef;
+       const attempt: RedemptionAttempt = { id: randomUUID(), tenantId: input.tenantId, storeId: input.storeId, couponId: coupon.id, employeeUserId: input.employeeUserId, posOrderRef: input.posOrderRef, status: 'reserved', errorCode: null, createdAt: nowIso() }; state.redemptionAttempts.push(attempt); return { coupon, attempt };
+     });
+   }
+-  async matchCoupon(couponId: string, tenantId: string, storeId: string, orderRef: string): Promise<{ coupon?: IssuedCoupon; errorCode?: string }> {
++  async matchCoupon(couponId: string, tenantId: string, storeId: string, orderRef: string, orderSource?: string, orderId?: string): Promise<{ coupon?: IssuedCoupon; errorCode?: string }> {
+     return this.mutate((state) => {
+       const coupon = state.issuedCoupons.find((item) => item.id === couponId);
+       if (!coupon || coupon.tenantId !== tenantId || coupon.storeId !== storeId) return { errorCode: 'coupon_not_found' };
+-      if (coupon.status === 'redeemed') return { coupon };
+-      if (coupon.status !== 'pending_pos_verification') return { errorCode: 'coupon_not_pending' };
+-      const order = state.orders.find((item) => item.tenantId === tenantId && item.storeId === storeId && item.externalOrderId === orderRef && item.active && item.status === 'paid');
+-      if (!order) return { errorCode: 'pos_order_not_found' };
++      if (!['redeemed', 'pending_pos_verification'].includes(coupon.status)) return { errorCode: 'coupon_not_pending' };
++      const resolved = resolveOrder(state.orders, { tenantId, storeId, orderExternalId: orderRef || undefined, orderSource, orderId });
++      if (!resolved.ok) return { errorCode: resolved.errorCode === 'order_not_found' ? 'pos_order_not_found' : resolved.errorCode };
++      const order = resolved.order;
++      if (order.status !== 'paid') return { errorCode: 'pos_order_not_found' };
++      if (coupon.status === 'redeemed') {
++        const previous = resolveOrder(state.orders, { tenantId, storeId, orderId: coupon.posOrderId, orderSource: coupon.posOrderSource, orderExternalId: coupon.posOrderRef || undefined });
++        return previous.ok && orderKey(previous.order) === orderKey(order) ? { coupon } : { errorCode: 'coupon_order_mismatch' };
++      }
+       const member = state.members.find((item) => item.id === coupon.memberId);
+       if (order.memberId && order.memberId !== coupon.memberId && order.memberId !== member?.externalMemberId) return { errorCode: 'member_mismatch' };
+-      coupon.status = 'redeemed'; coupon.posOrderRef = orderRef; coupon.redeemedAt = nowIso();
+-      state.attributionEvidence.push({ id: randomUUID(), tenantId, storeId, orderExternalId: orderRef, campaignId: coupon.campaignId, method: 'verified_coupon', occurredAt: nowIso() });
+-      const attempt = state.redemptionAttempts.find((item) => item.couponId === coupon.id && item.status === 'reserved'); if (attempt) attempt.status = 'matched';
++      coupon.status = 'redeemed'; coupon.posOrderRef = order.externalOrderId; coupon.posOrderSource = order.source; coupon.posOrderId = order.id; coupon.redeemedAt = nowIso();
++      state.attributionEvidence.push({ id: randomUUID(), tenantId, storeId, orderExternalId: order.externalOrderId, orderSource: order.source, orderId: order.id, campaignId: coupon.campaignId, method: 'verified_coupon', occurredAt: nowIso() });
++      const attempt = state.redemptionAttempts.find((item) => item.couponId === coupon.id && item.status === 'reserved'); if (attempt) { attempt.status = 'matched'; attempt.posOrderRef = order.externalOrderId; attempt.posOrderSource = order.source; attempt.posOrderId = order.id; }
+       return { coupon };
+     });
+   }
+@@ -935,7 +958,7 @@
+       if (referral.status === 'ineligible' || referral.status === 'reversed') return { referral, reward: state.rewardLedger.find((item) => item.referralId === id) };
+       const order = state.orders.filter((item) => item.tenantId === referral.tenantId && item.storeId === referral.storeId && item.memberId === referral.inviteeMemberId && item.active && item.status === 'paid').sort((a, b) => Date.parse(a.paidAt) - Date.parse(b.paidAt))[0];
+       if (!order) return { referral, reward: state.rewardLedger.find((item) => item.referralId === id) };
+-      const refunded = state.refunds.filter((item) => item.tenantId === order.tenantId && item.storeId === order.storeId && item.source === order.source && item.externalOrderId === order.externalOrderId).reduce((sum, item) => sum + item.amountMinor, 0);
++      const refunded = state.refunds.filter((item) => orderKey(item) === orderKey(order)).reduce((sum, item) => sum + item.amountMinor, 0);
+       const reward = state.rewardLedger.find((item) => item.referralId === id);
+       if (refunded >= order.amountPaidMinor) { referral.status = 'reversed'; referral.reason = 'full_refund'; if (reward) { reward.status = 'reversed'; reward.reason = 'full_refund'; } return { referral, reward }; }
+       referral.status = 'qualified'; referral.firstQualifiedOrderId = order.id; if (reward) { reward.status = 'eligible'; reward.reason = 'first_qualified_order_observed'; }
+@@ -1406,6 +1429,8 @@
+     return this.mutate((state) => {
+       const campaign = state.campaigns.find((item) => item.id === id);
+       if (!campaign) return undefined;
++      const dates = { ...campaign, ...patch };
++      requireTimeRange(dates.startAt ?? null, dates.endAt ?? null, 'invalid_campaign_window');
+       Object.assign(campaign, patch, { updatedAt: nowIso(), revision: campaign.revision + 1 });
+       return campaign;
+     });
+@@ -1550,7 +1575,7 @@
+ function refundedAmount(state: RepositoryState, order: OrderRecord): number {
+   const seen = new Set<string>();
+   return state.refunds.filter((refund) => {
+-    if (refund.tenantId !== order.tenantId || refund.storeId !== order.storeId || refund.source !== order.source || refund.externalOrderId !== order.externalOrderId) return false;
++    if (orderKey(refund) !== orderKey(order)) return false;
+     const key = `${refund.source}|${refund.externalAdjustmentId}`;
+     if (seen.has(key)) return false;
+     seen.add(key);
+@@ -1559,7 +1584,7 @@
+ }
+ 
+ function countableOrdersForMember(state: RepositoryState, member: MemberRecord): OrderRecord[] {
+-  return state.orders.filter((order) => order.tenantId === member.tenantId && order.storeId === member.storeId && order.active && order.status === 'paid' && orderMatchesMember(order, member) && refundedAmount(state, order) < order.amountPaidMinor).sort((a, b) => Date.parse(a.paidAt) - Date.parse(b.paidAt));
++  return currentOrders(state.orders).filter((order) => order.tenantId === member.tenantId && order.storeId === member.storeId && order.active && order.status === 'paid' && orderMatchesMember(order, member) && refundedAmount(state, order) < order.amountPaidMinor).sort((a, b) => Date.parse(a.paidAt) - Date.parse(b.paidAt));
+ }
+ 
+ function currentMarketingConsent(state: RepositoryState, tenantId: string, memberId: string): boolean {
+--- /dev/null
++++ b/packages/domain/src/attribution-policy.ts
+@@ -0,0 +1,24 @@
++import type { AttributionEvidenceRecord, OrderRecord } from './imports';
++import { orderKey, resolveOrder } from './order-identity';
++import { explicitTimestamp } from './validation';
++
++export const ATTRIBUTION_MODEL = Object.freeze({ version: 'primary_source_v2', touch_window_days: 7 });
++const rank = { verified_coupon: 2, linked_first_party_touch: 1, declared_source: 0 };
++
++export function resolveAttribution(orders: OrderRecord[], evidence: AttributionEvidenceRecord[], asOf: string): Map<string, AttributionEvidenceRecord> {
++  const selected = new Map<string, AttributionEvidenceRecord>();
++  for (const row of evidence) {
++    if (!rank[row.method] || !explicitTimestamp(row.occurredAt) || Date.parse(row.occurredAt) > Date.parse(asOf)) continue;
++    const resolved = resolveOrder(orders, row);
++    if (!resolved.ok || !explicitTimestamp(resolved.order.paidAt)) continue;
++    if (row.method === 'linked_first_party_touch') {
++      const age = Date.parse(resolved.order.paidAt) - Date.parse(row.occurredAt);
++      if (age < 0 || age > ATTRIBUTION_MODEL.touch_window_days * 86_400_000) continue;
++    }
++    // Coupon proof confirms an order; its verification may occur after payment.
++    const key = orderKey(resolved.order);
++    const previous = selected.get(key);
++    if (!previous || rank[row.method] > rank[previous.method] || (rank[row.method] === rank[previous.method] && (Date.parse(row.occurredAt) > Date.parse(previous.occurredAt) || (Date.parse(row.occurredAt) === Date.parse(previous.occurredAt) && row.id < previous.id)))) selected.set(key, row);
++  }
++  return selected;
++}
+--- a/packages/domain/src/brand.ts
++++ b/packages/domain/src/brand.ts
+@@ -1,3 +1,5 @@
++import { nullableTimestamp, validTimeRange } from './validation';
++
+ export type KnowledgeStatus = 'draft' | 'approved' | 'rejected' | 'expired' | 'conflict';
+ export type SourceType = 'form' | 'markdown' | 'txt' | 'csv';
+ 
+@@ -118,10 +120,11 @@
+   const errors: PublishCheckResult['errors'] = [];
+   const warnings: PublishCheckResult['warnings'] = [];
+   const nowMs = now.getTime();
+-  if (startAt && !Number.isFinite(Date.parse(startAt))) errors.push({ code: 'invalid_start_at', detail: 'startAt must be an ISO timestamp' });
+-  if (endAt && !Number.isFinite(Date.parse(endAt))) errors.push({ code: 'invalid_end_at', detail: 'endAt must be an ISO timestamp' });
+-  if (startAt && endAt && Date.parse(endAt) < Date.parse(startAt)) errors.push({ code: 'invalid_window', detail: 'endAt must not precede startAt' });
+-  if (endAt && Date.parse(endAt) < nowMs) errors.push({ code: 'campaign_expired', detail: 'campaign end is in the past' });
++  if (!Number.isFinite(nowMs)) errors.push({ code: 'invalid_now', detail: 'current time is invalid' });
++  if (!nullableTimestamp(startAt ?? null)) errors.push({ code: 'invalid_start_at', detail: 'startAt requires a timestamp with timezone, or null' });
++  if (!nullableTimestamp(endAt ?? null)) errors.push({ code: 'invalid_end_at', detail: 'endAt requires a timestamp with timezone, or null' });
++  if (!validTimeRange(startAt ?? null, endAt ?? null)) errors.push({ code: 'invalid_window', detail: 'dates must be valid and endAt must follow startAt' });
++  if (endAt && Date.parse(endAt) <= nowMs) errors.push({ code: 'campaign_expired', detail: 'campaign end is in the past' });
+   if (!startAt) warnings.push({ code: 'start_date_missing', detail: '具体开始时间尚未提供' });
+   return { ok: errors.length === 0, errors, warnings };
+ }
+--- a/packages/domain/src/content-policy.ts
++++ b/packages/domain/src/content-policy.ts
+@@ -2,7 +2,7 @@
+ import type { DatabaseState } from './types';
+ import type { ContentApproval, ContentBrief, ContentFacts, ContentPackageData, ContentRevision } from './content';
+ import { validatePublishWindow, type PublishCheckInput, type PublishCheckResult } from './brand';
+-import { explicitTimestamp } from './validation';
++import { activeDuring, explicitTimestamp, nullableTimestamp, validTimeRange } from './validation';
+ 
+ export const contentDigest = (value: unknown): string => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+ const sorted = (values: string[]) => [...new Set(values)].sort();
+@@ -35,13 +35,15 @@
+     if (product.status !== 'active') fail('product_inactive', id, '产品已停用');
+     const price = state.priceVersions.find(p => p.id === product.currentPriceVersionId && p.productId === id && p.tenantId === input.tenantId);
+     if (!price || price.amountMinor === null || price.status !== 'approved') fail('price_missing_or_unapproved', id, '缺少已批准价格');
+-    else if (Date.parse(price.validFrom) > Date.parse(now) || (price.validTo && Date.parse(price.validTo) <= Date.parse(now))) fail('price_outside_validity', id, '价格不在有效期内');
++    else if (!validTimeRange(price.validFrom, price.validTo, true)) fail('price_validity_invalid', id, '价格有效期无法确认');
++    else if (!activeDuring(now, price.validFrom, price.validTo)) fail('price_outside_validity', id, '价格不在有效期内');
+   }
+   for (const id of input.assetIds || []) {
+     const asset = state.mediaAssets.find(a => a.id === id && a.tenantId === input.tenantId && (!a.storeId || a.storeId === input.storeId));
+     if (!asset) { fail('asset_not_found', id, '素材不属于当前门店'); continue; }
+     if (asset.rightsStatus !== 'approved') fail('asset_rights_missing', id, '素材授权未批准');
+-    if (asset.expiresAt && Date.parse(asset.expiresAt) <= Date.parse(now)) fail('asset_rights_expired', id, '素材授权已过期');
++    if (!nullableTimestamp(asset.expiresAt)) fail('asset_expiry_invalid', id, '素材到期时间无法确认');
++    else if (!activeDuring(now, null, asset.expiresAt)) fail('asset_rights_expired', id, '素材授权已过期');
+   }
+   return { ...result, ok: result.errors.length === 0 };
+ }
+@@ -67,7 +69,7 @@
+   for (const id of facts.brandRevisionIds) {
+     const brand = state.brandRevisions.find(b => b.id === id && b.tenantId === revision.tenantId);
+     const doc = brand && state.brandDocuments.find(d => d.id === brand.documentId && d.tenantId === revision.tenantId);
+-    if (!brand || !doc || brand.status !== 'approved' || (doc.storeId && doc.storeId !== brief.storeId) || (brand.effectiveFrom && Date.parse(brand.effectiveFrom) > Date.parse(now)) || (brand.effectiveTo && Date.parse(brand.effectiveTo) <= Date.parse(now))) fail('brand_revision_changed', '品牌版本已失效或不属于当前门店', id);
++    if (!brand || !doc || brand.status !== 'approved' || (doc.storeId && doc.storeId !== brief.storeId) || !activeDuring(now, brand.effectiveFrom, brand.effectiveTo)) fail('brand_revision_changed', '品牌版本已失效或不属于当前门店', id);
+   }
+   if (data.needs_input.length) fail('content_needs_input', '内容仍有未解决输入');
+   if (data.variants.some(v => v.locale === 'bn' && v.review_status !== 'reviewed')) fail('bn_review_required', '孟语版本需要人工复核');
+@@ -80,7 +82,7 @@
+   const fail = (code: string, detail: string) => errors.push({ code, detail });
+   if (!approval) return { ok: false, errors: [{ code: 'approval_not_found', detail: '审批不存在' }] };
+   if (!['pending', 'approved'].includes(approval.status)) fail('approval_not_active', '审批不可执行');
+-  if (!explicitTimestamp(approval.expiresAt) || Date.parse(approval.expiresAt) <= Date.parse(now)) fail('approval_expired', '审批已过期');
++  if (!explicitTimestamp(now) || !explicitTimestamp(approval.expiresAt) || Date.parse(approval.expiresAt) <= Date.parse(now)) fail('approval_expired', '审批已过期');
+   const revision = state.contentRevisions.find(r => r.id === approval.resourceRevisionId && r.tenantId === approval.tenantId);
+   if (!revision) fail('approval_scope_mismatch', '审批内容不存在');
+   else {
+--- a/packages/domain/src/control-service.ts
++++ b/packages/domain/src/control-service.ts
+@@ -1,8 +1,9 @@
+ import { createHash } from 'node:crypto';
+ import type { ActorContext, DatabaseState } from './types';
+ import { ALLOWED_METRICS, type MetricEvidence, type MetricQueryRequest, type RouterRequest, type RouterResult } from './control';
++import { METRIC_FORMULA_VERSION } from './metric-engine';
+ import { calculateMetrics } from './metric-service';
+-import { explicitTimestamp, requireCondition } from './validation';
++import { activeDuring, explicitTimestamp, requireCondition } from './validation';
+ import { validateRouterRequest, runDeterministicRouter } from './control-runtime';
+ 
+ const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+@@ -19,7 +20,7 @@
+     const metric = bundle.results.find(m => m.metric_key === key);
+     const quality = freshness.quality;
+     const value = quality !== 'missing' && typeof metric?.value === 'number' ? metric.value : null;
+-    const evidence = { metricKey: key, value, numerator: quality === 'missing' ? null : metric?.numerator ?? null, denominator: quality === 'missing' ? null : metric?.denominator ?? null, asOf, completeThrough, quality, sourceCoverage, sourceRefs, storeIds, formulaVersion: 'metric-engine-v2-scoped', missingReason: freshness.missingReason, recordRefs } as const;
++    const evidence = { metricKey: key, value, numerator: quality === 'missing' ? null : metric?.numerator ?? null, denominator: quality === 'missing' ? null : metric?.denominator ?? null, asOf, completeThrough, quality, sourceCoverage, sourceRefs, storeIds, formulaVersion: METRIC_FORMULA_VERSION, missingReason: freshness.missingReason, recordRefs } as const;
+     return { ...evidence, id: 'metric_' + digest(evidence).slice(0, 24) };
+   });
+ }
+@@ -33,7 +34,7 @@
+   const metrics = queryMetrics(state, scopedActor, input.metricQueries || [], asOf);
+   const result = runDeterministicRouter(input, metrics, actor.userId, asOf);
+   const visible = (item: {tenantId:string;storeId?:string|null}) => item.tenantId === actor.tenantId && (!item.storeId || storeIds.includes(item.storeId));
+-  const revisions = state.brandRevisions.filter(r => r.status === 'approved' && r.tenantId === actor.tenantId && (!r.effectiveFrom || Date.parse(r.effectiveFrom) <= Date.parse(asOf)) && (!r.effectiveTo || Date.parse(r.effectiveTo) > Date.parse(asOf)) && state.brandDocuments.some(d => d.id === r.documentId && visible(d)));
++  const revisions = state.brandRevisions.filter(r => r.status === 'approved' && r.tenantId === actor.tenantId && activeDuring(asOf, r.effectiveFrom, r.effectiveTo) && state.brandDocuments.some(d => d.id === r.documentId && visible(d)));
+   const records: Array<{id:string;kind:string;summary:string}> = [];
+   const needs: string[] = ['weather_unavailable', 'campus_calendar_unavailable'];
+   switch (input.skill) {
+--- a/packages/domain/src/growth.ts
++++ b/packages/domain/src/growth.ts
+@@ -75,6 +75,8 @@
+   issuedAt: string;
+   reservedAt: string | null;
+   posOrderRef: string | null;
++  posOrderSource?: string;
++  posOrderId?: string;
+   redeemedAt: string | null;
+   reversedAt: string | null;
+ }
+@@ -86,6 +88,8 @@
+   couponId: string;
+   employeeUserId: string;
+   posOrderRef: string | null;
++  posOrderSource?: string;
++  posOrderId?: string;
+   status: 'reserved' | 'rejected' | 'matched' | 'unknown';
+   errorCode: string | null;
+   createdAt: string;
+--- a/packages/domain/src/imports.ts
++++ b/packages/domain/src/imports.ts
+@@ -1,3 +1,4 @@
++import { explicitTimestamp } from './validation';
+ import { createHash, randomUUID } from 'node:crypto';
+ 
+ export type ImportKind = 'orders' | 'refunds' | 'members';
+@@ -57,6 +58,8 @@
+   tenantId: string;
+   storeId: string;
+   orderExternalId: string;
++  orderSource?: string;
++  orderId?: string;
+   campaignId: string;
+   method: 'verified_coupon' | 'linked_first_party_touch' | 'declared_source';
+   occurredAt: string;
+@@ -186,7 +189,7 @@
+ }
+ 
+ function isoDate(raw: string, key: string, errors: Array<{ code: string; message: string }>): string {
+-  if (!raw || !Number.isFinite(Date.parse(raw))) errors.push({ code: 'invalid_date', message: `${key} must be an ISO timestamp` });
++  if (!raw || !explicitTimestamp(raw)) errors.push({ code: 'invalid_date', message: `${key} must be an ISO timestamp` });
+   return raw;
+ }
+ 
+--- a/packages/domain/src/metric-engine.ts
++++ b/packages/domain/src/metric-engine.ts
+@@ -1,8 +1,13 @@
+ import type { AttributionEvidenceRecord, MemberRecord, OrderRecord, RefundRecord } from './imports';
+ import { assessMetricQuality } from './metric-quality';
++import { currentOrders, orderKey } from './order-identity';
++import { ATTRIBUTION_MODEL, resolveAttribution } from './attribution-policy';
++
++export const METRIC_FORMULA_VERSION = 'metric-engine-v3-order-identity';
+ 
+ export interface MetricEngineInput {
+   orders: OrderRecord[];
++  orderCatalog?: OrderRecord[];
+   refunds: RefundRecord[];
+   members: MemberRecord[];
+   attribution: AttributionEvidenceRecord[];
+@@ -46,20 +51,14 @@
+   const seenRefund = new Set<string>();
+   for (const refund of input.refunds) {
+     if (dateMs(refund.occurredAt) > cutoffMs) continue;
+-    const refundKey = `${refund.tenantId}|${refund.storeId}|${refund.source}|${refund.externalAdjustmentId}`;
++    const refundKey = JSON.stringify([refund.tenantId, refund.storeId, refund.source, refund.externalAdjustmentId]);
+     if (seenRefund.has(refundKey)) continue;
+     seenRefund.add(refundKey);
+-    const orderKey = `${refund.tenantId}|${refund.storeId}|${refund.source}|${refund.externalOrderId}`;
+-    refundByOrder.set(orderKey, (refundByOrder.get(orderKey) || 0) + refund.amountMinor);
++    const key = orderKey(refund);
++    refundByOrder.set(key, (refundByOrder.get(key) || 0) + refund.amountMinor);
+   }
+-  const current = new Map<string, OrderRecord>();
+-  for (const order of input.orders) {
+-    const key = `${order.tenantId}|${order.storeId}|${order.source}|${order.externalOrderId}`;
+-    const existing = current.get(key);
+-    if (!existing || order.revision > existing.revision) current.set(key, order);
+-  }
+-  const qualified = Array.from(current.values()).filter((order) => order.active && order.status === 'paid' && dateMs(order.paidAt) <= cutoffMs).map((order) => {
+-    const refund = refundByOrder.get(`${order.tenantId}|${order.storeId}|${order.source}|${order.externalOrderId}`) || 0;
++  const qualified = currentOrders(input.orders).filter((order) => order.active && order.status === 'paid' && dateMs(order.paidAt) <= cutoffMs).map((order) => {
++    const refund = refundByOrder.get(orderKey(order)) || 0;
+     const net = Math.max(0, order.amountPaidMinor - Math.min(order.amountPaidMinor, refund));
+     return { order, refund, net };
+   }).filter((item) => item.net > 0);
+@@ -98,23 +97,22 @@
+     ordersByMember.set(memberId, items);
+   }
+   const mature30 = Array.from(firstByMember.entries()).filter(([, item]) => dateMs(item.order.paidAt) + 30 * 86_400_000 <= cutoffMs);
+-  const repeat30 = mature30.filter(([memberId, first]) => (ordersByMember.get(memberId) || []).some((item) => item.order.externalOrderId !== first.order.externalOrderId && dateMs(item.order.paidAt) > dateMs(first.order.paidAt) && dateMs(item.order.paidAt) <= dateMs(first.order.paidAt) + 30 * 86_400_000 && localDate(item.order.paidAt, input.timezone) !== localDate(first.order.paidAt, input.timezone)));
++  const repeat30 = mature30.filter(([memberId, first]) => (ordersByMember.get(memberId) || []).some((item) => orderKey(item.order) !== orderKey(first.order) && dateMs(item.order.paidAt) > dateMs(first.order.paidAt) && dateMs(item.order.paidAt) <= dateMs(first.order.paidAt) + 30 * 86_400_000 && localDate(item.order.paidAt, input.timezone) !== localDate(first.order.paidAt, input.timezone)));
+   const mature7 = input.members.filter((member) => dateMs(member.registeredAt) + 7 * 86_400_000 <= cutoffMs && (!firstByMember.has(member.id) || dateMs(firstByMember.get(member.id)!.order.paidAt) >= dateMs(member.registeredAt)));
+   const converted7 = mature7.filter((member) => {
+     const first = firstByMember.get(member.id);
+     return Boolean(first && dateMs(first.order.paidAt) <= dateMs(member.registeredAt) + 7 * 86_400_000);
+   });
+-  const methodRank: Record<string, number> = { verified_coupon: 2, linked_first_party_touch: 1 };
++  const primary = resolveAttribution(input.orderCatalog ?? input.orders, input.attribution, input.asOf);
+   const attributed: Record<string, number> = { unknown: 0 };
+   for (const item of qualified) {
+-    const evidence = input.attribution.filter((row) => row.tenantId === item.order.tenantId && row.storeId === item.order.storeId && row.orderExternalId === item.order.externalOrderId && dateMs(row.occurredAt) <= dateMs(item.order.paidAt) && row.method !== 'declared_source').sort((a, b) => (methodRank[b.method] || 0) - (methodRank[a.method] || 0) || dateMs(b.occurredAt) - dateMs(a.occurredAt));
+-    const campaign = evidence[0]?.campaignId || 'unknown';
++    const campaign = primary.get(orderKey(item.order))?.campaignId || 'unknown';
+     attributed[campaign] = (attributed[campaign] || 0) + item.net;
+   }
+   const freshness = assessMetricQuality({ hasData: input.orders.length > 0, asOf: input.asOf, completeThrough: input.completeThrough });
+   const quality: MetricResult['quality'] = freshness.quality === 'verified' ? 'complete' : freshness.quality;
+   const coverage = { qualified_orders: qualified.length, linked_orders: linked.length, identity_coverage: qualified.length ? linked.length / qualified.length : null };
+-  const base = { formula_version: 'metric-engine-v1', scope: {}, period: { as_of: input.asOf }, as_of: input.asOf, complete_through: input.completeThrough, coverage, quality, source_refs: ['orders', 'refunds', 'members'] as string[], missing_reason: freshness.missingReason };
++  const base = { formula_version: METRIC_FORMULA_VERSION, scope: {}, period: { as_of: input.asOf }, as_of: input.asOf, complete_through: input.completeThrough, coverage, quality, source_refs: ['orders', 'refunds', 'members'] as string[], missing_reason: freshness.missingReason };
+   const result = (metric_key: string, value: MetricResult['value'], numerator?: number | null, denominator?: number | null): MetricResult => ({ ...base, metric_key, value, ...(numerator === undefined ? {} : { numerator }), ...(denominator === undefined ? {} : { denominator }) });
+   const results: MetricResult[] = [
+     result('net_revenue_minor', netRevenue),
+@@ -131,5 +129,5 @@
+     result('conversion_7d_rate', mature7.length ? converted7.length / mature7.length : null, converted7.length, mature7.length),
+     result('primary_attributed_revenue_minor', attributed)
+   ];
+-  return { results, summary: { net_revenue_minor: netRevenue, qualified_order_count: qualified.length, average_order_value_minor: qualified.length ? netRevenue / qualified.length : null, linked_order_count: linked.length, identity_coverage: coverage.identity_coverage, member_revenue_minor: memberRevenue, member_revenue_share: netRevenue ? memberRevenue / netRevenue : null, mature_30d_cohort_count: mature30.length, repeat_30d_count: repeat30.length, repeat_30d_rate: mature30.length ? repeat30.length / mature30.length : null, mature_7d_registration_cohort_count: mature7.length, converted_7d_count: converted7.length, conversion_7d_rate: mature7.length ? converted7.length / mature7.length : null, primary_attributed_revenue_minor: attributed } };
++  return { results, summary: { attribution_model: ATTRIBUTION_MODEL, net_revenue_minor: netRevenue, qualified_order_count: qualified.length, average_order_value_minor: qualified.length ? netRevenue / qualified.length : null, linked_order_count: linked.length, identity_coverage: coverage.identity_coverage, member_revenue_minor: memberRevenue, member_revenue_share: netRevenue ? memberRevenue / netRevenue : null, mature_30d_cohort_count: mature30.length, repeat_30d_count: repeat30.length, repeat_30d_rate: mature30.length ? repeat30.length / mature30.length : null, mature_7d_registration_cohort_count: mature7.length, converted_7d_count: converted7.length, conversion_7d_rate: mature7.length ? converted7.length / mature7.length : null, primary_attributed_revenue_minor: attributed } };
+ }
+--- a/packages/domain/src/metric-service.ts
++++ b/packages/domain/src/metric-service.ts
+@@ -38,7 +38,8 @@
+   requireCondition(stores.length === storeIds.length, 'not_found', 404);
+   requireCondition(new Set(stores.map(s => s.currency + ':' + s.timezone)).size <= 1, 'mixed_store_currency_or_timezone_requires_single_store', 400);
+   const visible = (row: { tenantId: string; storeId: string }) => row.tenantId === actor.tenantId && storeIds.includes(row.storeId);
+-  const orders = state.orders.filter(o => visible(o) && Date.parse(o.paidAt) <= Date.parse(asOf));
++  const orderCatalog = state.orders.filter(visible);
++  const orders = orderCatalog.filter(o => Date.parse(o.paidAt) <= Date.parse(asOf));
+   requireCondition(orders.every(o => o.currency === stores.find(s => s.id === o.storeId)?.currency), 'order_currency_mismatch', 400);
+   const refunds = state.refunds.filter(r => visible(r) && Date.parse(r.occurredAt) <= Date.parse(asOf));
+   const members = state.members.filter(m => visible(m) && Date.parse(m.registeredAt) <= Date.parse(asOf));
+@@ -47,6 +48,6 @@
+   const completeThrough = sourceCoverage.length && sourceCoverage.every(s => s.completeThrough) ? sourceCoverage.map(s => s.completeThrough!).sort()[0] : null;
+   const freshness = assessMetricQuality({ hasData: orders.length > 0, hasImport: imports.some(b => b.kind === 'orders'), asOf, completeThrough });
+   if (freshness.quality === 'provisional' && sourceCoverage.some(s => s.status === 'not_imported')) freshness.missingReason = 'store_sources_incomplete';
+-  const bundle = computeMetricBundle({ orders, refunds, members, attribution: state.attributionEvidence.filter(visible), asOf, completeThrough, timezone: stores[0]?.timezone || 'Asia/Dhaka' });
++  const bundle = computeMetricBundle({ orders, orderCatalog, refunds, members, attribution: state.attributionEvidence.filter(visible), asOf, completeThrough, timezone: stores[0]?.timezone || 'Asia/Dhaka' });
+   return { storeIds, orders, imports, completeThrough, freshness, sourceCoverage, bundle, sourceRefs: imports.map(b => b.id), recordRefs: { orders: orders.map(o => o.id), refunds: refunds.map(r => r.id), members: members.map(m => m.id) } };
+ }
+--- a/packages/domain/src/metrics.ts
++++ b/packages/domain/src/metrics.ts
+@@ -1,30 +1,42 @@
+-export interface FixtureMember {
++import { computeMetricBundle } from './metric-engine';
++import type { AttributionEvidenceRecord, OrderRecord } from './imports';
++
++interface FixtureScope { tenant_id?: string; store_id?: string }
++
++export interface FixtureMember extends FixtureScope {
+   id: string;
+   registered_at: string;
+ }
+ 
+-export interface FixtureOrder {
++export interface FixtureOrder extends FixtureScope {
++  source?: string;
++  currency?: string;
+   external_order_id: string;
+   member_id: string | null;
+   paid_at: string;
+   amount_paid_minor: number;
+-  status: string;
++  status: OrderRecord['status'];
+ }
+ 
+-export interface FixtureAdjustment {
++export interface FixtureAdjustment extends FixtureScope {
++  source?: string;
++  occurred_at?: string;
+   external_adjustment_id: string;
+   external_order_id: string;
+   amount_minor: number;
+ }
+ 
+-export interface FixtureAttribution {
++export interface FixtureAttribution extends FixtureScope {
++  order_source?: string;
+   order_id: string;
+   campaign_id: string;
+-  method: string;
++  method: AttributionEvidenceRecord['method'];
+   occurred_at: string;
+ }
+ 
+-export interface GoldenFixture {
++export interface GoldenFixture extends FixtureScope {
++  timezone?: string;
++  currency?: string;
+   as_of: string;
+   orders_complete_through: string;
+   members: FixtureMember[];
+@@ -50,93 +62,17 @@
+   primary_attributed_revenue_minor: Record<string, number>;
+ }
+ 
+-function ms(value: string): number {
+-  return Date.parse(value);
++// The fixture adapter uses the application engine; it contains no second metric policy.
++export function computeGoldenMetrics(fixture: GoldenFixture): GoldenMetrics {
++  const scope = (row: FixtureScope) => ({ tenantId: row.tenant_id ?? fixture.tenant_id ?? 'fixture', storeId: row.store_id ?? fixture.store_id ?? 'fixture' });
++  const bundle = computeMetricBundle({
++    asOf: fixture.as_of, completeThrough: fixture.orders_complete_through, timezone: fixture.timezone ?? 'Asia/Dhaka',
++    orders: fixture.orders.map((row, i) => ({ ...scope(row), id: `fixture-order-${i}`, source: row.source ?? 'fixture', externalOrderId: row.external_order_id, memberId: row.member_id, paidAt: row.paid_at, currency: row.currency ?? fixture.currency ?? 'BDT', amountPaidMinor: row.amount_paid_minor, status: row.status, revision: 1, active: true, sourceRowHash: String(i), correctionOfId: null, createdAt: fixture.as_of, updatedAt: fixture.as_of })),
++    refunds: fixture.adjustments.map((row, i) => ({ ...scope(row), id: `fixture-refund-${i}`, source: row.source ?? 'fixture', externalAdjustmentId: row.external_adjustment_id, externalOrderId: row.external_order_id, amountMinor: row.amount_minor, occurredAt: row.occurred_at ?? fixture.as_of, sourceRowHash: String(i), createdAt: fixture.as_of })),
++    members: fixture.members.map(row => ({ ...scope(row), id: row.id, externalMemberId: row.id, registeredAt: row.registered_at, displayName: null, language: null, contact: null, contactHmac: null, publicAccessTokenHash: null, contactVerified: false, verificationProof: null, verificationExpiresAt: null, isSynthetic: true, createdAt: fixture.as_of })),
++    attribution: fixture.attribution_evidence.map((row, i) => ({ ...scope(row), id: `fixture-evidence-${i}`, orderExternalId: row.order_id, orderSource: row.order_source, campaignId: row.campaign_id, method: row.method, occurredAt: row.occurred_at }))
++  });
++  const summary = { ...bundle.summary };
++  delete summary.attribution_model;
++  return summary as unknown as GoldenMetrics;
+ }
+-
+-function dayDiff(later: string, earlier: string): number {
+-  return (ms(later) - ms(earlier)) / 86_400_000;
+-}
+-
+-function businessDate(value: string): string {
+-  // Fixture timestamps carry the store offset; preserving the date component
+-  // avoids treating two same-business-day checks as a "repeat".
+-  return value.slice(0, 10);
+-}
+-
+-export function computeGoldenMetrics(fixture: GoldenFixture): GoldenMetrics {
+-  const uniqueOrders = new Map<string, FixtureOrder>();
+-  for (const order of fixture.orders) {
+-    if (!uniqueOrders.has(order.external_order_id)) uniqueOrders.set(order.external_order_id, order);
+-  }
+-  const refundByOrder = new Map<string, number>();
+-  const seenRefunds = new Set<string>();
+-  for (const adjustment of fixture.adjustments) {
+-    if (seenRefunds.has(adjustment.external_adjustment_id)) continue;
+-    seenRefunds.add(adjustment.external_adjustment_id);
+-    refundByOrder.set(adjustment.external_order_id, (refundByOrder.get(adjustment.external_order_id) || 0) + adjustment.amount_minor);
+-  }
+-  const qualified = Array.from(uniqueOrders.values())
+-    .filter((order) => order.status === 'paid' && ms(order.paid_at) <= ms(fixture.orders_complete_through))
+-    .map((order) => ({ ...order, refund: refundByOrder.get(order.external_order_id) || 0 }))
+-    .map((order) => ({ ...order, net: Math.max(0, order.amount_paid_minor - Math.min(order.amount_paid_minor, order.refund)) }))
+-    .filter((order) => order.net > 0);
+-
+-  const netRevenue = qualified.reduce((sum, order) => sum + order.net, 0);
+-  const linked = qualified.filter((order) => Boolean(order.member_id));
+-  const memberRevenue = linked.reduce((sum, order) => sum + order.net, 0);
+-  const firstByMember = new Map<string, (typeof qualified)[number]>();
+-  for (const order of qualified) {
+-    if (!order.member_id) continue;
+-    const current = firstByMember.get(order.member_id);
+-    if (!current || ms(order.paid_at) < ms(current.paid_at)) firstByMember.set(order.member_id, order);
+-  }
+-
+-  const mature30 = Array.from(firstByMember.entries()).filter(([, first]) => dayDiff(fixture.as_of, first.paid_at) >= 30);
+-  const repeat30 = mature30.filter(([, first]) => qualified.some((candidate) =>
+-    candidate.member_id === first.member_id &&
+-    candidate.external_order_id !== first.external_order_id &&
+-    businessDate(candidate.paid_at) > businessDate(first.paid_at) &&
+-    dayDiff(candidate.paid_at, first.paid_at) <= 30
+-  ));
+-
+-  const orderByMember = new Map<string, typeof qualified>();
+-  for (const order of qualified) {
+-    if (!order.member_id) continue;
+-    const list = orderByMember.get(order.member_id) || [];
+-    list.push(order);
+-    orderByMember.set(order.member_id, list);
+-  }
+-  const mature7 = fixture.members.filter((member) => dayDiff(fixture.as_of, member.registered_at) >= 7);
+-  const converted7 = mature7.filter((member) => {
+-    const first = firstByMember.get(member.id);
+-    return Boolean(first && dayDiff(first.paid_at, member.registered_at) >= 0 && dayDiff(first.paid_at, member.registered_at) <= 7);
+-  });
+-
+-  const attributed: Record<string, number> = { unknown: 0 };
+-  const methodRank: Record<string, number> = { verified_coupon: 2, linked_first_party_touch: 1 };
+-  for (const order of qualified) {
+-    const candidates = fixture.attribution_evidence.filter((evidence) => evidence.order_id === order.external_order_id);
+-    const eligible = candidates.filter((evidence) => evidence.method !== 'declared_source');
+-    eligible.sort((a, b) => (methodRank[b.method] || 0) - (methodRank[a.method] || 0) || ms(b.occurred_at) - ms(a.occurred_at));
+-    const campaign = eligible[0]?.campaign_id || 'unknown';
+-    attributed[campaign] = (attributed[campaign] || 0) + order.net;
+-  }
+-
+-  return {
+-    net_revenue_minor: netRevenue,
+-    qualified_order_count: qualified.length,
+-    average_order_value_minor: qualified.length ? netRevenue / qualified.length : null,
+-    linked_order_count: linked.length,
+-    identity_coverage: qualified.length ? linked.length / qualified.length : null,
+-    member_revenue_minor: memberRevenue,
+-    member_revenue_share: netRevenue ? memberRevenue / netRevenue : null,
+-    mature_30d_cohort_count: mature30.length,
+-    repeat_30d_count: repeat30.length,
+-    repeat_30d_rate: mature30.length ? repeat30.length / mature30.length : null,
+-    mature_7d_registration_cohort_count: mature7.length,
+-    converted_7d_count: converted7.length,
+-    conversion_7d_rate: mature7.length ? converted7.length / mature7.length : null,
+-    primary_attributed_revenue_minor: attributed
+-  };
+-}
+--- /dev/null
++++ b/packages/domain/src/order-identity.ts
+@@ -0,0 +1,38 @@
++import type { OrderRecord } from './imports';
++
++type OrderIdentity = Pick<OrderRecord, 'tenantId' | 'storeId' | 'source' | 'externalOrderId'>;
++export interface OrderReference {
++  tenantId: string;
++  storeId: string;
++  orderId?: string;
++  orderExternalId?: string;
++  orderSource?: string;
++}
++
++// JSON tuples keep separator characters in upstream IDs unambiguous.
++export const orderKey = (order: OrderIdentity): string => JSON.stringify([order.tenantId, order.storeId, order.source, order.externalOrderId]);
++
++export function currentOrders(orders: OrderRecord[]): OrderRecord[] {
++  const current = new Map<string, OrderRecord>();
++  for (const order of orders) {
++    const key = orderKey(order);
++    if (!current.has(key) || current.get(key)!.revision < order.revision) current.set(key, order);
++  }
++  return [...current.values()];
++}
++
++export function resolveOrder(orders: OrderRecord[], ref: OrderReference): { ok: true; order: OrderRecord } | { ok: false; errorCode: string } {
++  const scoped = orders.filter(o => o.tenantId === ref.tenantId && o.storeId === ref.storeId);
++  for (const value of [ref.orderId, ref.orderExternalId, ref.orderSource]) {
++    if (value !== undefined && (typeof value !== 'string' || !value.trim())) return { ok: false, errorCode: 'order_reference_invalid' };
++  }
++  if (!ref.orderId && !ref.orderExternalId) return { ok: false, errorCode: 'order_reference_required' };
++  const revision = ref.orderId ? scoped.find(o => o.id === ref.orderId) : undefined;
++  if (ref.orderId && !revision) return { ok: false, errorCode: 'order_not_found' };
++  if (revision && ((ref.orderSource !== undefined && ref.orderSource !== revision.source) || (ref.orderExternalId !== undefined && ref.orderExternalId !== revision.externalOrderId))) return { ok: false, errorCode: 'order_reference_mismatch' };
++  const candidates = currentOrders(scoped).filter(o => revision ? orderKey(o) === orderKey(revision) : o.externalOrderId === ref.orderExternalId && (ref.orderSource === undefined || o.source === ref.orderSource));
++  // Count all business identities, including cancelled orders, before checking usability.
++  if (candidates.length > 1) return { ok: false, errorCode: 'order_reference_ambiguous' };
++  const order = candidates[0];
++  return order?.active ? { ok: true, order } : { ok: false, errorCode: 'order_not_found' };
++}
+--- a/packages/domain/src/validation.ts
++++ b/packages/domain/src/validation.ts
+@@ -1,7 +1,31 @@
+ export function explicitTimestamp(value: unknown): value is string {
+   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(value) || !Number.isFinite(Date.parse(value))) return false;
+   const [year, month, day] = value.slice(0, 10).split('-').map(Number);
+-  return month >= 1 && month <= 12 && day >= 1 && day <= new Date(Date.UTC(year, month, 0)).getUTCDate();
++  const days = [31, year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
++  return month >= 1 && month <= 12 && day >= 1 && day <= days[month - 1] && Number(value.slice(11, 13)) < 24 && Number(value.slice(14, 16)) < 60 && Number(value.slice(17, 19)) < 60;
++}
++
++export const nullableTimestamp = (value: unknown): value is string | null => value === null || explicitTimestamp(value);
++
++export function validTimeRange(from: unknown, to: unknown, requiredStart = false): boolean {
++  if (!nullableTimestamp(from) || !nullableTimestamp(to) || (requiredStart && from === null)) return false;
++  return from === null || to === null || Date.parse(to) > Date.parse(from);
++}
++
++export function requireTimeRange(from: unknown, to: unknown, code: string, requiredStart = false): void {
++  requireCondition(validTimeRange(from, to, requiredStart), code, 400);
++}
++
++export function activeDuring(now: string, from: string | null, to: string | null): boolean {
++  return explicitTimestamp(now) && validTimeRange(from, to) && (from === null || Date.parse(from) <= Date.parse(now)) && (to === null || Date.parse(now) < Date.parse(to));
++}
++
++export function timestampInput(value: unknown, field: string, fallback: string): string;
++export function timestampInput(value: unknown, field: string, fallback: null): string | null;
++export function timestampInput(value: unknown, field: string, fallback: string | null): string | null {
++  if (value === undefined) return fallback;
++  requireCondition(fallback === null ? nullableTimestamp(value) : explicitTimestamp(value), `invalid_${field}`, 400);
++  return value as string | null;
+ }
+ 
+ export class DomainError extends Error {
+--- a/scripts/capabilities.mjs
++++ b/scripts/capabilities.mjs
+@@ -1,13 +1,10 @@
+ import fs from 'node:fs';
+-import { createHash } from 'node:crypto';
++import { validationDirectory, assertValidation } from './validation-evidence.mjs';
+ 
+-const evidencePath = 'artifacts/audit-n01-n08/validation.json';
++const evidencePath = `${validationDirectory}/validation.json`;
+ const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
+ const capabilities = JSON.parse(fs.readFileSync('docs/capabilities.json', 'utf8'));
+-const changed = evidence.source_files.filter(file => !fs.existsSync(file.path) || createHash('sha256').update(fs.readFileSync(file.path)).digest('hex') !== file.sha256);
+-if (changed.length) throw new Error('validation_is_stale: ' + changed.map(file => file.path).join(', '));
+-if (evidence.checks.some(check => check.exit_code !== 0)) throw new Error('validation_has_failures');
+-const tests = evidence.checks.find(check => check.tests).tests;
++const tests = assertValidation(evidence);
+ const rows = capabilities.map(c => `| ${c.name} | ${c.status} | ${c.evidence.map(file => `[${file}](../${file})`).join('、')} | ${c.limit} |`);
+ const text = `# 能力与验证记录
+ 
+@@ -15,7 +12,7 @@
+ 
+ 最近验证：${evidence.recorded_at}；Node ${evidence.node}。${tests.passed} 项通过，${tests.failed} 项失败，${tests.skipped} 项跳过。
+ 
+-[命令、退出码、日志和源码哈希](../${evidencePath})。生成时检查源码是否与验证记录一致，源码变更后需重新验证。
++[命令、退出码、日志和源码哈希](../${evidencePath})。生成时比较完整文件集合、哈希、锁文件、工具链和验证命令；新增、删除、修改源码均需重新验证。
+ 
+ | 能力 | 状态 | 实现或测试证据 | 尚未覆盖 |
+ |---|---|---|---|
+--- a/scripts/validate-release.mjs
++++ b/scripts/validate-release.mjs
+@@ -1,38 +1,30 @@
+ import fs from 'node:fs';
+-import path from 'node:path';
+-import { createHash } from 'node:crypto';
+ import { spawnSync } from 'node:child_process';
++import { validationDirectory as directory, validationCommands, sourceSnapshot, changedSources, toolchainSnapshot, testCounts, sha256 } from './validation-evidence.mjs';
+ 
+-const directory = 'artifacts/audit-n01-n08';
+ fs.mkdirSync(directory, { recursive: true });
+-const sourceFiles = [];
+-function collect(directory) {
+-  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+-    const file = path.join(directory, entry.name);
+-    if (entry.isDirectory() && entry.name !== 'node_modules') collect(file);
+-    else if (entry.isFile()) sourceFiles.push(file);
+-  }
+-}
+-for (const directory of ['apps', 'packages', 'tests', 'scripts', 'fixtures']) collect(directory);
+-sourceFiles.push('package.json', 'package-lock.json', 'tsconfig.json', 'docs/capabilities.json');
++const sourceFiles = sourceSnapshot();
++const toolchain = toolchainSnapshot();
+ const checks = [];
+-for (const script of ['typecheck', 'build', 'test', 'security:scan', 'test:ai', 'fixtures:verify']) {
++for (const command of validationCommands) {
++  const script = command.split(' ')[2];
+   const args = ['run', script];
+   const started = new Date().toISOString();
+   const result = spawnSync('npm', args, { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+   const output = (result.stdout || '') + (result.stderr || '') + (result.error ? String(result.error) : '');
+   const log = `${directory}/${script.replaceAll(':', '-')}.log`;
+   fs.writeFileSync(log, output);
+-  const check = { command: `npm ${args.join(' ')}`, started_at: started, finished_at: new Date().toISOString(), exit_code: result.status ?? 1, log };
++  const check = { command, started_at: started, finished_at: new Date().toISOString(), exit_code: result.status ?? 1, log, log_sha256: sha256(log) };
+   if (script === 'test') {
+-    const count = name => [...output.matchAll(new RegExp(`(?:ℹ|#) ${name} (\\d+)`, 'g'))].reduce((sum, match) => sum + Number(match[1]), 0);
+-    check.tests = { total: count('tests'), passed: count('pass'), failed: count('fail'), skipped: count('skipped'), cancelled: count('cancelled') };
++    check.tests = testCounts(output);
+     if (!check.tests.total || check.tests.failed || check.tests.skipped || check.tests.cancelled || check.tests.passed !== check.tests.total) check.exit_code = check.exit_code || 1;
+   }
+   checks.push(check);
+   console.log(`${check.command}: exit ${check.exit_code}`);
+ }
+-const sha256 = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+-const evidence = { recorded_at: new Date().toISOString(), node: process.version, source_files: sourceFiles.sort().map(file => ({ path: file, sha256: sha256(file) })), checks, limitations: ['No clean dependency installation was attempted in this run; existing node_modules was used.', 'HTTP tests are not browser interaction acceptance.', 'No production database, live model, external message or customer UAT was exercised.'] };
++const changed = changedSources(sourceFiles, sourceSnapshot());
++const sourceStable = !changed.length && JSON.stringify(toolchain) === JSON.stringify(toolchainSnapshot());
++if (!sourceStable) console.error('validation_changed_during_run: ' + changed.join(', '));
++const evidence = { schema_version: 2, recorded_at: new Date().toISOString(), node: process.version, toolchain, source_stable: sourceStable, changed_during_run: changed, source_files: sourceFiles, checks, limitations: ['No clean dependency installation was attempted in this run; existing node_modules was used.', 'HTTP tests are not browser interaction acceptance.', 'No production database, live model, external message or customer UAT was exercised.'] };
+ fs.writeFileSync(`${directory}/validation.json`, JSON.stringify(evidence, null, 2) + '\n');
+-process.exitCode = checks.every(check => check.exit_code === 0) ? 0 : 1;
++process.exitCode = sourceStable && checks.every(check => check.exit_code === 0) ? 0 : 1;
+--- /dev/null
++++ b/scripts/validation-evidence.mjs
+@@ -0,0 +1,61 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import { createHash } from 'node:crypto';
++import { spawnSync } from 'node:child_process';
++
++export const validationDirectory = 'artifacts/audit-b01-b05';
++export const validationCommands = ['typecheck', 'build', 'test', 'security:scan', 'test:ai', 'fixtures:verify'].map(script => `npm run ${script}`);
++export const sha256 = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
++
++export function sourceSnapshot(root = '.') {
++  const files = ['package.json', 'package-lock.json', 'tsconfig.json', 'docs/capabilities.json'];
++  function collect(directory) {
++    for (const entry of fs.readdirSync(path.join(root, directory), { withFileTypes: true })) {
++      const file = path.join(directory, entry.name);
++      if (entry.name === 'node_modules') continue;
++      if (entry.isDirectory()) collect(file);
++      else if (entry.isFile()) files.push(file);
++      else throw new Error('unsupported_source_entry: ' + file);
++    }
++  }
++  for (const directory of ['apps', 'packages', 'tests', 'scripts', 'fixtures', 'contracts']) collect(directory);
++  return files.sort().map(file => ({ path: file, sha256: sha256(path.join(root, file)) }));
++}
++
++export function changedSources(before, after) {
++  const a = new Map(before.map(file => [file.path, file.sha256]));
++  const b = new Map(after.map(file => [file.path, file.sha256]));
++  return [...new Set([...a.keys(), ...b.keys()])].filter(file => a.get(file) !== b.get(file)).sort();
++}
++
++export function toolchainSnapshot(root = '.') {
++  const npm = spawnSync('npm', ['--version'], { encoding: 'utf8', cwd: root });
++  if (npm.status !== 0) throw new Error('npm_version_unavailable');
++  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
++  const versions = {};
++  for (const name of Object.keys({ ...manifest.dependencies, ...manifest.devDependencies }).sort()) {
++    versions[name] = JSON.parse(fs.readFileSync(path.join(root, 'node_modules', name, 'package.json'), 'utf8')).version;
++  }
++  return { node: process.version, npm: npm.stdout.trim(), platform: process.platform, arch: process.arch, packages: versions };
++}
++
++export function testCounts(output) {
++  const count = name => [...output.matchAll(new RegExp(`(?:ℹ|#) ${name} (\\d+)`, 'g'))].reduce((sum, match) => sum + Number(match[1]), 0);
++  return { total: count('tests'), passed: count('pass'), failed: count('fail'), skipped: count('skipped'), cancelled: count('cancelled') };
++}
++
++export function assertValidation(evidence, root = '.') {
++  if (evidence.schema_version !== 2 || !evidence.source_stable) throw new Error('validation_snapshot_incomplete');
++  const changed = changedSources(evidence.source_files, sourceSnapshot(root));
++  if (changed.length) throw new Error('validation_is_stale: ' + changed.join(', '));
++  if (JSON.stringify(evidence.toolchain) !== JSON.stringify(toolchainSnapshot(root))) throw new Error('validation_toolchain_changed');
++  if (JSON.stringify(evidence.checks.map(check => check.command)) !== JSON.stringify(validationCommands)) throw new Error('validation_commands_changed');
++  if (evidence.checks.some(check => check.exit_code !== 0)) throw new Error('validation_has_failures');
++  for (const check of evidence.checks) {
++    if (sha256(path.join(root, check.log)) !== check.log_sha256) throw new Error('validation_log_changed: ' + check.log);
++  }
++  const check = evidence.checks.find(item => item.command === 'npm run test');
++  const counts = testCounts(fs.readFileSync(path.join(root, check.log), 'utf8'));
++  if (JSON.stringify(counts) !== JSON.stringify(check.tests) || !counts.total || counts.passed !== counts.total || counts.failed || counts.skipped || counts.cancelled) throw new Error('validation_tests_incomplete');
++  return counts;
++}
+--- /dev/null
++++ b/tests/audit-b01-b05.test.ts
+@@ -0,0 +1,332 @@
++import test, { type TestContext } from 'node:test';
++import assert from 'node:assert/strict';
++import { startTestApp, TestClient } from '../packages/testing/src/http';
++import { computeMetricBundle } from '../packages/domain/src/metric-engine';
++import { captureContentFacts, checkPublish, contentDigest } from '../packages/domain/src/content-policy';
++import { orderKey, resolveOrder } from '../packages/domain/src/order-identity';
++import { explicitTimestamp } from '../packages/domain/src/validation';
++
++const tenantId = 'ten_demo_01';
++const storeId = 'sto_demo_01';
++const asOf = '2026-03-01T00:00:00Z';
++const post = (client: TestClient, url: string, body = {}) => client.request(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
++
++async function setup(t: TestContext) {
++  const app = await startTestApp({ seedDemo: true });
++  t.after(() => app.close());
++  const owner = new TestClient(app.baseUrl);
++  assert.equal((await owner.login('owner@demo.adda.local')).response.status, 200);
++  return { app, owner };
++}
++
++async function importOrders(owner: TestClient, source: string, paidAt: string, amount = 1000) {
++  const content = `tenant_id,store_id,source,external_order_id,member_id,paid_at,currency,amount_paid_minor,status\n${tenantId},${storeId},${source},ORDER-001,MEMBER-001,${paidAt},BDT,${amount},paid`;
++  const preview = await post(owner, '/api/imports/preview', { kind: 'orders', content, source, store_id: storeId, complete_through: asOf });
++  assert.equal(preview.response.status, 201, JSON.stringify(preview.body));
++  assert.equal(preview.body.preview.valid_row_count, 1);
++  const committed = await post(owner, `/api/imports/${preview.body.import.id}/commit`);
++  assert.equal(committed.response.status, 200);
++  return committed;
++}
++
++const metrics = (owner: TestClient) => owner.request(`/api/metrics?store_id=${storeId}&as_of=${asOf}`);
++const touch = (owner: TestClient, occurredAt: string, extra = {}) => post(owner, '/api/attribution/evidence', { store_id: storeId, order_external_id: 'ORDER-001', campaign_id: 'synthetic-campaign', method: 'linked_first_party_touch', occurred_at: occurredAt, ...extra });
++
++async function createProduct(owner: TestClient) {
++  const result = await post(owner, '/api/products', { store_id: storeId, external_sku: 'THIRD-AUDIT', names: { en: 'Milk Tea' } });
++  assert.equal(result.response.status, 201);
++  return result.body.item.id as string;
++}
++
++async function content(owner: TestClient, expiresAt: string | null = null) {
++  const brand = await post(owner, '/api/brand/documents', { source_type: 'form', source_label: 'synthetic third audit', content: JSON.stringify({ brand_name: 'ADDA TEA' }) });
++  assert.equal((await post(owner, `/api/brand/revisions/${brand.body.revision.id}/approve`)).response.status, 200);
++  const productId = await createProduct(owner);
++  const price = await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, status: 'approved', valid_from: '2025-01-01T00:00:00Z', valid_to: null });
++  assert.equal(price.response.status, 201);
++  const asset = await post(owner, '/api/media-assets', { store_id: storeId, storage_key: 'synthetic/third-audit.jpg', checksum: 'third-audit', rights_status: 'approved', allowed_uses: ['organic_social'], expires_at: expiresAt });
++  assert.equal(asset.response.status, 201);
++  const campaign = await post(owner, '/api/campaigns', { name: 'Third audit', objective: 'orders', store_id: storeId, product_ids: [productId], asset_ids: [asset.body.item.id] });
++  assert.equal(campaign.response.status, 201);
++  const generated = await post(owner, '/api/content/generate', { campaign_id: campaign.body.item.id });
++  assert.equal(generated.response.status, 201);
++  const revisionId = generated.body.revision.id as string;
++  assert.equal((await post(owner, `/api/content/${revisionId}/review-bn`)).response.status, 200);
++  return { revisionId, productId, priceId: price.body.item.id as string, assetId: asset.body.item.id as string, brandId: brand.body.revision.id as string, campaignId: campaign.body.item.id as string };
++}
++
++test('B01: source-scoped order numbers count as distinct cross-day purchases', async t => {
++  const { app, owner } = await setup(t);
++  await app.repository.createMember({ tenantId, storeId, externalMemberId: 'MEMBER-001', displayName: null, registeredAt: '2025-12-01T00:00:00Z', language: 'en', contact: null, contactHmac: null, publicAccessTokenHash: null, isSynthetic: true });
++  await importOrders(owner, 'pos', '2026-01-01T10:00:00Z');
++  await importOrders(owner, 'delivery', '2026-01-02T10:00:00Z');
++  const { body } = await metrics(owner);
++  assert.equal(body.summary.qualified_order_count, 2);
++  assert.equal(body.summary.mature_30d_cohort_count, 1);
++  assert.equal(body.summary.repeat_30d_count, 1);
++  assert.equal(body.summary.repeat_30d_rate, 1);
++});
++
++test('B02: a first-party touch 31 days before purchase stays unknown', async t => {
++  const { owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  assert.equal((await touch(owner, '2026-01-01T10:00:00Z')).response.status, 201);
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 1000 });
++});
++
++test('B03: ambiguous external order references are rejected without attribution writes', async t => {
++  const { app, owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z', 1000);
++  await importOrders(owner, 'delivery', '2026-02-01T11:00:00Z', 9000);
++  const result = await touch(owner, '2026-01-31T10:00:00Z');
++  assert.equal(result.response.status, 409);
++  assert.equal(result.body.error_code, 'order_reference_ambiguous');
++  assert.equal(app.repository.snapshot().attributionEvidence.length, 0);
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 10000 });
++});
++
++test('B04: malformed price dates are rejected before creating a version', async t => {
++  const { app, owner } = await setup(t);
++  const productId = await createProduct(owner);
++  const result = await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, status: 'approved', valid_from: 'not-a-date', valid_to: 'not-a-date' });
++  assert.equal(result.response.status, 400);
++  assert.equal(app.repository.snapshot().priceVersions.length, 0);
++  assert.equal(app.repository.findProduct(productId)!.currentPriceVersionId, null);
++});
++
++test('B05: malformed asset expiry is rejected before creating an asset', async t => {
++  const { app, owner } = await setup(t);
++  const result = await post(owner, '/api/media-assets', { store_id: storeId, storage_key: 'synthetic/bad.jpg', checksum: 'bad-expiry', rights_status: 'approved', allowed_uses: ['organic_social'], expires_at: 'not-a-date' });
++  assert.equal(result.response.status, 400);
++  assert.equal(app.repository.snapshot().mediaAssets.length, 0);
++});
++
++test('B02 control: a touch two days before purchase is attributed', async t => {
++  const { owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  assert.equal((await touch(owner, '2026-01-30T10:00:00Z')).response.status, 201);
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 0, 'synthetic-campaign': 1000 });
++});
++
++test('B05 control: a valid but expired asset blocks submission and export', async t => {
++  const { app, owner } = await setup(t);
++  const { revisionId } = await content(owner, '2020-01-01T00:00:00Z');
++  const submit = await post(owner, '/api/content/submit', { revision_id: revisionId });
++  assert.equal(submit.response.status, 409);
++  assert.equal(submit.body.error_code, 'asset_rights_expired');
++  assert.equal((await post(owner, '/api/content/export', { revision_id: revisionId })).response.status, 404); // No approval exists after rejected submission.
++  assert.equal(app.repository.snapshot().publicationIntents.length, 0);
++});
++
++test('B01/B03: bound identity survives another source, corrections and scoped refunds', async t => {
++  const { app, owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  const evidence = await touch(owner, '2026-01-31T10:00:00Z');
++  assert.equal(evidence.response.status, 201);
++  assert.equal(evidence.body.item.orderSource, 'pos');
++  assert.ok(evidence.body.item.orderId);
++  await importOrders(owner, 'delivery', '2026-02-01T11:00:00Z', 9000);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z', 5000);
++  const preview = await post(owner, '/api/imports/preview', { store_id: storeId, source: 'pos', kind: 'refunds', content: `tenant_id,store_id,source,external_adjustment_id,external_order_id,occurred_at,amount_minor\n${tenantId},${storeId},pos,REFUND-001,ORDER-001,2026-02-02T10:00:00Z,1000` });
++  assert.equal(preview.response.status, 201);
++  assert.equal((await post(owner, `/api/imports/${preview.body.import.id}/commit`)).response.status, 200);
++  const { body } = await metrics(owner);
++  assert.equal(body.summary.qualified_order_count, 2);
++  assert.equal(body.summary.net_revenue_minor, 13000);
++  assert.deepEqual(body.summary.primary_attributed_revenue_minor, { unknown: 9000, 'synthetic-campaign': 4000 });
++  const resolved = resolveOrder(app.repository.snapshot().orders, evidence.body.item);
++  assert.ok(resolved.ok);
++  assert.equal(resolved.order.revision, 2);
++  assert.notEqual(resolved.order.id, evidence.body.item.orderId);
++});
++
++test('B03: legacy ambiguous evidence stays unknown, including cancelled-source collisions', async t => {
++  const { app, owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z', 1000);
++  await importOrders(owner, 'delivery', '2026-02-01T11:00:00Z', 9000);
++  await app.repository.mutate(state => state.attributionEvidence.push({ id: 'legacy', tenantId, storeId, orderExternalId: 'ORDER-001', campaignId: 'legacy-campaign', method: 'linked_first_party_touch', occurredAt: '2026-01-31T10:00:00Z' }));
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 10000 });
++  await app.repository.mutate(state => { state.orders.find(o => o.source === 'delivery')!.status = 'cancelled'; });
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 1000 });
++  assert.equal((await touch(owner, '2026-01-31T10:00:00Z')).response.status, 409);
++  await app.repository.mutate(state => { const order = state.orders.find(o => o.source === 'delivery')!; order.status = 'paid'; order.paidAt = '2026-04-01T00:00:00Z'; });
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 1000 });
++});
++
++test('B03: explicit source or internal ID resolves one order; mismatches never write evidence', async t => {
++  const { app, owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  await importOrders(owner, 'delivery', '2026-02-01T11:00:00Z', 9000);
++  const delivery = app.repository.snapshot().orders.find(o => o.source === 'delivery')!;
++  for (const fields of [{ order_id: delivery.id, order_source: 'pos' }, { order_id: 'unknown' }, { order_source: '' }, { order_source: null }, { order_source: 2 }]) {
++    assert.equal((await touch(owner, '2026-01-31T10:00:00Z', fields)).response.status, 409);
++  }
++  assert.equal(app.repository.snapshot().attributionEvidence.length, 0);
++  const one = await touch(owner, '2026-01-31T10:00:00Z', { order_id: delivery.id, order_external_id: undefined });
++  assert.equal(one.response.status, 201);
++  assert.equal(one.body.item.orderSource, 'delivery');
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 1000, 'synthetic-campaign': 9000 });
++  assert.equal((await touch(owner, '2026-01-31T10:00:00Z', { order_source: 'pos', campaign_id: 'pos-campaign' })).response.status, 201);
++  assert.deepEqual((await metrics(owner)).body.summary.primary_attributed_revenue_minor, { unknown: 0, 'pos-campaign': 1000, 'synthetic-campaign': 9000 });
++  assert.deepEqual(resolveOrder(app.repository.snapshot().orders, { tenantId: 'other-tenant', storeId, orderId: delivery.id }), { ok: false, errorCode: 'order_not_found' });
++  assert.deepEqual(resolveOrder(app.repository.snapshot().orders, { tenantId, storeId: 'other-store', orderId: delivery.id }), { ok: false, errorCode: 'order_not_found' });
++  assert.notEqual(orderKey({ ...delivery, source: 'a|b', externalOrderId: 'c' }), orderKey({ ...delivery, source: 'a', externalOrderId: 'b|c' }));
++});
++
++test('B02: seven-day boundaries, latest eligible touch and post-purchase evidence', async t => {
++  const { app, owner } = await setup(t);
++  const paidAt = '2026-02-01T10:00:00Z';
++  await importOrders(owner, 'pos', paidAt);
++  const state = app.repository.snapshot();
++  const base = { id: 'touch', tenantId, storeId, orderExternalId: 'ORDER-001', orderSource: 'pos', campaignId: 'touch-campaign', method: 'linked_first_party_touch' as const, occurredAt: paidAt };
++  const input = { orders: state.orders, refunds: state.refunds, members: state.members, asOf, completeThrough: asOf, timezone: 'Asia/Dhaka' };
++  for (const age of [-1, 0, 1, 7 * 86400000, 7 * 86400000 + 1]) {
++    const occurredAt = new Date(Date.parse(paidAt) - age).toISOString();
++    const result = computeMetricBundle({ ...input, attribution: [{ ...base, occurredAt }] });
++    assert.deepEqual(result.summary.primary_attributed_revenue_minor, age >= 0 && age <= 7 * 86400000 ? { unknown: 0, 'touch-campaign': 1000 } : { unknown: 1000 }, `age=${age}`);
++  }
++  const rows = [
++    { ...base, id: 'old', campaignId: 'old', occurredAt: '2026-01-26T10:00:00Z' },
++    { ...base, id: 'latest', campaignId: 'latest', occurredAt: '2026-01-31T10:00:00Z' },
++    { ...base, id: 'after', campaignId: 'after', occurredAt: '2026-02-01T10:00:00.001Z' }
++  ];
++  assert.deepEqual(computeMetricBundle({ ...input, attribution: rows }).summary.primary_attributed_revenue_minor, { unknown: 0, latest: 1000 });
++  assert.deepEqual((await metrics(owner)).body.summary.attribution_model, { version: 'primary_source_v2', touch_window_days: 7 });
++});
++
++test('B02: verified order evidence has priority and is bounded by report as-of, not touch age', async t => {
++  const { app, owner } = await setup(t);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  const state = app.repository.snapshot();
++  const input = { orders: state.orders, refunds: [], members: [], asOf, completeThrough: asOf, timezone: 'Asia/Dhaka' };
++  const base = { id: 'coupon', tenantId, storeId, orderExternalId: 'ORDER-001', orderSource: 'pos', campaignId: 'coupon', method: 'verified_coupon' as const, occurredAt: '2026-02-02T10:00:00Z' };
++  const touchRow = { ...base, id: 'touch', campaignId: 'touch', method: 'linked_first_party_touch' as const, occurredAt: '2026-02-01T10:00:00Z' };
++  for (const occurredAt of ['2026-01-01T10:00:00Z', '2026-02-02T10:00:00Z']) {
++    assert.deepEqual(computeMetricBundle({ ...input, attribution: [touchRow, { ...base, occurredAt }] }).summary.primary_attributed_revenue_minor, { unknown: 0, coupon: 1000 });
++  }
++  for (const row of [{ ...base, occurredAt: '2026-03-02T10:00:00Z' }, { ...base, occurredAt: 'bad' }, { ...base, method: 'declared_source' as const }]) {
++    assert.deepEqual(computeMetricBundle({ ...input, attribution: [touchRow, row] }).summary.primary_attributed_revenue_minor, { unknown: 0, touch: 1000 });
++  }
++});
++
++test('B03: coupon matching rejects ambiguous orders and saves the exact source', async t => {
++  const { app, owner } = await setup(t);
++  const member = await app.repository.createMember({ tenantId, storeId, externalMemberId: 'MEMBER-001', displayName: null, registeredAt: '2025-12-01T00:00:00Z', language: 'en', contact: null, contactHmac: null, publicAccessTokenHash: null, isSynthetic: true });
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  await importOrders(owner, 'delivery', '2026-02-01T11:00:00Z', 9000);
++  const campaign = await post(owner, '/api/campaigns', { store_id: storeId, name: 'Coupon audit', objective: 'orders' });
++  const offer = await app.repository.createOffer({ tenantId, storeId, campaignId: campaign.body.item.id, name: 'Synthetic', terms: 'Synthetic terms', validFrom: '2025-01-01T00:00:00Z', validTo: new Date(Date.now() + 86400000).toISOString(), maxRedemptions: null, createdBy: 'usr_demo_owner' });
++  const coupon = await app.repository.issueCoupon({ tenantId, storeId, offerId: offer.id, memberId: member.id, sourceLinkId: null, tokenHash: 'synthetic-coupon' });
++  await app.repository.reserveCoupon({ tokenHash: coupon.tokenHash, tenantId, storeId, employeeUserId: 'usr_demo_owner', posOrderRef: 'ORDER-001' });
++  const url = `/api/redemptions/${coupon.id}/match-pos`;
++  const fields = { store_id: storeId, pos_order_ref: 'ORDER-001' };
++  const ambiguous = await post(owner, url, fields);
++  assert.equal(ambiguous.response.status, 409);
++  assert.equal(ambiguous.body.error_code, 'order_reference_ambiguous');
++  assert.equal(app.repository.snapshot().attributionEvidence.length, 0);
++  const matched = await post(owner, url, { ...fields, order_source: 'pos' });
++  assert.equal(matched.response.status, 200);
++  assert.equal(matched.body.coupon.order_source, 'pos');
++  assert.equal((await post(owner, url, { ...fields, order_source: 'delivery' })).response.status, 409);
++  assert.equal((await post(owner, url, { ...fields, order_source: 'pos' })).response.status, 200);
++  assert.equal(app.repository.snapshot().attributionEvidence.length, 1);
++  const result = await owner.request(`/api/metrics?store_id=${storeId}&as_of=${new Date().toISOString()}`);
++  assert.deepEqual(result.body.summary.primary_attributed_revenue_minor, { unknown: 9000, [campaign.body.item.id]: 1000 });
++});
++
++test('B04/B05: date input types, calendar values and reversed intervals cannot change saved state', async t => {
++  const { app, owner } = await setup(t);
++  const productId = await createProduct(owner);
++  const invalid = ['', 42, true, {}, '2026-02-01', '2026-02-01T12:00:00', '2026-02-30T00:00:00Z', '2026-01-01T24:00:00Z'];
++  for (const value of invalid) {
++    assert.equal((await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, valid_from: value })).response.status, 400, JSON.stringify(value));
++    assert.equal((await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, valid_to: value })).response.status, 400);
++    assert.equal((await post(owner, '/api/media-assets', { storage_key: 'synthetic/invalid', checksum: 'invalid', expires_at: value })).response.status, 400);
++  }
++  assert.equal((await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, valid_from: null })).response.status, 400);
++  for (const end of ['2026-01-01T00:00:00Z', '2026-01-02T00:00:00Z']) {
++    assert.equal((await post(owner, `/api/products/${productId}/prices`, { amount_minor: 15000, valid_from: '2026-01-02T00:00:00Z', valid_to: end })).response.status, 400);
++  }
++  assert.equal(app.repository.snapshot().priceVersions.length, 0);
++  assert.equal(app.repository.snapshot().mediaAssets.length, 0);
++  assert.equal((await post(owner, '/api/products', { store_id: storeId, external_sku: 'REJECTED', price_minor: 1, valid_from: 'bad' })).response.status, 400);
++  assert.equal(app.repository.snapshot().products.length, 1);
++});
++
++test('B04/B05: repository writes and idempotent asset lookup also validate dates', async t => {
++  const { app, owner } = await setup(t);
++  const values = await content(owner);
++  const state = app.repository.snapshot();
++  const price = state.priceVersions.find(p => p.id === values.priceId)!;
++  const asset = state.mediaAssets.find(a => a.id === values.assetId)!;
++  await assert.rejects(app.repository.addPriceVersion({ ...price, validFrom: 'bad' }), /invalid_price_validity/);
++  await assert.rejects(app.repository.createMediaAsset({ ...asset, expiresAt: 'bad' }), /invalid_expires_at/);
++  await assert.rejects(app.repository.updateCampaign(values.campaignId, { endAt: 'bad' }), /invalid_campaign_window/);
++  assert.equal(app.repository.snapshot().priceVersions.length, 1);
++  assert.equal(app.repository.snapshot().mediaAssets.length, 1);
++});
++
++test('B04/B05: brand, campaign and attribution routes reject malformed dates', async t => {
++  const { app, owner } = await setup(t);
++  assert.equal((await post(owner, '/api/brand/documents', { source_type: 'form', content: '{"brand_name":"Synthetic"}', effective_to: 'bad' })).response.status, 400);
++  assert.equal((await post(owner, '/api/campaigns', { store_id: storeId, name: 'Invalid', start_at: 'bad' })).response.status, 400);
++  const created = await post(owner, '/api/campaigns', { store_id: storeId, name: 'Valid' });
++  const result = await owner.request(`/api/campaigns/${created.body.item.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ start_at: '2026-03-01T00:00:00Z', end_at: '2026-02-01T00:00:00Z' }) });
++  assert.equal(result.response.status, 400);
++  assert.equal(app.repository.findCampaign(created.body.item.id)!.revision, 1);
++  await importOrders(owner, 'pos', '2026-02-01T10:00:00Z');
++  assert.equal((await touch(owner, 'not-a-date')).response.status, 400);
++  assert.equal(app.repository.snapshot().attributionEvidence.length, 0);
++});
++
++for (const kind of ['price', 'asset', 'brand'] as const) {
++  test(`B04/B05: an otherwise valid legacy approval with invalid ${kind} dates cannot export`, async t => {
++    const { app, owner } = await setup(t);
++    const values = await content(owner);
++    const submitted = await post(owner, '/api/content/submit', { revision_id: values.revisionId });
++    assert.equal(submitted.response.status, 201);
++    assert.equal((await post(owner, `/api/approvals/${submitted.body.approval.id}/approve`)).response.status, 200);
++    await app.repository.mutate(state => {
++      if (kind === 'price') state.priceVersions.find(p => p.id === values.priceId)!.validFrom = 'not-a-date';
++      if (kind === 'asset') state.mediaAssets.find(a => a.id === values.assetId)!.expiresAt = 'not-a-date';
++      if (kind === 'brand') state.brandRevisions.find(b => b.id === values.brandId)!.effectiveTo = 'not-a-date';
++      // Reconstruct a historical approval that already bound these dirty facts.
++      // The date rule must reject it even when all version/hash bindings match.
++      const revision = state.contentRevisions.find(r => r.id === values.revisionId)!;
++      const brief = state.contentBriefs.find(b => b.id === revision.briefId)!;
++      revision.generationFacts = captureContentFacts(state, brief, revision.packageData);
++      state.contentApprovals.find(a => a.id === submitted.body.approval.id)!.factsHash = contentDigest(revision.generationFacts);
++    });
++    const exported = await post(owner, '/api/content/export', { revision_id: values.revisionId });
++    assert.equal(exported.response.status, 409);
++    assert.equal(exported.body.error_code, { price: 'price_validity_invalid', asset: 'asset_expiry_invalid', brand: 'brand_revision_changed' }[kind]);
++    assert.equal(app.repository.snapshot().publicationIntents.length, 0);
++  });
++}
++
++test('B04/B05: null expiry permits manual export; starts and ends obey exact boundaries', async t => {
++  const { app, owner } = await setup(t);
++  const values = await content(owner);
++  const submitted = await post(owner, '/api/content/submit', { revision_id: values.revisionId });
++  assert.equal(submitted.response.status, 201);
++  assert.equal((await post(owner, `/api/approvals/${submitted.body.approval.id}/approve`)).response.status, 200);
++  const exported = await post(owner, '/api/content/export', { revision_id: values.revisionId });
++  assert.equal(exported.response.status, 200);
++  assert.equal(exported.body.published, false);
++  const state = app.repository.snapshot();
++  const price = state.priceVersions.find(p => p.id === values.priceId)!;
++  const asset = state.mediaAssets.find(a => a.id === values.assetId)!;
++  const input = { tenantId, storeId, productIds: [values.productId], assetIds: [values.assetId] };
++  price.validFrom = asOf;
++  assert.equal(checkPublish(state, input, asOf).ok, true);
++  price.validFrom = '2026-03-01T00:00:00.001Z';
++  assert.equal(checkPublish(state, input, asOf).errors[0].code, 'price_outside_validity');
++  price.validFrom = '2026-01-01T00:00:00Z';
++  price.validTo = asOf;
++  assert.equal(checkPublish(state, input, asOf).errors[0].code, 'price_outside_validity');
++  price.validTo = null;
++  asset.expiresAt = asOf;
++  assert.equal(checkPublish(state, input, asOf).errors[0].code, 'asset_rights_expired');
++  assert.equal(explicitTimestamp('2024-02-29T06:00:00+06:00'), true);
++  assert.equal(explicitTimestamp('2025-02-29T06:00:00+06:00'), false);
++});
+--- /dev/null
++++ b/tests/validation-evidence.test.mjs
+@@ -0,0 +1,127 @@
++import test, { before, after } from 'node:test';
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import path from 'node:path';
++import { spawnSync } from 'node:child_process';
++
++let root;
++let evidence;
++const evidencePath = 'artifacts/audit-b01-b05/validation.json';
++const run = (directory, script) => {
++  const env = { ...process.env };
++  delete env.NODE_TEST_CONTEXT; // The fixture starts an independent Node test runner.
++  return spawnSync(process.execPath, [`scripts/${script}.mjs`], { cwd: directory, env, encoding: 'utf8' });
++};
++
++function fixture() {
++  const directory = fs.mkdtempSync(path.join(process.cwd(), '.tmp-evidence-'));
++  for (const dir of ['apps/web/src', 'packages', 'tests', 'scripts', 'fixtures', 'contracts', 'docs']) fs.mkdirSync(path.join(directory, dir), { recursive: true });
++  for (const script of ['capabilities', 'validate-release', 'validation-evidence']) fs.copyFileSync(`scripts/${script}.mjs`, path.join(directory, `scripts/${script}.mjs`));
++  // This miniature project exercises the evidence recorder, not application gates.
++  const scripts = Object.fromEntries(['typecheck', 'build', 'security:scan', 'test:ai', 'fixtures:verify'].map(name => [name, 'node -e "process.exit(0)"']));
++  scripts.test = 'node --test tests/smoke.cjs';
++  fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify({ name: 'evidence-test-fixture', private: true, scripts }));
++  fs.writeFileSync(path.join(directory, 'package-lock.json'), '{}');
++  fs.writeFileSync(path.join(directory, 'tsconfig.json'), '{}');
++  fs.writeFileSync(path.join(directory, 'docs/capabilities.json'), '[]');
++  fs.writeFileSync(path.join(directory, 'tests/smoke.cjs'), 'require("node:test")("synthetic fixture", () => require("node:assert/strict").equal(2 + 2, 4));');
++  fs.writeFileSync(path.join(directory, 'apps/web/src/main.ts'), 'export const fixture = true;');
++  return directory;
++}
++
++before(() => {
++  root = fixture();
++  const result = run(root, 'validate-release');
++  assert.equal(result.status, 0, result.stdout + result.stderr + fs.readFileSync(path.join(root, 'artifacts/audit-b01-b05/test.log'), 'utf8'));
++  evidence = fs.readFileSync(path.join(root, evidencePath), 'utf8');
++});
++after(() => { if (root) fs.rmSync(root, { recursive: true, force: true }); });
++
++function rejectsChangedFile(file, value) {
++  const target = path.join(root, file);
++  const before = fs.existsSync(target) ? fs.readFileSync(target) : null;
++  try {
++    if (value === null) fs.unlinkSync(target);
++    else fs.writeFileSync(target, value);
++    const result = run(root, 'capabilities');
++    assert.notEqual(result.status, 0);
++    assert.ok((result.stderr + result.stdout).includes('validation_is_stale: '), result.stderr);
++    assert.ok(result.stderr.includes(file), result.stderr);
++  } finally {
++    if (before === null) fs.rmSync(target, { force: true });
++    else fs.writeFileSync(target, before);
++  }
++}
++
++test('A01: unchanged source and actual successful command logs generate capabilities', () => {
++  const result = run(root, 'capabilities');
++  assert.equal(result.status, 0, result.stderr);
++  assert.match(fs.readFileSync(path.join(root, 'docs/CAPABILITIES.md'), 'utf8'), /1 项通过，0 项失败，0 项跳过/);
++});
++
++test('A01: adding a previously unrecorded source file invalidates old evidence', () => {
++  const output = fs.readFileSync(path.join(root, 'docs/CAPABILITIES.md'), 'utf8');
++  rejectsChangedFile('apps/web/src/audit-unvalidated-file.ts', 'throw new Error("unvalidated");');
++  assert.equal(fs.readFileSync(path.join(root, 'docs/CAPABILITIES.md'), 'utf8'), output);
++});
++
++test('A01: deleted, changed and renamed sources invalidate old evidence', () => {
++  rejectsChangedFile('apps/web/src/main.ts', null);
++  rejectsChangedFile('apps/web/src/main.ts', 'export const fixture = false;');
++  const from = path.join(root, 'apps/web/src/main.ts');
++  const to = path.join(root, 'apps/web/src/renamed.ts');
++  try {
++    fs.renameSync(from, to);
++    const result = run(root, 'capabilities');
++    assert.notEqual(result.status, 0);
++    assert.match(result.stderr, /main\.ts/);
++    assert.match(result.stderr, /renamed\.ts/);
++  } finally { fs.renameSync(to, from); }
++});
++
++test('A01: lockfile and actual package scripts are part of the source snapshot', () => {
++  rejectsChangedFile('package-lock.json', '{"lockfileVersion":3}');
++  const manifest = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
++  manifest.scripts.test = 'node -e "process.exit(0)"';
++  rejectsChangedFile('package.json', JSON.stringify(manifest));
++});
++
++test('A01: different toolchain, omitted commands and changed logs cannot claim a current validation', () => {
++  for (const [change, expected] of [
++    [record => { record.toolchain.node = 'v0.0.0'; }, /validation_toolchain_changed/],
++    [record => { record.checks.pop(); }, /validation_commands_changed/],
++    [record => { record.source_stable = false; }, /validation_snapshot_incomplete/]
++  ]) {
++    try {
++      const modified = JSON.parse(evidence);
++      change(modified);
++      fs.writeFileSync(path.join(root, evidencePath), JSON.stringify(modified));
++      const result = run(root, 'capabilities');
++      assert.notEqual(result.status, 0);
++      assert.match(result.stderr, expected);
++    } finally { fs.writeFileSync(path.join(root, evidencePath), evidence); }
++  }
++  const log = path.join(root, JSON.parse(evidence).checks[0].log);
++  const original = fs.readFileSync(log);
++  try {
++    fs.appendFileSync(log, '\nchanged log');
++    const result = run(root, 'capabilities');
++    assert.notEqual(result.status, 0);
++    assert.match(result.stderr, /validation_log_changed/);
++  } finally { fs.writeFileSync(log, original); }
++});
++
++test('A01: a file created during the gate run makes that run invalid', () => {
++  const directory = fixture();
++  try {
++    const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'package.json'), 'utf8'));
++    manifest.scripts.build = 'node -e "require(\'node:fs\').writeFileSync(\'apps/web/src/late.ts\', \'export {}\')"';
++    fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify(manifest));
++    const result = run(directory, 'validate-release');
++    assert.notEqual(result.status, 0);
++    const recorded = JSON.parse(fs.readFileSync(path.join(directory, evidencePath), 'utf8'));
++    assert.equal(recorded.source_stable, false);
++    assert.deepEqual(recorded.changed_during_run, ['apps/web/src/late.ts']);
++    assert.notEqual(run(directory, 'capabilities').status, 0);
++  } finally { fs.rmSync(directory, { recursive: true, force: true }); }
++});

@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "service": "adda-web",
+  "mode": "production",
+  "demo": false,
+  "database_adapter": "file-dev",
+  "schema_version": 1,
+  "has_business_data": false,
+  "worker_heartbeat_at": null,
+  "connectors": {
+    "whatsapp": { "mode": "unconfigured", "enabled": false, "reason": "credentials_and_approved_template_required" },
+    "pos": { "mode": "manual", "enabled": true, "reason": "CSV import adapter is available; live connector not configured" },
+    "testOutbox": { "mode": "disabled", "enabled": false }
+  },
+  "missing_configuration": ["brand_profile", "store", "menu", "owner_invitation"]
+}

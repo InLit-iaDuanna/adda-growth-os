@@ -1,0 +1,7 @@
+{
+  "required_locales": ["zh-CN", "en", "bn"],
+  "required_sections": ["hook_variants", "shot_list", "subtitle_srt", "cta", "sources", "needs_input", "risk_flags"],
+  "bn_initial_status": "needs_local_review",
+  "approval_binding": ["content_hash", "channel", "language", "budget", "policy_version", "expiry"],
+  "provider": { "mode": "demo", "name": "deterministic-fake", "live": false }
+}

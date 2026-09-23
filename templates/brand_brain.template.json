@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "status": "pending_owner_approval",
+  "provenance": "user_supplied_brief_in_this_conversation",
+  "brand_name": "ADDA TEA",
+  "slogan": "More than tea. It’s our Adda.",
+  "positioning_draft": [
+    "茶",
+    "社交",
+    "年轻文化",
+    "朋友",
+    "分享",
+    "孟加拉本土生活方式"
+  ],
+  "mascot": {
+    "name": "SHAPLI",
+    "asset": null,
+    "usage_rights": null
+  },
+  "content_pillars": [
+    "ADDA People",
+    "Today’s Adda",
+    "SHAPLI Daily",
+    "Dhaka Youth Life",
+    "Tea Story",
+    "Campus Adda"
+  ],
+  "locales": {
+    "admin": [
+      "zh-CN",
+      "en"
+    ],
+    "consumer": [
+      "en",
+      "bn"
+    ]
+  },
+  "default_timezone": "Asia/Dhaka",
+  "default_currency": "BDT",
+  "logo": null,
+  "brand_colors": null,
+  "declared_product_count_in_brief": 18,
+  "products": [],
+  "membership_program_name": "ADDA MATE",
+  "membership_rules": null,
+  "store": {
+    "display_name": null,
+    "address": null,
+    "opening_hours": null,
+    "launch_date": null,
+    "capacity": null
+  },
+  "local_language_reviewer": null,
+  "forbidden_unverified_claims": [
+    "具体价格与折扣",
+    "营养/健康功效",
+    "具体开业日",
+    "学校官方合作",
+    "真人KOC及其影响力",
+    "保证增长幅度"
+  ],
+  "needs_input": [
+    "官方素材",
+    "菜单价格",
+    "门店信息",
+    "会员权益",
+    "本地审核人",
+    "授权渠道"
+  ]
+}

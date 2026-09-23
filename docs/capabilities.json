@@ -1,0 +1,127 @@
+[
+  {
+    "name": "报表与任务门店权限",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/audit-n01-n08.test.ts",
+      "packages/domain/src/report-policy.ts"
+    ],
+    "limit": "已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。"
+  },
+  {
+    "name": "生成事实、审批、导出",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/audit-n01-n08.test.ts",
+      "packages/domain/src/content-policy.ts",
+      "tests/audit-b01-b05.test.ts"
+    ],
+    "limit": "人工导出；不证明真人文案质量或真实发布。"
+  },
+  {
+    "name": "指标范围与完整性",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/metrics-remediation.test.ts",
+      "packages/domain/src/metric-service.ts",
+      "tests/audit-b01-b05.test.ts"
+    ],
+    "limit": "来源以门店 orderSources 配置和已知导入/订单为准；无法发现从未登记的外部系统。"
+  },
+  {
+    "name": "订单身份、复购与归因",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/audit-b01-b05.test.ts",
+      "packages/domain/src/order-identity.ts",
+      "packages/domain/src/attribution-policy.ts"
+    ],
+    "limit": "历史歧义引用保留 unknown；新模型固定七天，尚无窗口配置或历史证据修复界面。"
+  },
+  {
+    "name": "日期保存与执行检查",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/audit-b01-b05.test.ts",
+      "packages/domain/src/validation.ts",
+      "packages/domain/src/content-policy.ts"
+    ],
+    "limit": "覆盖价格、素材、品牌、活动和相关输入；不代表所有领域字段已做全面数据治理。"
+  },
+  {
+    "name": "验收记录新鲜度",
+    "status": "自动化回归通过",
+    "evidence": [
+      "tests/validation-evidence.test.mjs",
+      "scripts/validation-evidence.mjs"
+    ],
+    "limit": "完整文件集合、内容、工具链、命令和日志检查；不替代干净安装、可复现构建或签名。"
+  },
+  {
+    "name": "触达预算、去重、重试",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/audit-n01-n08.test.ts",
+      "packages/domain/src/outreach-ledger.ts"
+    ],
+    "limit": "待发额度预留及 test outbox；未知/失败结果保留额度，尚无人工对账释放界面。"
+  },
+  {
+    "name": "任务租约与生产 Cookie",
+    "status": "离线回归通过",
+    "evidence": [
+      "tests/jobs-cookie-remediation.test.ts"
+    ],
+    "limit": "不等于实际业务 worker 或生产认证系统已交付。"
+  },
+  {
+    "name": "WhatsApp 协议",
+    "status": "本地协议测试通过",
+    "evidence": [
+      "tests/whatsapp-remediation.test.ts",
+      "tests/g07-g10.test.ts"
+    ],
+    "limit": "无真实 WABA 联调；发送适配器未接入业务 worker。"
+  },
+  {
+    "name": "生产数据库",
+    "status": "内部未实现",
+    "evidence": [
+      "packages/adapters/src/config.ts"
+    ],
+    "limit": "当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。"
+  },
+  {
+    "name": "发送与对账 worker",
+    "status": "内部未实现",
+    "evidence": [
+      "apps/worker/src/index.ts"
+    ],
+    "limit": "只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。"
+  },
+  {
+    "name": "真实模型技能",
+    "status": "内部未实现",
+    "evidence": [
+      "packages/domain/src/content-provider.ts"
+    ],
+    "limit": "使用确定性生成；缺 provider 接入、成本记录及真人评测。"
+  },
+  {
+    "name": "生产初始化与客户界面",
+    "status": "部分实现",
+    "evidence": [
+      "apps/web/src/ui.ts",
+      "tests/e2e.test.ts"
+    ],
+    "limit": "缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。"
+  },
+  {
+    "name": "真实渠道与客户验收",
+    "status": "内部开发及外部条件均待完成",
+    "evidence": [
+      "docs/BLOCKERS.md"
+    ],
+    "limit": "需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。"
+  }
+]

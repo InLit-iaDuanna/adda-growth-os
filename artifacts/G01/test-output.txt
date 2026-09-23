@@ -1,0 +1,11 @@
+G01 automated result summary (2026-09-22 UTC)
+
+A06  passed — missing launch date/menu price/approved asset remain needs_input; no invented product values
+A07  passed — draft facts hidden; approved facts visible; conflict revision returns brand_revision_conflict
+A08  passed — changing approved price marks prior content reference stale and non-executable
+A13  passed — missing rights and expired campaign are blocked; approved asset/product path succeeds
+extra passed — expired brand revision cannot be approved
+
+G00 regression suite: 13 passed (4 unit + 6 integration + 3 e2e)
+G01 suite: 5 passed
+No real client brand data, assets, prices, or external credentials were used.

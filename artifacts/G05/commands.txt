@@ -1,0 +1,6 @@
+G05 evidence recorded 2026-09-22 (UTC)
+
+npm run typecheck -> exit 0
+npm run test:g05  -> exit 0 (4 passed, 0 failed)
+
+All partner/event/referral tests use synthetic members and a local repository; no real KOC, school, event, payment or outreach was used.

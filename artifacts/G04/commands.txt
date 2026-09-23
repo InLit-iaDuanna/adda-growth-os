@@ -1,0 +1,6 @@
+G04 evidence recorded 2026-09-22 (UTC)
+
+npm run typecheck -> exit 0
+npm run test:g04  -> exit 0 (5 passed, 0 failed)
+
+The tests use approved synthetic brand/product/asset records and the deterministic fake provider; no live model, external publish or customer data was used.

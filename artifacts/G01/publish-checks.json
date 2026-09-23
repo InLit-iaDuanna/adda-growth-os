@@ -1,0 +1,9 @@
+{
+  "blocked": [
+    "asset_rights_missing",
+    "campaign_expired"
+  ],
+  "approved_path": { "ok": true, "status": 200 },
+  "stale_reference_after_price_change": { "status": "stale", "executable": false },
+  "evidence_level": "offline synthetic repository/API test; not customer approval"
+}

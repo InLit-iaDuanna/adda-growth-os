@@ -1,0 +1,280 @@
+{
+  "is_synthetic": true,
+  "purpose": "Specification regression fixture, not actual ADDA performance",
+  "tenant_id": "DEMO_TENANT_ADDA",
+  "store_id": "DEMO_STORE_001",
+  "as_of": "2026-09-22T00:00:00+06:00",
+  "orders_complete_through": "2026-09-22T00:00:00+06:00",
+  "timezone": "Asia/Dhaka",
+  "currency": "BDT",
+  "money_scale": 100,
+  "members": [
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "id": "M001",
+      "display_name": "DEMO M001",
+      "registered_at": "2026-08-01T09:00:00+06:00",
+      "language": "en",
+      "contact": "demo-m001@example.invalid",
+      "is_synthetic": true
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "id": "M002",
+      "display_name": "DEMO M002",
+      "registered_at": "2026-08-01T09:00:00+06:00",
+      "language": "en",
+      "contact": "demo-m002@example.invalid",
+      "is_synthetic": true
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "id": "M003",
+      "display_name": "DEMO M003",
+      "registered_at": "2026-08-05T09:00:00+06:00",
+      "language": "en",
+      "contact": "demo-m003@example.invalid",
+      "is_synthetic": true
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "id": "M004",
+      "display_name": "DEMO M004",
+      "registered_at": "2026-09-10T09:00:00+06:00",
+      "language": "en",
+      "contact": "demo-m004@example.invalid",
+      "is_synthetic": true
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "id": "M005",
+      "display_name": "DEMO M005",
+      "registered_at": "2026-09-01T09:00:00+06:00",
+      "language": "en",
+      "contact": "demo-m005@example.invalid",
+      "is_synthetic": true
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "id": "M006",
+      "display_name": "DEMO M006",
+      "registered_at": "2026-09-20T09:00:00+06:00",
+      "language": "en",
+      "contact": "demo-m006@example.invalid",
+      "is_synthetic": true
+    }
+  ],
+  "orders": [
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O001",
+      "member_id": "M001",
+      "paid_at": "2026-08-01T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 20000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O002",
+      "member_id": "M001",
+      "paid_at": "2026-08-10T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 25000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O003",
+      "member_id": "M002",
+      "paid_at": "2026-08-01T11:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 20000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O004",
+      "member_id": "M002",
+      "paid_at": "2026-09-10T11:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 20000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O005",
+      "member_id": "M003",
+      "paid_at": "2026-08-05T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 18000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O006",
+      "member_id": "M003",
+      "paid_at": "2026-08-05T16:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 22000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O007",
+      "member_id": "M003",
+      "paid_at": "2026-08-20T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 20000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O008",
+      "member_id": "M004",
+      "paid_at": "2026-09-10T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 30000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O009",
+      "member_id": "M004",
+      "paid_at": "2026-09-12T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 20000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O010",
+      "member_id": "M006",
+      "paid_at": "2026-09-20T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 22000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O011",
+      "member_id": null,
+      "paid_at": "2026-09-21T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 15000,
+      "status": "paid"
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_order_id": "O001",
+      "member_id": "M001",
+      "paid_at": "2026-08-01T10:00:00+06:00",
+      "currency": "BDT",
+      "amount_paid_minor": 20000,
+      "status": "paid"
+    }
+  ],
+  "adjustments": [
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_adjustment_id": "R001",
+      "external_order_id": "O007",
+      "occurred_at": "2026-08-21T10:00:00+06:00",
+      "amount_minor": 20000
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_adjustment_id": "R002",
+      "external_order_id": "O009",
+      "occurred_at": "2026-09-13T10:00:00+06:00",
+      "amount_minor": 2000
+    },
+    {
+      "tenant_id": "DEMO_TENANT_ADDA",
+      "store_id": "DEMO_STORE_001",
+      "source": "demo_pos",
+      "external_adjustment_id": "R001",
+      "external_order_id": "O007",
+      "occurred_at": "2026-08-21T10:00:00+06:00",
+      "amount_minor": 20000
+    }
+  ],
+  "attribution_evidence": [
+    {
+      "order_id": "O001",
+      "campaign_id": "CMP_CAMPUS_01",
+      "method": "verified_coupon",
+      "occurred_at": "2026-08-01T10:00:00+06:00"
+    },
+    {
+      "order_id": "O001",
+      "campaign_id": "CMP_EVENT_01",
+      "method": "linked_first_party_touch",
+      "occurred_at": "2026-07-31T10:00:00+06:00"
+    },
+    {
+      "order_id": "O003",
+      "campaign_id": "CMP_CAMPUS_01",
+      "method": "verified_coupon",
+      "occurred_at": "2026-08-01T11:00:00+06:00"
+    },
+    {
+      "order_id": "O005",
+      "campaign_id": "CMP_EVENT_01",
+      "method": "verified_coupon",
+      "occurred_at": "2026-08-05T10:00:00+06:00"
+    },
+    {
+      "order_id": "O007",
+      "campaign_id": "CMP_CAMPUS_01",
+      "method": "verified_coupon",
+      "occurred_at": "2026-08-20T10:00:00+06:00"
+    },
+    {
+      "order_id": "O008",
+      "campaign_id": "CMP_EVENT_01",
+      "method": "verified_coupon",
+      "occurred_at": "2026-09-10T10:00:00+06:00"
+    },
+    {
+      "order_id": "O010",
+      "campaign_id": "CMP_TIKTOK_SELF_REPORT",
+      "method": "declared_source",
+      "occurred_at": "2026-09-20T10:00:00+06:00"
+    }
+  ]
+}

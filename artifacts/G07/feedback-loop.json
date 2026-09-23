@@ -1,0 +1,17 @@
+{
+  "ordinary": {
+    "source": "operator",
+    "status": "in_progress",
+    "case": { "escalation_level": "normal", "has_owner": true, "sla_hours": 48 },
+    "reply": { "approval_required": true, "delivery_mode": "manual_task" }
+  },
+  "urgent": {
+    "source": "manual",
+    "risk": "urgent",
+    "risk_reasons": ["food_safety"],
+    "case": { "escalation_level": "urgent", "sla_hours": 4 },
+    "policy": "human escalation only; no diagnosis or compensation promise"
+  },
+  "dedupe": "source + external_id",
+  "pii": "contact values are not included in this evidence"
+}

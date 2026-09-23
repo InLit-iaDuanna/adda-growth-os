@@ -1,0 +1,24 @@
+npm run typecheck
+exit 0
+npm run build
+exit 0
+npm run security:scan
+exit 0; {"scanned_files":48,"findings":[],"status":"clean"}
+npm run performance -- 100000
+exit 0; p95_ms=232.535477; synthetic single-process metric-engine measurement, not service benchmark.
+APP_MODE=test ADDA_DATA_FILE=<db> npm run db:seed:demo
+exit 0
+APP_MODE=test ADDA_DATA_FILE=<db> npm run backup -- <db> <backup>
+exit 0; schema_version=1
+APP_MODE=test ADDA_DATA_FILE=<restore> npm run restore -- <backup> <restore>
+exit 0; restored_consistently=true
+APP_MODE=test ADDA_DATA_FILE=<db> npm run worker -- --once
+exit 0; heartbeat emitted, recovered_jobs=0.
+npm test
+exit 0; all unit/g01/g02/g03/g04/g05/g06/g07-g10/integration/e2e suites passed (total 48 tests in final run).
+npm run test:ai
+exit 0; 30 synthetic contract cases, 24 boundary cases.
+npm run fixtures:verify
+exit 0; fixture consistency only, not product/live acceptance.
+handoff
+exit 0; ADDA_Growth_OS_G07-G10_reviewed.zip; source/tests/docs/artifacts only, no node_modules/dist/data/tmp; sha256=reported with the final handoff link

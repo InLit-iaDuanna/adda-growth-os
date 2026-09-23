@@ -1,0 +1,3 @@
+npm run test:g07-g10
+exit 0
+The suite includes injection rejection, versioned daily reports, source-limited deterministic router and max-three-task behavior. G08 remains offline deterministic; no client freshness/UAT dataset was supplied.

@@ -1,0 +1,7 @@
+{
+  "partner": { "source_required": true, "initial_stage": "identified", "follower_inference": false },
+  "templates": 12,
+  "event": { "registration_count": 2, "checkin_count": 1, "capacity_over_sell": false },
+  "referral": { "qualified_on_first_authoritative_order": true, "full_refund_reversed": true, "reward_payment": "not_automated" },
+  "evidence_level": "DEMO_READY synthetic repository/API test"
+}

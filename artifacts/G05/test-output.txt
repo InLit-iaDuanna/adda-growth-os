@@ -1,0 +1,5 @@
+G05 automated result summary (2026-09-22 UTC)
+
+A33 passed — partner/KOC source URL required; stage starts identified and verification is explicit
+A34 passed — 12 parameterized templates; capacity is transactional; registrations/check-ins separate; duplicates idempotent
+A35/A36 passed — self/duplicate/prior-buyer/full-refund cases are ineligible/reversed; reward ledger is manual and no payment is automated

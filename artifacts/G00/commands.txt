@@ -1,0 +1,20 @@
+G00 evidence recorded 2026-09-22 (UTC)
+
+node --version                                      -> v24.19.0 (exit 0)
+npm --version                                       -> 11.9.0 (exit 0; npm emitted an existing http-proxy warning)
+docker --version                                    -> command not found (environment limitation)
+npm install --no-audit --no-fund                    -> exit 0
+npm run lint                                        -> exit 0
+npm run typecheck                                   -> exit 0
+npm run test:unit                                   -> exit 0 (4 passed, 0 failed)
+npm run test:integration                            -> exit 0 (6 passed, 0 failed)
+npm run test:e2e                                    -> exit 0 (3 passed, 0 failed)
+npm run test:ai                                     -> exit 0 (30 synthetic cases; 24 boundary cases)
+npm run build                                       -> exit 0
+npm run fixtures:verify                             -> exit 0 (specification-only verifier)
+APP_MODE=production SESSION_SECRET='<redacted>' ADDA_DATA_DIR=.tmp-evidence-prod npm run db:migrate -> exit 0
+APP_MODE=demo ADDA_DATA_DIR=.tmp-evidence-demo npm run db:migrate -> exit 0
+APP_MODE=demo ADDA_DATA_DIR=.tmp-evidence-demo npm run db:seed:demo -> exit 0
+APP_MODE=demo ADDA_DATA_DIR=.tmp-evidence-demo npm run worker -- --once -> exit 0
+
+Note: a direct `tsx` CLI invocation attempted a restricted IPC pipe in this environment; scripts were changed to `node --import tsx`, then rerun successfully.

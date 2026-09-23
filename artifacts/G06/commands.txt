@@ -1,0 +1,10 @@
+G06 evidence recorded 2026-09-22 (UTC; final refresh 2026-09-22T05:42:02Z)
+
+npm run typecheck -> exit 0
+npm run test:g06  -> exit 0 (4 passed, 0 failed)
+npm test          -> exit 0 (all existing G00-G06, integration and e2e tests passed; final run 2026-09-22T05:42Z)
+npm run build     -> exit 0
+npm run test:ai   -> exit 0 (30 synthetic cases + 24 boundary cases)
+npm run fixtures:verify -> exit 0 (fixture self-check; not product acceptance)
+
+Dependencies/limits: Node 24 local runtime; JSON file-dev repository; synthetic data only; no Docker/PostgreSQL or live messaging credentials.

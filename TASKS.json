@@ -1,0 +1,352 @@
+{
+  "spec_version": "1.0",
+  "status_note": "当前为离线原型。最新可验证范围见 docs/CAPABILITIES.md 与 reports/PROJECT_REVIEW_2026-09-23.md；生产数据库、业务 worker、运行时模型、受控初始化与生产客户流程仍有内部实现缺口，真实渠道及客户验收另需外部条件。G00–G10 不代表生产就绪。",
+  "goals": [
+    {
+      "id": "G00",
+      "title": "基础骨架、权限与可运行环境",
+      "depends_on": [],
+      "status": "done",
+      "acceptance_ids": [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A57"
+      ],
+      "exec_plan": ".agent/plans/G00.md",
+      "evidence_dir": "artifacts/G00",
+      "blockers": [
+        "internal_not_implemented: PostgreSQL adapter, production migrations, controlled OWNER bootstrap/invitation",
+        "unverified: production authentication and deployment"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T04:26:40Z"
+    },
+    {
+      "id": "G01",
+      "title": "品牌事实、菜单、素材与版本审核",
+      "depends_on": [
+        "G00"
+      ],
+      "status": "done",
+      "acceptance_ids": [
+        "A06",
+        "A07",
+        "A08",
+        "A13"
+      ],
+      "exec_plan": ".agent/plans/G01.md",
+      "evidence_dir": "artifacts/G01",
+      "blockers": [
+        "external_blocked: no real client brand/menu/asset approvals supplied; synthetic evidence only"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T04:35:00Z"
+    },
+    {
+      "id": "G02",
+      "title": "POS 导入、身份映射与指标引擎",
+      "depends_on": [
+        "G00"
+      ],
+      "status": "done",
+      "acceptance_ids": [
+        "A15",
+        "A16",
+        "A17",
+        "A18",
+        "A19",
+        "A20",
+        "A21",
+        "A22",
+        "A23",
+        "A26",
+        "A64"
+      ],
+      "exec_plan": ".agent/plans/G02.md",
+      "evidence_dir": "artifacts/G02",
+      "blockers": [
+        "internal_not_implemented: production database adapter",
+        "external_blocked: approved POS source inventory, samples and completeness agreement"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T04:45:00Z"
+    },
+    {
+      "id": "G03",
+      "title": "活动到成交的第一个完整切片",
+      "depends_on": [
+        "G01",
+        "G02"
+      ],
+      "status": "done",
+      "acceptance_ids": [
+        "A24",
+        "A25",
+        "A27",
+        "A28",
+        "A29",
+        "A30",
+        "A31",
+        "A32"
+      ],
+      "exec_plan": ".agent/plans/G03.md",
+      "evidence_dir": "artifacts/G03",
+      "blockers": [
+        "external_blocked: verification/POS/live channel credentials and customer-approved consent copy are absent; synthetic test outbox only"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T04:58:00Z"
+    },
+    {
+      "id": "G04",
+      "title": "三语言内容工作室与审批发布包",
+      "depends_on": [
+        "G01",
+        "G03"
+      ],
+      "status": "done",
+      "acceptance_ids": [
+        "A09",
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14",
+        "A46",
+        "A47"
+      ],
+      "exec_plan": ".agent/plans/G04.md",
+      "evidence_dir": "artifacts/G04",
+      "blockers": [
+        "internal_not_implemented: live model skill with cost/timeout/output validation",
+        "external_blocked: approved brand tasks and Bangla reviewer; real publishing acceptance"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T05:12:00Z"
+    },
+    {
+      "id": "G05",
+      "title": "校园合作、活动执行与推荐核验",
+      "depends_on": [
+        "G03",
+        "G04"
+      ],
+      "status": "done",
+      "acceptance_ids": [
+        "A33",
+        "A34",
+        "A35",
+        "A36"
+      ],
+      "exec_plan": ".agent/plans/G05.md",
+      "evidence_dir": "artifacts/G05",
+      "blockers": [
+        "external_blocked: no real partner/school records, UGC rights or reward/payment approval; synthetic evidence only"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T05:25:00Z"
+    },
+    {
+      "id": "G06",
+      "title": "会员分群、触达审批与实验",
+      "depends_on": [
+        "G02",
+        "G03",
+        "G04"
+      ],
+      "status": "done",
+      "acceptance_ids": [
+        "A28",
+        "A37",
+        "A38",
+        "A39",
+        "A40"
+      ],
+      "exec_plan": ".agent/plans/G06.md",
+      "evidence_dir": "artifacts/G06",
+      "blockers": [
+        "internal_not_implemented: final dispatch worker and reconciliation/credit release workflow",
+        "external_blocked: approved templates and permitted recipients"
+      ],
+      "delivery_level": "DEMO_READY",
+      "completed_at": "2026-09-22T05:26:43Z"
+    },
+    {
+      "id": "G07",
+      "title": "顾客声音、客服草稿与任务闭环",
+      "depends_on": [
+        "G01",
+        "G04"
+      ],
+      "status": "in_progress",
+      "acceptance_ids": [
+        "A41",
+        "A42",
+        "A43",
+        "A46"
+      ],
+      "exec_plan": ".agent/plans/G07.md",
+      "evidence_dir": "artifacts/G07",
+      "blockers": [
+        "external_blocked: no approved customer feedback sources or assigned case owner/SLA policy supplied; offline/manual evidence only"
+      ],
+      "delivery_level": "DEMO_READY"
+    },
+    {
+      "id": "G08",
+      "title": "增长总控、每日指挥台与可解释报告",
+      "depends_on": [
+        "G02",
+        "G04",
+        "G05",
+        "G06",
+        "G07"
+      ],
+      "status": "in_progress",
+      "acceptance_ids": [
+        "A44",
+        "A45",
+        "A46",
+        "A47",
+        "A64"
+      ],
+      "exec_plan": ".agent/plans/G08.md",
+      "evidence_dir": "artifacts/G08",
+      "blockers": [
+        "external_blocked: no client metric source freshness agreement or real daily-report/UAT dataset supplied; deterministic offline handler only"
+      ],
+      "delivery_level": "DEMO_READY"
+    },
+    {
+      "id": "G09",
+      "title": "指定真实渠道联调与故障恢复",
+      "depends_on": [
+        "G06",
+        "G07",
+        "G08"
+      ],
+      "status": "in_progress",
+      "acceptance_ids": [
+        "A48",
+        "A49",
+        "A50",
+        "A51",
+        "A60",
+        "A61"
+      ],
+      "exec_plan": ".agent/plans/G09.md",
+      "evidence_dir": "artifacts/G09",
+      "blockers": [
+        "internal_not_implemented: business worker calling send adapter with final policy checks and recovery/reconciliation",
+        "external_blocked: WABA access token, phone number id, approved template, webhook deployment and permitted test recipients absent; no real provider write made"
+      ],
+      "delivery_level": "DEMO_READY"
+    },
+    {
+      "id": "G10",
+      "title": "安全、性能、部署、培训与正式验收",
+      "depends_on": [
+        "G00",
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G06",
+        "G07",
+        "G08",
+        "G09"
+      ],
+      "status": "in_progress",
+      "acceptance_ids": [
+        "A01",
+        "A03",
+        "A04",
+        "A05",
+        "A52",
+        "A53",
+        "A54",
+        "A55",
+        "A56",
+        "A57",
+        "A58",
+        "A59",
+        "A60",
+        "A61",
+        "A62",
+        "A63"
+      ],
+      "exec_plan": ".agent/plans/G10.md",
+      "evidence_dir": "artifacts/G10",
+      "blockers": [
+        "internal_not_implemented: production data layer, initialization, complete client workflow",
+        "unverified: clean install and staging deployment; local demo browser interaction was reviewed separately on 2026-09-23",
+        "external_blocked: real brand tasks, Bangla review, live channel acceptance and client UAT"
+      ],
+      "delivery_level": "DEMO_READY"
+    }
+  ],
+  "code_cleanup": {
+    "status": "done",
+    "scope": "触达策略消重、未使用代码清理、README精简",
+    "tests": {
+      "passed": 63,
+      "failed": 0,
+      "skipped": 0
+    },
+    "evidence_dir": "artifacts/G10/code-cleanup"
+  },
+  "audit_n01_n08": {
+    "status": "done",
+    "scope": "报表门店隔离、生成事实与事务内审批导出、指标来源、预算预留和显式重试",
+    "exec_plan": ".agent/plans/AUDIT_N01_N08.md",
+    "evidence_dir": "artifacts/audit-n01-n08",
+    "capability_ledger": "docs/CAPABILITIES.md",
+    "completed_at": "2026-09-22T17:53:39.308Z",
+    "delivery_level": "OFFLINE_REMEDIATION_VERIFIED",
+    "validation": "artifacts/audit-n01-n08/validation.json"
+  },
+  "audit_b01_b05": {
+    "status": "done",
+    "scope": "订单身份、归因窗口、日期校验及验收新文件检测",
+    "exec_plan": ".agent/plans/AUDIT_B01_B05.md",
+    "evidence_dir": "artifacts/audit-b01-b05",
+    "capability_ledger": "docs/CAPABILITIES.md",
+    "validation": "artifacts/audit-b01-b05/validation.json",
+    "delivery_level": "OFFLINE_REMEDIATION_VERIFIED",
+    "completed_at": "2026-09-22T19:01:37.657Z"
+  },
+  "ui_review_2026_09_23": {
+    "status": "done",
+    "scope": "解包核对、Computer Use 逐项操作、前端可用性重构、业务边界修复和 CodeBuddy CLI 合成事实测试",
+    "exec_plan": ".agent/plans/UI_REVIEW_2026_09_23.md",
+    "evidence_dir": "artifacts/ui-review-2026-09-23",
+    "report": "reports/PROJECT_REVIEW_2026-09-23.md",
+    "validation": "artifacts/audit-b01-b05/validation.json",
+    "tests": {
+      "passed": 122,
+      "failed": 0,
+      "skipped": 0
+    },
+    "delivery_level": "OFFLINE_USABILITY_REVIEW_VERIFIED",
+    "completed_on": "2026-09-23"
+  },
+  "ui_redesign_2026_09_23": {
+    "status": "done",
+    "scope": "暖纸色/深绿/陶土色视觉系统、后台九项导航与总览、顾客来源页、桌面与手机 Computer Use 复核",
+    "exec_plan": ".agent/plans/UI_REDESIGN_2026_09_23.md",
+    "evidence_dir": "artifacts/ui-review-2026-09-23",
+    "report": "reports/PROJECT_REVIEW_2026-09-23.md",
+    "validation": "artifacts/audit-b01-b05/validation.json",
+    "tests": {
+      "passed": 122,
+      "failed": 0,
+      "skipped": 0
+    },
+    "delivery_level": "OFFLINE_VISUAL_REVIEW_VERIFIED",
+    "completed_on": "2026-09-23"
+  }
+}

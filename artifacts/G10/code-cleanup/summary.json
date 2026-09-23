@@ -1,0 +1,31 @@
+{
+  "checked_at": "2026-09-22T15:17:53.419918+00:00",
+  "changes": [
+    "合并预览、发送意图、离线执行的会员策略参数",
+    "复用预算统计、当地发送时段和营销同意筛选",
+    "删除未调用的指标查询函数、日期函数和无用导入",
+    "精简注释和 README；启用 noUnusedLocals/noUnusedParameters"
+  ],
+  "validation": {
+    "npm test": {
+      "exit_code": 0,
+      "tests": 63,
+      "passed": 63,
+      "failed": 0,
+      "skipped": 0
+    },
+    "npm run typecheck": {
+      "exit_code": 0
+    },
+    "npm run build": {
+      "exit_code": 0
+    },
+    "npm run security:scan": {
+      "exit_code": 0,
+      "scanned_files": 54,
+      "findings": []
+    }
+  },
+  "review": "独立只读复审未发现本轮行为或权限变化",
+  "scope": "未改测试断言、外发配置或生产功能范围"
+}

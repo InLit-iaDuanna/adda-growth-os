@@ -1,0 +1,2183 @@
+--- previous/.agent/plans/AUDIT_N01_N08.md
++++ current/.agent/plans/AUDIT_N01_N08.md
+@@ -0,0 +1,37 @@
++# N01–N08 复审修复
++
++## 目标和用户可见结果
++日报不返回未授权门店的数据；内容从生成事实到审批和导出保持同一版本；指标入口一致；待执行触达占用预算；显式重试能重新评估可恢复的跳过原因。
++
++## 仓库现状与依赖
++基于当前 JSON 文件仓储及 63 项离线测试。用户提供复审报告，未提供本轮复现脚本，因此新增等价回归，不声称重跑了原审计脚本。保留原测试及历史证据。真实数据库、业务 worker、模型、渠道和客户界面仍有内部实现缺口。
++
++## Progress
++- [x] 新增反例并记录修复前结果。
++- [x] 修复 N03 门店隔离及 N01/N02/N08 内容生命周期。
++- [x] 修复 N04/N05 指标范围及 N06/N07 触达账本与重试。
++- [x] 全量验证、能力记录及源码交付。
++
++## 设计与文件路径
++领域规则放在 packages/domain/src；JSON 仓储在 mutate 锁内重新读取并执行校验和写入。路由负责权限及输入输出。回归放在 tests/audit-n01-n08.test.ts；证据保存在 artifacts/audit-n01-n08。
++
++## 实施步骤
++先固定反例，再分别完成内容/权限和指标/触达，最后运行全部测试、类型检查、编译。发布意图保存批准版本及包快照；新批准显式替代旧批准。触达按业务身份去重，保留请求及尝试历史，未知送达继续占用预算。新请求键才允许重新评估未发送的跳过。
++
++## 验证命令及预期
++node --test --import tsx tests/audit-n01-n08.test.ts；npm test；npm run typecheck；npm run build。目标为反例转通过且既有测试不回退。真实发送、浏览器操作及干净依赖安装另行披露。
++
++## 实际验证证据
++`artifacts/audit-n01-n08/validation.json` 保存最终命令、退出码、Node 版本和源码哈希。8 个初始反例修复前均失败；增加边界后 22 个定向回归通过。完整测试为 85/85，通过 typecheck、build、有限扫描和合成契约/夹具检查。未执行干净安装、浏览器或真实外部联调。
++
++## Surprises & Discoveries
++复审中的 8 项包含 6 个缺陷和 2 个流程缺口，不能全部归因为上轮精简。既有 G09 的重复发送夹具依赖了被修复的行为；改用不同会员保留原超时/停发断言，另验证同业务去重。第一轮类型检查发现缺失的 flatMap 返回类型及未使用导入，已修正。
++
++## Decision Log
++见 D025–D029。新增内容、报表、指标及触达领域服务；尝试和意图共用账本视图，不引入第三套消费计数。未决结果不释放额度，新显式请求键只重评未发送对象。
++
++## 回滚与幂等
++新增字段兼容已有 JSON 数据；缺少生成事实绑定的旧内容不可重新绑定新事实冒充有效。历史记录保留，不删除旧批准或尝试。
++
++## Outcomes & Next Checkpoint
++本轮完成离线修复和完整回归，交付源码包及证据。下一检查点是生产数据层、受控初始化与实际业务 worker，再完成界面闭环和获准真实联调；不得把这些内部缺口全部转给客户提供密钥。
+--- previous/.agent/plans/AUDIT_REMEDIATION.md
++++ current/.agent/plans/AUDIT_REMEDIATION.md
+@@ -1,8 +1,10 @@
+- # Remediation ExecPlan — 审查问题修复与首个可交付闭环
++ # Remediation ExecPlan — 首轮审查历史记录
++
++ > 复审更正：下列计划中的最终 worker/生产基础部分未实现。当前状态以 docs/CAPABILITIES.md 为准；测试数量仅是本阶段历史结果。
+  
+  ## 目标和用户可见结果
+  
+- 把审查报告中已复现的 R01–R12 从“离线原型缺陷”推进到可回归验证的正确行为，并把修复后的代码保留为一个可重启的实施基线。第一阶段不接真实模型、真实 WhatsApp 或生产数据库；这些仍明确标为 external_blocked。用户可见结果是：越权请求被拒且不产生部分写入；改价/过期/撤销/改稿后的旧审批不能导出；G06 预览、G09 创建意图和最终 worker 发送对同一会员给出一致触达结论；多门店同号会员不被错误合并；过期数据不再标 verified；生产 Cookie 带 Secure；未到期租约任务不会被错误恢复。
++ 把审查报告中已复现的 R01–R12 从“离线原型缺陷”推进到可回归验证的正确行为，并把修复后的代码保留为一个可重启的实施基线。第一阶段不接真实模型、真实 WhatsApp 或生产数据库；其中适配器、模型技能及业务 worker 为内部未实现，真实联调另需外部条件。用户可见结果是：越权请求被拒且不产生部分写入；改价/过期/撤销/改稿后的旧审批不能导出；G06 预览和 G09 创建意图共用基础触达判断；最终 worker 发送仍待实现；多门店同号会员不被错误合并；过期数据不再标 verified；生产 Cookie 带 Secure；未到期租约任务不会被错误恢复。
+  
+  ## 仓库现状与依赖
+  
+@@ -19,7 +21,8 @@
+  - [x] 建立失败反例的隔离测试夹具并固定当前基线（R01–R12）。
+  - [x] 实施第一批 P0 权限和执行前审批修复（R01–R04、R07–R08）。
+  - [x] 实施第二批身份、指标质量、Cookie 和任务租约修复（R09–R12）。
+- - [x] 实施第三批 WhatsApp 原始协议归一化和 worker/outbox 连接（R05–R06 的离线协议层；真实渠道前置条件仍阻塞）。
++ - [x] 实施 R05/R06 WhatsApp 原始协议离线归一化。
++ - [ ] worker/outbox 发送及对账连接：内部未实现。
+  - [ ] 将 PostgreSQL/迁移/生产初始化、真实模型和 UI 端到端列入后续交付，不在本计划中伪装完成。
+  - [x] 运行原有 48 条测试、修复回归、typecheck/build，并更新 artifacts 和阻塞记录。
+  
+@@ -89,7 +92,7 @@
+  
+  ## 实际验证证据
+  
+- 本轮已完成离线修复和回归。\`artifacts/audit-remediation/\` 保存了全量测试 stdout、退出码和独立基线退出码；原有测试链 48/48 通过，加入修复回归后当前 npm test 为 63/63 通过。构建、安全扫描、AI 合约元数据检查和 fixture 一致性检查也通过。AI 检查仍是 synthetic contract check，不是真实模型评测；WhatsApp 只完成原始协议/签名/challenge 离线验证，真实 WABA 外发仍 external_blocked。
++ 本轮已完成离线修复和回归。\`artifacts/audit-remediation/\` 保存了全量测试 stdout、退出码和独立基线退出码；原有测试链 48/48 通过，加入修复回归后当时 npm test 为 63/63 通过。构建、安全扫描、AI 合约元数据检查和 fixture 一致性检查也通过。AI 检查仍是 synthetic contract check，不是真实模型评测；WhatsApp 只完成原始协议/签名/challenge 离线验证，真实 WABA 外发仍 external_blocked。
+  
+  ## Surprises & Discoveries
+  
+--- previous/.agent/plans/G09.md
++++ current/.agent/plans/G09.md
+@@ -11,7 +11,8 @@
+ - [x] 仅服务器配置可激活能力，intent 绑定同租户/门店/模板/受众审批。
+ - [x] 超时、unknown_delivery、签名/去重/乱序、kill switch 离线回归。
+ - [x] 可审计 manual 降级、状态 API 和操作说明。
+-- [ ] 真实授权发送/回执/退订：external_blocked。
++- [ ] 业务发送及对账 worker：内部未实现。
++- [ ] 真实授权发送/回执/退订：待内部实现及外部条件。
+ 
+ ## 设计与文件路径
+ packages/adapters/src/whatsapp.ts、packages/domain/src/connectors.ts、apps/worker/src/index.ts。
+@@ -20,7 +21,7 @@
+ G08 后执行；分离服务器配置信任边界与 API 用户输入。
+ 
+ ## 验证命令及预期
+-adapter/worker 集成使用模拟 transport 且明确标识；真实验收不能由模拟取代。
++adapter 单元测试使用模拟 transport；worker 尚未调用 adapter。真实验收不能由模拟取代。
+ 
+ ## 实际验证证据
+ npm run test:g07-g10 与完整 npm test 通过；5 个测试覆盖审批绑定、签名、幂等、单调状态、kill switch 和 adapter blocked/fake transport。官方规则核对见 artifacts/G09/official-check.md；没有真实 provider 请求。
+@@ -35,4 +36,4 @@
+ 外发前持久化 dispatching；未知结果不得自动重试；webhook 只更新已存在且匹配账号的 intent。
+ 
+ ## Outcomes & Next Checkpoint
+-G09 离线 adapter/ledger 已完成；因缺 WABA 凭证、获批模板、webhook 部署和许可测试接收人，真实渠道验收 external_blocked，仍保持 in_progress。
++G09 已有离线 adapter、意图及协议回归。业务 worker 和对账未实现；WABA 凭证、获批模板、部署及许可测试接收人另需具备。仍保持 in_progress。
+--- previous/README.md
++++ current/README.md
+@@ -35,6 +35,22 @@
+ - `npm run worker` 目前只处理 `maintenance` 任务；其他任务返回 `worker_handler_unimplemented`。发送与回执对账处理器尚未实现。
+ - `test` 模式可使用本地 outbox；人工导出不代表平台发布。真实渠道、生产部署及客户 UAT 均需单独验收。
+ 
++## 复审修复与恢复
++
++本轮修复 N01–N08：日报按全部涉及门店鉴权；生成时冻结事实版本；批准和导出在同一仓储锁内校验；指标入口共用范围与完整性判断；触达意图预留预算，跨入口去重。
++
++- 旧内容缺少生成事实时，需要重新生成、语言复核及批准。改价后只编辑说明文字不能刷新事实绑定。
++- 日报或任务范围不完整时隐藏，按当前权限重新生成。未导入门店不能算零；订单表头空文件加明确完整水位可确认零成交。可通过门店 `orderSources` 配置登记预期来源；尚无配置界面。
++- 相同请求键重放原结果；新的显式请求键可重新评估未发送的跳过项。已发送、已预留或未知送达不能据此再发。同活动同会员的新一轮营销应创建新活动并重新批准。
++- 旧触达审批需通过编辑、重新批准升级绑定；历史意图继续计入额度。无法关联活动的旧意图阻止新的预算分配，需核实记录后处理。
++
++```bash
++npm run validate:release
++npm run capabilities
++```
++
++前者保存命令、退出码、日志和源码哈希；后者生成 [能力记录](docs/CAPABILITIES.md)，源码与证据不一致时拒绝生成。内部未实现能力和外部联调条件分别列在 [未完成事项](docs/BLOCKERS.md)。
++
+ ## 目录
+ 
+ | 路径 | 内容 |
+@@ -46,4 +62,4 @@
+ | `scripts` | 数据迁移、备份恢复、安全扫描和性能测量 |
+ | `spec`、`goals`、`TASKS.json` | 产品规格、里程碑和进度 |
+ | `docs/BLOCKERS.md`、`docs/DECISIONS.md` | 未完成事项与技术决策 |
+-| `artifacts/audit-remediation` | 审查修复记录与验证证据 |
++| `artifacts/audit-remediation`、`artifacts/audit-n01-n08` | 两轮审查修复证据 |
+--- previous/TASKS.json
++++ current/TASKS.json
+@@ -1,6 +1,6 @@
+ {
+   "spec_version": "1.0",
+-  "status_note": "G00–G06 保持 DEMO_READY；G07–G10 已有可运行离线切片和回归，但仍未完成正式验收，不能宣称 CORE/LIVE/PRODUCTION_READY。2026-09-22 审查修复 R01–R12 已完成离线代码回归（原有 48 条与当前 63 条测试均通过），真实 PostgreSQL、模型、渠道和客户 UAT 仍 external_blocked。",
++  "status_note": "当前为离线原型。最新可验证范围见 docs/CAPABILITIES.md；生产数据库、业务 worker、模型、初始化与客户界面仍有内部实现缺口，真实渠道及客户验收另需外部条件。G00–G10 不代表生产就绪。",
+   "goals": [
+     {
+       "id": "G00",
+@@ -18,7 +18,8 @@
+       "exec_plan": ".agent/plans/G00.md",
+       "evidence_dir": "artifacts/G00",
+       "blockers": [
+-        "external_blocked: Docker/PostgreSQL unavailable in execution environment; file-dev adapter evidence is not production database acceptance"
++        "internal_not_implemented: PostgreSQL adapter, production migrations, controlled OWNER bootstrap/invitation",
++        "unverified: production authentication and deployment"
+       ],
+       "delivery_level": "DEMO_READY",
+       "completed_at": "2026-09-22T04:26:40Z"
+@@ -67,7 +68,8 @@
+       "exec_plan": ".agent/plans/G02.md",
+       "evidence_dir": "artifacts/G02",
+       "blockers": [
+-        "external_blocked: no live POS credentials/sample and PostgreSQL unavailable; synthetic CSV/API evidence only"
++        "internal_not_implemented: production database adapter",
++        "external_blocked: approved POS source inventory, samples and completeness agreement"
+       ],
+       "delivery_level": "DEMO_READY",
+       "completed_at": "2026-09-22T04:45:00Z"
+@@ -119,7 +121,8 @@
+       "exec_plan": ".agent/plans/G04.md",
+       "evidence_dir": "artifacts/G04",
+       "blockers": [
+-        "external_blocked: no real model credentials, client-approved Bangla reviewer or live publication connector; deterministic fake/manual evidence only"
++        "internal_not_implemented: live model skill with cost/timeout/output validation",
++        "external_blocked: approved brand tasks and Bangla reviewer; real publishing acceptance"
+       ],
+       "delivery_level": "DEMO_READY",
+       "completed_at": "2026-09-22T05:12:00Z"
+@@ -165,7 +168,8 @@
+       "exec_plan": ".agent/plans/G06.md",
+       "evidence_dir": "artifacts/G06",
+       "blockers": [
+-        "external_blocked: no live SMS/email/WhatsApp credentials, approved channel templates or permitted test recipients; dispatch remains test outbox or external_blocked"
++        "internal_not_implemented: final dispatch worker and reconciliation/credit release workflow",
++        "external_blocked: approved templates and permitted recipients"
+       ],
+       "delivery_level": "DEMO_READY",
+       "completed_at": "2026-09-22T05:26:43Z"
+@@ -236,6 +240,7 @@
+       "exec_plan": ".agent/plans/G09.md",
+       "evidence_dir": "artifacts/G09",
+       "blockers": [
++        "internal_not_implemented: business worker calling send adapter with final policy checks and recovery/reconciliation",
+         "external_blocked: WABA access token, phone number id, approved template, webhook deployment and permitted test recipients absent; no real provider write made"
+       ],
+       "delivery_level": "DEMO_READY"
+@@ -277,7 +282,9 @@
+       "exec_plan": ".agent/plans/G10.md",
+       "evidence_dir": "artifacts/G10",
+       "blockers": [
+-        "external_blocked: Docker/PostgreSQL, staging, 30 real brand tasks, Bangla reviewer, live channel acceptance and client UAT/signoff absent"
++        "internal_not_implemented: production data layer, initialization, complete client workflow",
++        "unverified: clean install, browser interaction and staging deployment",
++        "external_blocked: real brand tasks, Bangla review, live channel acceptance and client UAT"
+       ],
+       "delivery_level": "DEMO_READY"
+     }
+@@ -291,5 +298,15 @@
+       "skipped": 0
+     },
+     "evidence_dir": "artifacts/G10/code-cleanup"
++  },
++  "audit_n01_n08": {
++    "status": "done",
++    "scope": "报表门店隔离、生成事实与事务内审批导出、指标来源、预算预留和显式重试",
++    "exec_plan": ".agent/plans/AUDIT_N01_N08.md",
++    "evidence_dir": "artifacts/audit-n01-n08",
++    "capability_ledger": "docs/CAPABILITIES.md",
++    "completed_at": "2026-09-22T17:53:39.308Z",
++    "delivery_level": "OFFLINE_REMEDIATION_VERIFIED",
++    "validation": "artifacts/audit-n01-n08/validation.json"
+   }
+ }
+--- previous/apps/web/src/server.ts
++++ current/apps/web/src/server.ts
+@@ -17,14 +17,14 @@
+ import type { SourceLink } from '../../../packages/domain/src/growth';
+ import type { ContentPackageData } from '../../../packages/domain/src/content';
+ import type { OutreachCampaign, SegmentRule } from '../../../packages/domain/src/crm';
++import { captureContentFacts } from '../../../packages/domain/src/content-policy';
+ import { generateDeterministicContent } from '../../../packages/domain/src/content-provider';
+ import { JsonRepository, verifyPassword, nowIso } from '../../../packages/db/src/repository';
+ import { parseMembersCsv, parseOrdersCsv, parseRefundsCsv, type ImportKind } from '../../../packages/domain/src/imports';
+-import { computeMetricBundle } from '../../../packages/domain/src/metric-engine';
+-import { assessMetricQuality } from '../../../packages/domain/src/metric-quality';
++import { calculateMetrics } from '../../../packages/domain/src/metric-service';
+ import type { RouterRequest } from '../../../packages/domain/src/control';
+ import { runDeterministicRouter } from '../../../packages/domain/src/control-runtime';
+-import { orderCompleteThrough, queryMetrics, runControl } from '../../../packages/domain/src/control-service';
++import { queryMetrics, runControl } from '../../../packages/domain/src/control-service';
+ import { DomainError } from '../../../packages/domain/src/validation';
+ import { renderAdminPage, renderConsumerPage } from './ui';
+ 
+@@ -448,14 +448,14 @@
+     const taskInputs = result.proposedActions.slice(0, 3);
+     const tasks = [];
+     for (const task of taskInputs) tasks.push(await repository.createControlTask({ tenantId: context.actor.tenantId, storeIds: storeId ? [storeId] : context.actor.storeIds, ownerUserId: task.ownerUserId, title: task.title, dueAt: task.dueAt, targetMetric: metrics[0]?.metricKey || 'qualified_order_count', budgetMinor: task.budgetMinor, guardrails: task.guardrails, evidenceRefs: task.evidenceRefs }));
+-    const report = await repository.createDailyReport({ tenantId: context.actor.tenantId, storeId, storeIds: storeId ? [storeId] : context.actor.storeIds, metrics, dataHash: createHash('sha256').update(JSON.stringify(metrics)).digest('hex'), asOf, completeThrough: metrics.map((metric) => metric.completeThrough).filter(Boolean).sort()[0] || null, status: metrics.length && metrics.every((metric) => metric.quality === 'verified') ? 'verified' : metrics.length ? 'provisional' : 'missing', observations: result.observations.map((item) => ({ text: item.text, metricRefs: item.sourceRefs })), hypotheses: result.hypotheses, advice: result.proposedActions.map((item) => ({ text: item.title, guardrails: item.guardrails, evidenceRefs: item.evidenceRefs })), taskIds: tasks.map((task) => task.id), sourceRefs: metrics.flatMap((metric) => metric.sourceRefs), createdBy: context.actor.userId });
++    const report = await repository.createDailyReport({ tenantId: context.actor.tenantId, storeId, storeIds: storeId ? [storeId] : context.actor.storeIds, metrics, dataHash: createHash('sha256').update(JSON.stringify(metrics)).digest('hex'), asOf, completeThrough: metrics.map((metric) => metric.completeThrough).filter(Boolean).sort()[0] || null, status: metrics.every(metric => metric.quality === 'missing') ? 'missing' : metrics.every(metric => metric.quality === 'verified') ? 'verified' : 'provisional', observations: result.observations.map((item) => ({ text: item.text, metricRefs: item.sourceRefs })), hypotheses: result.hypotheses, advice: result.proposedActions.map((item) => ({ text: item.title, guardrails: item.guardrails, evidenceRefs: item.evidenceRefs })), taskIds: tasks.map((task) => task.id), sourceRefs: metrics.flatMap((metric) => metric.sourceRefs), createdBy: context.actor.userId });
+     sendJson(res, 201, { report: publicDailyReport(report), tasks: tasks.map(publicControlTask), limits: result.limits });
+     return;
+   }
+   if (pathname === '/api/reports/daily' && method === 'GET') {
+     if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'report_read_forbidden');
+     const storeId = parsed.searchParams.get('store_id'); if (storeId && !context.actor.storeIds.includes(storeId)) return notFound(res, requestId);
+-    sendJson(res, 200, { items: repository.listDailyReports(context.actor.tenantId, storeId).map(publicDailyReport), tasks: repository.listControlTasks(context.actor.tenantId).slice(0, 3).map(publicControlTask) });
++    sendJson(res, 200, { items: repository.listDailyReports(context.actor.tenantId, storeId ? [storeId] : context.actor.storeIds, storeId).map(publicDailyReport), tasks: repository.listControlTasks(context.actor.tenantId, storeId ? [storeId] : context.actor.storeIds).slice(0, 3).map(publicControlTask) });
+     return;
+   }
+   const controlTaskMatch = pathname.match(/^\/api\/control-tasks\/([^/]+)\/complete$/);
+@@ -497,27 +497,18 @@
+     if (!storeId || !memberId || !idempotencyKey || !context.actor.storeIds.includes(storeId)) return badRequest(res, requestId, 'delivery_intent_fields_required');
+     const member = repository.snapshot().members.find((item) => item.id === memberId && item.tenantId === context.actor.tenantId && item.storeId === storeId);
+     if (!member) return notFound(res, requestId);
+-    const consentEvents = repository.snapshot().consentEvents.filter((entry) => entry.tenantId === context.actor.tenantId && entry.memberId === memberId && entry.purpose === 'marketing' && (entry.channel === 'whatsapp' || entry.channel === 'unknown')).sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
+-    const consent = Boolean(consentEvents[0]?.granted);
+-    if (!consent) { sendJson(res, 409, { error_code: 'marketing_consent_missing_or_revoked', retryable: false }); return; }
+     const approvalHash = typeof body.approval_hash === 'string' ? body.approval_hash : '';
+     const templateName = typeof body.template_name === 'string' ? body.template_name : '';
+-    const state = repository.snapshot();
+-    const approvedOutreach = state.outreachCampaigns.find((campaign) => {
+-      if (campaign.tenantId !== context.actor.tenantId || campaign.storeId !== storeId || campaign.channel !== 'whatsapp') return false;
+-      if (!['approved', 'queued', 'completed'].includes(campaign.status) || campaign.approvalHash !== approvalHash || campaign.templateId !== templateName) return false;
+-      if (campaign.expiresAt && Date.parse(campaign.expiresAt) <= Date.now()) return false;
+-      const snapshot = state.audienceSnapshots.find((item) => item.id === campaign.audienceSnapshotId && item.tenantId === campaign.tenantId);
+-      return Boolean(snapshot?.memberIds.includes(memberId));
+-    });
+-    if (!approvedOutreach) { sendJson(res, 409, { error_code: 'approved_outreach_required', message: '外发必须绑定已批准、未过期且覆盖该会员的 WhatsApp 受众审批', retryable: false }); return; }
+     const intent = await repository.createDeliveryIntent({ tenantId: context.actor.tenantId, storeId, provider: 'whatsapp', memberId, templateName, approvalHash, idempotencyKey, createdBy: context.actor.userId });
+-    sendJson(res, intent.status === 'pending' ? 202 : intent.status === 'delivered' ? 200 : 409, { intent, external_write: false, retry_allowed: false, delivery_mode: intent.status === 'pending' ? 'pending_provider' : intent.status === 'blocked' ? 'external_blocked' : 'reconciliation_required' }); return;
++    sendJson(res, intent.status === 'pending' ? 202 : intent.status === 'delivered' ? 200 : 409, { intent, external_write: false, execution_ready: false, budget_reserved: ['pending', 'accepted', 'unknown_delivery'].includes(intent.status), retry_allowed: intent.status === 'blocked' && !intent.providerReference, retry_requires_new_key: intent.status === 'blocked', delivery_mode: intent.status === 'pending' ? 'reserved_offline' : intent.status === 'blocked' ? 'external_blocked' : 'reconciliation_required' }); return;
+   }
+   const intentTimeoutMatch = pathname.match(/^\/api\/connectors\/whatsapp\/intents\/([^/]+)\/timeout$/);
+   if (intentTimeoutMatch && method === 'POST') {
+     if (!hasPermission(context.actor, 'integration:manage')) return forbidden(res, requestId, 'connector_manage_forbidden'); if (!checkCsrf(req, context)) return csrfFailure(res, requestId);
+-    try { const item = await repository.markDeliveryUnknown(decodeURIComponent(intentTimeoutMatch[1]), context.actor.tenantId); sendJson(res, 200, { intent: item, retry_allowed: false, reconciliation_required: true }); } catch (error) { sendJson(res, 404, { error_code: error instanceof Error ? error.message : 'delivery_not_found', retryable: false }); } return;
++    const intentId = decodeURIComponent(intentTimeoutMatch[1]);
++    const intent = repository.findDeliveryIntent(intentId, context.actor.tenantId);
++    if (!intent || !context.actor.storeIds.includes(intent.storeId)) return notFound(res, requestId);
++    try { const item = await repository.markDeliveryUnknown(intentId, context.actor.tenantId); sendJson(res, 200, { intent: item, retry_allowed: false, reconciliation_required: true }); } catch (error) { sendJson(res, 404, { error_code: error instanceof Error ? error.message : 'delivery_not_found', retryable: false }); } return;
+   }
+ 
+   // ----- Rule-based CRM segmentation, approvals and controlled outreach (G06) -----
+@@ -596,7 +587,7 @@
+       frequencyCapDays,
+       status: 'pending_approval',
+       createdBy: context.actor.userId,
+-      policyVersion: 'crm-policy-v1',
++      policyVersion: 'crm-policy-v2',
+       expiresAt: typeof body.expires_at === 'string' && Number.isFinite(Date.parse(body.expires_at)) ? body.expires_at : new Date(Date.now() + 7 * 86_400_000).toISOString()
+     });
+     await repository.audit({ tenantId: context.actor.tenantId, storeId, actorUserId: context.actor.userId, action: 'outreach.preview_created', resourceType: 'outreach', resourceId: campaign.id, metadata: { segment_rule: rule, assigned_count: frozen.snapshot.memberIds.length, holdout_percent: frozen.snapshot.holdoutPercent, contact_fields_included: false } });
+@@ -827,7 +818,7 @@
+       sendJson(res, 422, { status: 'failed', error_code: generated.errorCode || 'content_generation_failed', manual_edit_available: true, reason: generated.manualEditReason || 'provider returned no schema-valid package' });
+       return;
+     }
+-    const revision = await repository.createContentRevision({ briefId: brief.id, tenantId: context.actor.tenantId, packageData: generated.packageData, createdBy: context.actor.userId });
++    const revision = await repository.createContentRevision({ briefId: brief.id, tenantId: context.actor.tenantId, packageData: generated.packageData, generationFacts: captureContentFacts(state, brief, generated.packageData), createdBy: context.actor.userId });
+     sendJson(res, 201, { brief: publicContentBrief(brief), revision: publicContentRevision(revision), provider: { mode: 'demo', name: 'deterministic-fake', live: false } });
+     return;
+   }
+@@ -888,13 +879,7 @@
+     if (!revision || !brief || revision.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(brief.storeId)) return notFound(res, requestId);
+     if (revision.packageData.needs_input.length) { sendJson(res, 409, { error_code: 'content_needs_input', message: '内容仍缺少批准资料', retryable: false, needs_input: revision.packageData.needs_input }); return; }
+     if (revision.packageData.variants.some((variant) => variant.locale === 'bn' && variant.review_status !== 'reviewed')) { sendJson(res, 409, { error_code: 'bn_review_required', message: '孟语版本需要本地人工复核', retryable: false }); return; }
+-    const campaign = repository.findCampaign(brief.campaignId);
+-    const productPriceRefs = brief.productIds.map((productId) => {
+-      const product = repository.findProduct(productId);
+-      return product?.currentPriceVersionId ? { productId, priceVersionId: product.currentPriceVersionId } : null;
+-    }).filter((item): item is { productId: string; priceVersionId: string } => Boolean(item));
+-    const brandRevisionIds = Array.from(new Set([revision.packageData.brand_revision_id, ...revision.packageData.sources.map((source) => source.revision_id)]));
+-    const approval = await repository.createContentApproval({ tenantId: context.actor.tenantId, resourceType: 'content', resourceId: revision.id, resourceRevisionId: revision.id, payloadHash: revision.contentHash, audienceSnapshotId: null, channel: brief.channel, language: 'en,bn', budgetMinor: campaign?.budgetMinor ?? null, campaignRevision: campaign?.revision ?? 0, brandRevisionIds, productPriceRefs, assetIds: [...brief.assetIds], policyVersion: 'content-policy-v1', expiresAt: typeof body.expires_at === 'string' && Number.isFinite(Date.parse(body.expires_at)) ? body.expires_at : new Date(Date.now() + 7 * 86_400_000).toISOString() });
++    const approval = await repository.createContentApproval({ tenantId: context.actor.tenantId, resourceRevisionId: revision.id, payloadHash: revision.contentHash, expiresAt: typeof body.expires_at === 'string' ? body.expires_at : new Date(Date.now() + 7 * 86_400_000).toISOString() });
+     sendJson(res, 201, { approval: publicContentApproval(approval) });
+     return;
+   }
+@@ -907,8 +892,6 @@
+     const revision = approval ? repository.findContentRevision(approval.resourceRevisionId) : undefined;
+     const brief = revision ? repository.findContentBrief(revision.briefId) : undefined;
+     if (!approval || !revision || !brief || approval.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(brief.storeId)) return notFound(res, requestId);
+-    const check = repository.publishCheck({ tenantId: context.actor.tenantId, storeId: brief.storeId, productIds: brief.productIds, assetIds: brief.assetIds, startAt: repository.findCampaign(brief.campaignId)?.startAt, endAt: repository.findCampaign(brief.campaignId)?.endAt });
+-    if (!check.ok) { sendJson(res, 409, { error_code: 'publish_check_failed', message: '发布前事实/授权检查未通过', retryable: false, checks: check }); return; }
+     try {
+       const approved = await repository.approveContent(approval.id, context.actor.userId, revision.contentHash);
+       sendJson(res, 200, { approval: publicContentApproval(approved), revision: publicContentRevision(revision) });
+@@ -925,12 +908,9 @@
+     const body = await readJson(req);
+     const revision = typeof body.revision_id === 'string' ? repository.findContentRevision(body.revision_id) : undefined;
+     const brief = revision ? repository.findContentBrief(revision.briefId) : undefined;
+-    const approved = revision ? repository.snapshot().contentApprovals.find((item) => item.resourceRevisionId === revision.id && item.status === 'approved') : undefined;
+-    if (!revision || !brief || !approved || revision.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(brief.storeId)) return notFound(res, requestId);
+-    const execution = repository.validateContentExecution(approved.id);
+-    if (!execution.ok) { sendJson(res, 409, { error_code: execution.errors[0]?.code || 'publish_check_failed', message: '审批绑定的内容或事实已改变，必须重新审批', retryable: false, checks: execution }); return; }
++    if (!revision || !brief || revision.tenantId !== context.actor.tenantId || !context.actor.storeIds.includes(brief.storeId)) return notFound(res, requestId);
+     const intent = await repository.createPublicationIntent({ tenantId: context.actor.tenantId, storeId: brief.storeId, contentRevisionId: revision.id, channel: brief.channel, mode: 'manual', createdBy: context.actor.userId });
+-    sendJson(res, 200, { intent: publicPublicationIntent(intent), package: revision.packageData, status: 'manual_ready', published: false, evidence_required: 'operator_attested_or_provider_confirmed' });
++    sendJson(res, 200, { intent: publicPublicationIntent(intent), package: intent.packageData, status: 'manual_ready', published: false, evidence_required: 'operator_attested_or_provider_confirmed' });
+     return;
+   }
+ 
+@@ -1449,21 +1429,15 @@
+     if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'report_read_forbidden');
+     const storeId = parsed.searchParams.get('store_id');
+     if (storeId && !context.actor.storeIds.includes(storeId)) return notFound(res, requestId);
+-    const storeIds = storeId ? [storeId] : context.actor.storeIds;
+-    const orders = repository.listOrders(context.actor.tenantId, storeIds);
+-    if (!orders.length) {
+-      sendJson(res, 200, { items: [], quality: 'missing', missing_reason: 'orders_not_imported', scope: { tenant_id: context.actor.tenantId, store_ids: storeIds } });
++    const asOf = parsed.searchParams.get('as_of') || nowIso();
++    const { storeIds, orders, bundle, imports, completeThrough, freshness, sourceCoverage } = calculateMetrics(repository.snapshot(), context.actor, storeId, asOf);
++    const quality = freshness.quality;
++    if (quality === 'missing') {
++      sendJson(res, 200, { items: [], quality, missing_reason: freshness.missingReason, source_coverage: sourceCoverage, scope: { tenant_id: context.actor.tenantId, store_ids: storeIds } });
+       return;
+     }
+-    const stores = storeIds.map((id) => repository.findStoreById(id)).filter(Boolean);
+-    const timezone = stores[0]?.timezone || 'Asia/Dhaka';
+-    const completeThrough = orderCompleteThrough(repository.snapshot(), context.actor.tenantId, storeIds);
+-    const asOf = parsed.searchParams.get('as_of') && Number.isFinite(Date.parse(parsed.searchParams.get('as_of')!)) ? parsed.searchParams.get('as_of')! : nowIso();
+-    const bundle = computeMetricBundle({ orders, refunds: repository.listRefunds(context.actor.tenantId, storeIds), members: repository.listMembers(context.actor.tenantId, storeIds), attribution: repository.listAttribution(context.actor.tenantId, storeIds), asOf, completeThrough, timezone });
+-    const sourceRefs = repository.listImports(context.actor.tenantId, storeIds).filter((item) => item.status === 'committed').map((item) => ({ source_id: item.id, revision_id: item.id, kind: 'metric_snapshot', excerpt: `committed ${item.kind} import ${item.fileName}` }));
+-    const scope = { tenant_id: context.actor.tenantId, store_id: storeId || null };
+-    const freshness = assessMetricQuality({ hasData: orders.length > 0, asOf, completeThrough });
+-    const quality = freshness.quality;
++    const sourceRefs = imports.map(item => ({ source_id: item.id, revision_id: item.id, kind: 'metric_snapshot', excerpt: `committed ${item.kind} import ${item.fileName}` }));
++    const scope = { tenant_id: context.actor.tenantId, store_id: storeId || null, store_ids: storeIds };
+     const periodStart = orders.map((item) => item.paidAt).sort()[0] || asOf;
+     const contractItems = bundle.results.filter((item) => typeof item.value !== 'object' || item.value === null).map((item) => ({
+       metric_key: item.metric_key,
+@@ -1483,11 +1457,14 @@
+       missing_reason: freshness.missingReason
+     }));
+     const attributionItems = Object.entries(bundle.summary.primary_attributed_revenue_minor as Record<string, number>).map(([campaignId, value]) => ({ metric_key: `primary_attributed_revenue_minor:${campaignId}`, formula_version: 'primary_source_v1', scope, period_start: periodStart, period_end: asOf, value, unit: 'minor_units', numerator: null, denominator: null, as_of: asOf, complete_through: completeThrough, quality, coverage: null, source_refs: sourceRefs, missing_reason: freshness.missingReason }));
+-    sendJson(res, 200, { items: [...contractItems, ...attributionItems], summary: { ...bundle.summary, scope, complete_through: completeThrough, quality, missing_reason: freshness.missingReason } });
++    sendJson(res, 200, { items: [...contractItems, ...attributionItems], summary: { ...bundle.summary, scope, source_coverage: sourceCoverage, complete_through: completeThrough, quality, missing_reason: freshness.missingReason } });
+     return;
+   }
+ 
+   if (pathname === '/api/jobs' && method === 'GET') {
++    if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'job_read_forbidden');
++    const tenantStores = repository.snapshot().stores.filter(s => s.tenantId === context.actor.tenantId).map(s => s.id);
++    if (!tenantStores.every(id => context.actor.storeIds.includes(id))) { sendJson(res, 200, { items: [] }); return; }
+     const items = repository.listJobs(context.actor.tenantId).map((job) => ({ id: job.id, type: job.type, status: job.status, attempts: job.attempts, updated_at: job.updatedAt }));
+     sendJson(res, 200, { items });
+     return;
+@@ -1590,7 +1567,7 @@
+ }
+ 
+ function publicContentRevision(revision: any): Record<string, unknown> {
+-  return { id: revision.id, brief_id: revision.briefId, tenant_id: revision.tenantId, revision: revision.revision, status: revision.status, content_hash: revision.contentHash, created_by: revision.createdBy, created_at: revision.createdAt, updated_at: revision.updatedAt, needs_input: revision.packageData?.needs_input || [], risk_flags: revision.packageData?.risk_flags || [] };
++  return { id: revision.id, brief_id: revision.briefId, tenant_id: revision.tenantId, revision: revision.revision, status: revision.status, content_hash: revision.contentHash, generation_facts: revision.generationFacts || null, current_approval_id: revision.currentApprovalId || null, created_by: revision.createdBy, created_at: revision.createdAt, updated_at: revision.updatedAt, needs_input: revision.packageData?.needs_input || [], risk_flags: revision.packageData?.risk_flags || [] };
+ }
+ 
+ function publicContentApproval(approval: any): Record<string, unknown> {
+@@ -1598,7 +1575,7 @@
+ }
+ 
+ function publicPublicationIntent(intent: any): Record<string, unknown> {
+-  return { id: intent.id, tenant_id: intent.tenantId, store_id: intent.storeId, content_revision_id: intent.contentRevisionId, channel: intent.channel, mode: intent.mode, status: intent.status, created_by: intent.createdBy, created_at: intent.createdAt };
++  return { id: intent.id, tenant_id: intent.tenantId, store_id: intent.storeId, content_revision_id: intent.contentRevisionId, approval_id: intent.approvalId, payload_hash: intent.payloadHash, channel: intent.channel, mode: intent.mode, status: intent.status, created_by: intent.createdBy, created_at: intent.createdAt };
+ }
+ 
+ function publicSegmentDefinition(segment: any): Record<string, unknown> {
+@@ -1656,7 +1633,7 @@
+ }
+ 
+ function publicMessageAttempt(attempt: any): Record<string, unknown> {
+-  return { id: attempt.id, outreach_id: attempt.outreachId, member_ref: attempt.memberId, assignment: attempt.assignment, status: attempt.status, reason: attempt.reason, provider_reference: attempt.providerReference, created_at: attempt.createdAt };
++  return { id: attempt.id, outreach_id: attempt.outreachId, member_ref: attempt.memberId, assignment: attempt.assignment, status: attempt.status, reason: attempt.reason, provider_reference: attempt.providerReference, dispatch_key: attempt.dispatchKey, retry_of_id: attempt.retryOfId, delivery_intent_id: attempt.deliveryIntentId, created_at: attempt.createdAt };
+ }
+ 
+ function publicFeedback(item: any): Record<string, unknown> {
+--- previous/docs/BLOCKERS.md
++++ current/docs/BLOCKERS.md
+@@ -1,25 +1,23 @@
+-# 真实上线阻塞项（不阻塞基础开发）
++# 尚未完成的交付能力
+ 
+-目前没有真实品牌素材、菜单价格、门店地址/营业时间/开业日、POS 样本及字段口径、营销同意文案、WhatsApp 凭证及获批模板、指定本地语言审核员、生产域名与托管信息。
+-将具体项分配给甲方或实施方，并填入状态、负责人、交付日期、证据链接。不得把这些空项自动改成完成。
+-本轮部分 Meta Instagram 开发者页面读取失败；具体权限/账户类型和接口版本需在工程实施与实际账户联调时核对。
++当前交付限于离线原型。最新测试数量、源码哈希和证据统一见 [能力记录](CAPABILITIES.md)，不在多份文档手工维护。
+ 
+-## 审查修复后的离线状态（2026-09-22）
++## 内部研发
+ 
+-- R01–R04、R07–R12 已完成代码修复和离线回归；原有 48 条测试与修复后全量 60 条测试通过。
+-- R05/R06 已完成嵌套 WhatsApp 状态归一化、签名校验和未登录 challenge 离线合同测试；没有真实 WABA 请求或 provider 回执，仍为 `external_blocked`。
+-- 本轮没有把 PostgreSQL、真实模型、真实渠道、浏览器级客户流程或 UAT 签字改成 done；交付等级仍是 `DEMO_READY`。
+-- worker 已修复租约/恢复/fencing，但当前只有 maintenance handler；真实 delivery/reconciliation 处理器需要渠道合同与部署验收，仍保持 `external_blocked`。
++- PostgreSQL 适配器、生产事务和迁移尚未实现。Docker 可用也不能替代这些开发工作。
++- worker 只有 maintenance handler。业务发送、最终执行前重验、外部成功但本地无回执时的恢复与对账尚未接通。
++- 真实模型尚未接入业务技能；缺超时、成本记录和真实任务评测。
++- 缺受控的生产 OWNER 创建/邀请入口，客户界面不足以独立完成约定业务流程。
++- 触达失败或未知结果会保守保留额度；尚无人工对账及释放预算的界面。不能用新请求键强行重发。
+ 
+-## G00 执行环境记录（2026-09-22）
++## 外部资料和联调
+ 
+-- `docker` 命令不可用，未能在本轮启动 PostgreSQL；当前可运行验证使用 `file-dev` JSON repository，状态为 `external_blocked`，不是生产就绪声明。
+-- 真实品牌、菜单、价格、开业日、POS 凭证、WhatsApp 凭证和本地语言复核人仍缺失；应用以 `needs_input` / `unconfigured` / `external_blocked` 返回，不生成假数据。
+-- G06 真实触达仍缺少 SMS/email/WhatsApp 凭证、获批模板、连接器回执和明确许可测试接收人；test outbox 仅用于隔离自动化测试，不能作为 live 渠道验收。
++在内部能力完成后，仍需客户批准的品牌/菜单/素材、POS 样本及来源完整性约定、同意文案、本地语言复核人、WhatsApp 账户和获批模板、明确许可的测试接收人、部署环境及 UAT。
+ 
+-## G07–G10 当前阻塞（2026-09-22）
++这些外部条件不解释或替代上面的内部研发缺口。没有真实发送或客户验收证据时，不标记 LIVE_CHANNEL_ACCEPTED 或 PRODUCTION_READY。
+ 
+-- G07：没有甲方批准的反馈来源、真实工单负责人/SLA 和关闭政策；当前验证为合成/人工离线记录。
+-- G08：没有甲方确认的指标口径、源新鲜度协议和真实日报 UAT 数据集；当前 handler 为确定性离线实现。
+-- G09：没有 WABA access token、phone number id、获批模板、可部署 webhook 和明确许可测试接收人。本轮没有向真实 provider 发请求。
+-- G10：执行环境没有 Docker/PostgreSQL；没有 staging、30 个真实品牌任务、本地孟语审核签字、live channel receipt 或客户 UAT 签字。因此交付等级不得超过 DEMO_READY。
++## 本轮验证范围
++
++N01–N08 使用合成数据和 HTTP/仓储回归；用户提供了报告，未附其原始本轮脚本，因此这里保存的是新增等价反例。修复前和修复后日志见 `artifacts/audit-n01-n08/`。
++
++本轮使用已有 node_modules，未验证干净依赖安装；没有运行浏览器点击流程、生产数据库、真实模型或真实渠道。既有备份/性能记录仅说明当时的合成 JSON 恢复与单进程计算结果。
+--- previous/docs/CAPABILITIES.md
++++ current/docs/CAPABILITIES.md
+@@ -0,0 +1,23 @@
++# 能力与验证记录
++
++由 npm run capabilities 生成。能力范围维护在 docs/capabilities.json；测试数量来自实际运行记录，不由文档手填。离线通过只说明所列用例通过。
++
++最近验证：2026-09-22T17:53:39.308Z；Node v24.19.0。85 项通过，0 项失败，0 项跳过。
++
++[命令、退出码、日志和源码哈希](../artifacts/audit-n01-n08/validation.json)。生成时检查源码是否与验证记录一致，源码变更后需重新验证。
++
++| 能力 | 状态 | 实现或测试证据 | 尚未覆盖 |
++|---|---|---|---|
++| 报表与任务门店权限 | 离线回归通过 | [tests/audit-n01-n08.test.ts](../tests/audit-n01-n08.test.ts)、[packages/domain/src/report-policy.ts](../packages/domain/src/report-policy.ts) | 已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。 |
++| 生成事实、审批、导出 | 离线回归通过 | [tests/audit-n01-n08.test.ts](../tests/audit-n01-n08.test.ts)、[packages/domain/src/content-policy.ts](../packages/domain/src/content-policy.ts) | 人工导出；不证明真人文案质量或真实发布。 |
++| 指标范围与完整性 | 离线回归通过 | [tests/metrics-remediation.test.ts](../tests/metrics-remediation.test.ts)、[packages/domain/src/metric-service.ts](../packages/domain/src/metric-service.ts) | 来源以门店 orderSources 配置和已知导入/订单为准；无法发现从未登记的外部系统。 |
++| 触达预算、去重、重试 | 离线回归通过 | [tests/audit-n01-n08.test.ts](../tests/audit-n01-n08.test.ts)、[packages/domain/src/outreach-ledger.ts](../packages/domain/src/outreach-ledger.ts) | 待发额度预留及 test outbox；未知/失败结果保留额度，尚无人工对账释放界面。 |
++| 任务租约与生产 Cookie | 离线回归通过 | [tests/jobs-cookie-remediation.test.ts](../tests/jobs-cookie-remediation.test.ts) | 不等于实际业务 worker 或生产认证系统已交付。 |
++| WhatsApp 协议 | 本地协议测试通过 | [tests/whatsapp-remediation.test.ts](../tests/whatsapp-remediation.test.ts)、[tests/g07-g10.test.ts](../tests/g07-g10.test.ts) | 无真实 WABA 联调；发送适配器未接入业务 worker。 |
++| 生产数据库 | 内部未实现 | [packages/adapters/src/config.ts](../packages/adapters/src/config.ts) | 当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。 |
++| 发送与对账 worker | 内部未实现 | [apps/worker/src/index.ts](../apps/worker/src/index.ts) | 只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。 |
++| 真实模型技能 | 内部未实现 | [packages/domain/src/content-provider.ts](../packages/domain/src/content-provider.ts) | 使用确定性生成；缺 provider 接入、成本记录及真人评测。 |
++| 生产初始化与客户界面 | 部分实现 | [apps/web/src/ui.ts](../apps/web/src/ui.ts)、[tests/e2e.test.ts](../tests/e2e.test.ts) | 缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。 |
++| 真实渠道与客户验收 | 内部开发及外部条件均待完成 | [docs/BLOCKERS.md](../docs/BLOCKERS.md) | 需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。 |
++
++本轮使用已有依赖，未做干净安装；浏览器点击、生产数据库、真实模型、渠道和客户验收未运行。AI-contract 仅检查合成契约；安全扫描是有限静态检查。
+--- previous/docs/DECISIONS.md
++++ current/docs/DECISIONS.md
+@@ -24,3 +24,9 @@
+ D022（审查修复）：G06 预览、G09 intent 和离线 dispatch 共用 `dispatch-policy`；未验证联系方式、退订/抑制和 holdout 不得进入 pending intent。
+ D023（审查修复）：指标使用内部会员 ID 和统一 freshness 质量；租约恢复按过期时间及 owner/token fencing；生产 Cookie 显式带 `Secure`。
+ D024（代码精简）：统一触达参数和营销同意筛选，保留各入口的预算与幂等顺序。删除未调用的指标查询实现，启用 TypeScript 未使用代码检查；不引入新依赖。
++
++D025（N01/N02/N08，替代 D021 的先查后写）：生成时持久化事实绑定；提交沿用该绑定；批准时选定 currentApprovalId 并替代旧审批。导出在 mutate 锁内重新读取、校验、保存 approvalId/payloadHash/内容包快照，响应使用该快照。缺生成事实的旧内容要求重新生成。
++D026（N03）：日报及任务必须授权全部门店与证据引用；范围缺失或包含未授权引用则隐藏，不返回裁剪标签后的原总额。tenant-wide job 元数据仅供拥有全部门店权限的报表用户读取。
++D027（N04/N05）：HTTP 指标、控制台问数和日报共用 calculateMetrics。逐请求门店核对配置及已知订单来源；缺失与确认零成交分开，混合币种/时区拒绝汇总。
++D028（N06/N07）：messageAttempts 与 deliveryIntents 通过统一账本视图计费和频控；pending/accepted/unknown 占用额度，已消费成本冻结。业务去重按活动、会员、渠道；请求键仅控制重放。新显式键可重评未发跳过，历史不覆盖，成功/已预留/未知结果不盲重发。未决或供应商失败的额度待人工核实，不自动退回。修改审批使未发 pending 失效，已可能发送的记录保留。
++D029（交付说明）：当前能力只在 docs/capabilities.json 维护范围，由脚本结合实际验证记录生成展示。生产数据层、业务 worker、模型、初始化和客户界面属于内部研发缺口，不能统称等待客户密钥。
+--- previous/docs/capabilities.json
++++ current/docs/capabilities.json
+@@ -0,0 +1,13 @@
++[
++  { "name": "报表与任务门店权限", "status": "离线回归通过", "evidence": ["tests/audit-n01-n08.test.ts", "packages/domain/src/report-policy.ts"], "limit": "已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。" },
++  { "name": "生成事实、审批、导出", "status": "离线回归通过", "evidence": ["tests/audit-n01-n08.test.ts", "packages/domain/src/content-policy.ts"], "limit": "人工导出；不证明真人文案质量或真实发布。" },
++  { "name": "指标范围与完整性", "status": "离线回归通过", "evidence": ["tests/metrics-remediation.test.ts", "packages/domain/src/metric-service.ts"], "limit": "来源以门店 orderSources 配置和已知导入/订单为准；无法发现从未登记的外部系统。" },
++  { "name": "触达预算、去重、重试", "status": "离线回归通过", "evidence": ["tests/audit-n01-n08.test.ts", "packages/domain/src/outreach-ledger.ts"], "limit": "待发额度预留及 test outbox；未知/失败结果保留额度，尚无人工对账释放界面。" },
++  { "name": "任务租约与生产 Cookie", "status": "离线回归通过", "evidence": ["tests/jobs-cookie-remediation.test.ts"], "limit": "不等于实际业务 worker 或生产认证系统已交付。" },
++  { "name": "WhatsApp 协议", "status": "本地协议测试通过", "evidence": ["tests/whatsapp-remediation.test.ts", "tests/g07-g10.test.ts"], "limit": "无真实 WABA 联调；发送适配器未接入业务 worker。" },
++  { "name": "生产数据库", "status": "内部未实现", "evidence": ["packages/adapters/src/config.ts"], "limit": "当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。" },
++  { "name": "发送与对账 worker", "status": "内部未实现", "evidence": ["apps/worker/src/index.ts"], "limit": "只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。" },
++  { "name": "真实模型技能", "status": "内部未实现", "evidence": ["packages/domain/src/content-provider.ts"], "limit": "使用确定性生成；缺 provider 接入、成本记录及真人评测。" },
++  { "name": "生产初始化与客户界面", "status": "部分实现", "evidence": ["apps/web/src/ui.ts", "tests/e2e.test.ts"], "limit": "缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。" },
++  { "name": "真实渠道与客户验收", "status": "内部开发及外部条件均待完成", "evidence": ["docs/BLOCKERS.md"], "limit": "需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。" }
++]
+--- previous/package.json
++++ current/package.json
+@@ -2,7 +2,7 @@
+   "name": "adda-growth-os",
+   "version": "0.1.0",
+   "private": true,
+-  "description": "ADDA Growth OS — executable G00-G10 offline vertical slices",
++  "description": "ADDA Growth OS \u2014 executable G00-G10 offline vertical slices",
+   "workspaces": [
+     "apps/*",
+     "packages/*"
+@@ -32,14 +32,17 @@
+     "test:integration": "node --test --import tsx tests/integration.test.ts",
+     "test:e2e": "node --test --import tsx tests/e2e.test.ts",
+     "test:ai": "node scripts/test-ai-contracts.mjs",
+-    "test": "npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e",
++    "test": "npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e && npm run test:audit-n01-n08",
+     "db:migrate": "node --import tsx scripts/migrate.ts",
+     "db:seed:demo": "node --import tsx scripts/seed-demo.ts",
+     "fixtures:verify": "node scripts/verify-fixtures.mjs",
+     "backup": "node --import tsx scripts/backup.ts",
+     "restore": "node --import tsx scripts/restore.ts",
+     "security:scan": "node scripts/security-scan.mjs",
+-    "performance": "node --import tsx scripts/performance.ts"
++    "performance": "node --import tsx scripts/performance.ts",
++    "test:audit-n01-n08": "node --test --import tsx tests/audit-n01-n08.test.ts",
++    "validate:release": "node scripts/validate-release.mjs",
++    "capabilities": "node scripts/capabilities.mjs"
+   },
+   "devDependencies": {
+     "@types/node": "^22.10.2",
+--- previous/packages/db/src/repository.ts
++++ current/packages/db/src/repository.ts
+@@ -23,7 +23,7 @@
+   PublishCheckInput,
+   PublishCheckResult
+ } from '../../domain/src/brand';
+-import { validatePublishWindow } from '../../domain/src/brand';
++import { checkPublish, checkContentFacts, checkContentApproval, contentDigest } from '../../domain/src/content-policy';
+ import type {
+   AttributionEvidenceRecord,
+   ImportBatch,
+@@ -43,7 +43,6 @@
+   Offer,
+   RedemptionAttempt,
+   SourceLink,
+-  SuppressionEntry,
+   TouchEvent
+ } from '../../domain/src/growth';
+ import { validateContentPackage, type ContentApproval, type ContentBrief, type ContentRevision, type PublicationIntent, type PublicationReceipt } from '../../domain/src/content';
+@@ -53,9 +52,11 @@
+ import { classifyFeedback, hashFeedbackCustomer, redactFeedbackText } from '../../domain/src/voice';
+ import type { ConnectorState, DeliveryIntent, WebhookEvent, DeliveryStatus } from '../../domain/src/connectors';
+ import { canAdvanceDelivery } from '../../domain/src/connectors';
++import { canReadDailyReport, canReadControlTask } from '../../domain/src/report-policy';
+ import type { DailyReport, ControlTask } from '../../domain/src/control';
+ import { explicitTimestamp, requireCondition } from '../../domain/src/validation';
+-import { evaluateDispatchPolicy } from '../../domain/src/dispatch-policy';
++import { approvedOutreachContext, marketingConsentForChannel, outreachApprovalHash, outsideOutreachWindow, evaluateMemberDispatch } from '../../domain/src/outreach-policy';
++import { existingDelivery, outreachBudget, outreachSpend, outreachLedger, refreshOutreachStatus, refreshDeliveryCampaign } from '../../domain/src/outreach-ledger';
+ import type { AppMode } from '../../adapters/src/config';
+ 
+ const SCHEMA_VERSION = 1;
+@@ -547,23 +548,7 @@
+   findBrandReference(id: string): BrandReference | undefined { return this.requireState().brandReferences.find((item) => item.id === id); }
+ 
+   publishCheck(input: PublishCheckInput): PublishCheckResult {
+-    const state = this.requireState();
+-    const result = validatePublishWindow(new Date(), input.startAt, input.endAt);
+-    for (const productId of input.productIds || []) {
+-      const product = state.products.find((item) => item.id === productId && item.tenantId === input.tenantId && item.storeId === input.storeId);
+-      if (!product) { result.errors.push({ code: 'product_not_found', resourceId: productId, detail: '产品不属于当前租户/门店或不存在' }); continue; }
+-      if (product.status !== 'active') result.errors.push({ code: 'product_inactive', resourceId: productId, detail: '停用产品不能发布' });
+-      const price = product.currentPriceVersionId ? state.priceVersions.find((item) => item.id === product.currentPriceVersionId) : undefined;
+-      if (!price || price.amountMinor === null || price.status !== 'approved') result.errors.push({ code: 'price_missing_or_unapproved', resourceId: productId, detail: '缺少已批准的真实价格' });
+-    }
+-    for (const assetId of input.assetIds || []) {
+-      const asset = state.mediaAssets.find((item) => item.id === assetId && item.tenantId === input.tenantId && (item.storeId === null || item.storeId === input.storeId));
+-      if (!asset) { result.errors.push({ code: 'asset_not_found', resourceId: assetId, detail: '素材不属于当前租户/门店或不存在' }); continue; }
+-      if (asset.rightsStatus !== 'approved') result.errors.push({ code: 'asset_rights_missing', resourceId: assetId, detail: '素材版权/出镜授权未批准' });
+-      if (asset.expiresAt && Date.parse(asset.expiresAt) < Date.now()) result.errors.push({ code: 'asset_rights_expired', resourceId: assetId, detail: '素材授权已过期' });
+-    }
+-    result.ok = result.errors.length === 0;
+-    return result;
++    return checkPublish(this.requireState(), input, nowIso());
+   }
+ 
+   findImport(id: string): ImportBatch | undefined { return this.requireState().imports.find((item) => item.id === id); }
+@@ -801,8 +786,10 @@
+       if (validateContentPackage(packageData).length) throw new Error('content_schema_invalid');
+       const current = state.contentRevisions.find((item) => item.id === id);
+       if (!current) return undefined;
+-      const contentHash = createHash('sha256').update(JSON.stringify(packageData)).digest('hex');
+-      current.packageData = packageData; current.contentHash = contentHash; current.revision += 1; current.status = 'needs_local_review'; current.updatedAt = nowIso();
++      current.currentApprovalId = null;
++      current.packageData = structuredClone(packageData);
++      for (const variant of current.packageData.variants.filter(v => v.locale === 'bn')) { variant.review_status = 'needs_local_review'; variant.reviewer_id = null; }
++      current.contentHash = contentDigest(current.packageData); current.revision += 1; current.status = 'needs_local_review'; current.updatedAt = nowIso();
+       for (const approval of state.contentApprovals.filter((item) => item.resourceRevisionId === id && item.status === 'approved')) { approval.status = 'stale'; }
+       return current;
+     });
+@@ -813,6 +800,7 @@
+       if (!revision) return undefined;
+       const variant = revision.packageData.variants.find((item) => item.locale === 'bn');
+       if (!variant) return revision;
++      revision.currentApprovalId = null;
+       variant.review_status = decision; variant.reviewer_id = reviewerId;
+       revision.contentHash = createHash('sha256').update(JSON.stringify(revision.packageData)).digest('hex');
+       for (const approval of state.contentApprovals.filter((item) => item.resourceRevisionId === id && item.status === 'approved')) approval.status = 'stale';
+@@ -820,77 +808,62 @@
+       return revision;
+     });
+   }
+-  async createContentApproval(input: Omit<ContentApproval, 'id' | 'createdAt' | 'status' | 'approvedBy' | 'approvedAt'>): Promise<ContentApproval> {
+-    return this.mutate((state) => {
+-      const revision = state.contentRevisions.find((item) => item.id === input.resourceRevisionId && item.tenantId === input.tenantId);
+-      requireCondition(Boolean(revision), 'content_revision_not_found', 404);
+-      const approval: ContentApproval = { ...input, id: randomUUID(), status: 'pending', approvedBy: null, approvedAt: null, createdAt: nowIso() };
++  async createContentApproval(input: Pick<ContentApproval, 'tenantId' | 'resourceRevisionId' | 'payloadHash' | 'expiresAt'>): Promise<ContentApproval> {
++    return this.mutate(state => {
++      const revision = state.contentRevisions.find(r => r.id === input.resourceRevisionId && r.tenantId === input.tenantId);
++      requireCondition(revision, 'content_revision_not_found', 404);
++      requireCondition(revision.contentHash === input.payloadHash, 'stale_approval');
++      const errors = checkContentFacts(state, revision, nowIso());
++      requireCondition(!errors.length, errors[0]?.code || 'content_invalid');
++      requireCondition(explicitTimestamp(input.expiresAt) && Date.parse(input.expiresAt) > Date.now(), 'approval_expired');
++      const brief = state.contentBriefs.find(b => b.id === revision.briefId)!;
++      const campaign = state.campaigns.find(c => c.id === brief.campaignId)!;
++      const facts = revision.generationFacts!;
++      const approval: ContentApproval = {
++        ...input, ...structuredClone(facts), factsHash: contentDigest(facts), id: randomUUID(), resourceType: 'content', resourceId: revision.id,
++        audienceSnapshotId: null, channel: brief.channel, language: 'en,bn', budgetMinor: campaign.budgetMinor,
++        policyVersion: 'content-policy-v2', status: 'pending', approvedBy: null, approvedAt: null, createdAt: nowIso()
++      };
+       state.contentApprovals.push(approval);
+-      revision!.status = 'pending_approval';
++      revision.status = 'pending_approval';
+       return approval;
+     });
+   }
+-  findContentApproval(id: string): ContentApproval | undefined { return this.requireState().contentApprovals.find((item) => item.id === id); }
+-  validateContentExecution(approvalId: string, now = nowIso()): { ok: boolean; errors: Array<{ code: string; resourceId?: string; detail: string }> } {
++  findContentApproval(id: string): ContentApproval | undefined { return this.requireState().contentApprovals.find(item => item.id === id); }
++  validateContentExecution(approvalId: string, now = nowIso()) {
+     const state = this.requireState();
+-    const approval = state.contentApprovals.find((item) => item.id === approvalId);
+-    const revision = approval ? state.contentRevisions.find((item) => item.id === approval.resourceRevisionId) : undefined;
+-    const brief = revision ? state.contentBriefs.find((item) => item.id === revision.briefId && item.tenantId === approval?.tenantId) : undefined;
+-    const campaign = brief ? state.campaigns.find((item) => item.id === brief.campaignId && item.tenantId === approval?.tenantId && item.storeId === brief.storeId) : undefined;
+-    const errors: Array<{ code: string; resourceId?: string; detail: string }> = [];
+-    if (!approval) errors.push({ code: 'approval_not_found', detail: '内容审批不存在' });
+-    else if (!['pending', 'approved'].includes(approval.status)) errors.push({ code: 'approval_not_active', detail: '内容审批状态不可执行' });
+-    if (!revision || !brief || !campaign) errors.push({ code: 'approval_scope_mismatch', detail: '审批绑定的内容、简报或活动范围已改变' });
+-    if (approval && Date.parse(approval.expiresAt) <= Date.parse(now)) errors.push({ code: 'approval_expired', detail: '审批已过期' });
+-    if (approval && revision && revision.contentHash !== approval.payloadHash) errors.push({ code: 'stale_approval', detail: '内容哈希已改变' });
+-    if (approval && campaign && approval.campaignRevision !== undefined && approval.campaignRevision !== campaign.revision) errors.push({ code: 'campaign_revision_changed', detail: '活动配置已改变，需重新审批' });
+-    if (approval && brief && approval.assetIds && JSON.stringify([...approval.assetIds].sort()) !== JSON.stringify([...brief.assetIds].sort())) errors.push({ code: 'asset_binding_changed', detail: '素材清单已改变，需重新审批' });
+-    if (approval && brief && approval.productPriceRefs) {
+-      for (const ref of approval.productPriceRefs) {
+-        const product = state.products.find((item) => item.id === ref.productId && item.tenantId === approval.tenantId && item.storeId === brief.storeId);
+-        if (!product || product.currentPriceVersionId !== ref.priceVersionId) errors.push({ code: 'price_version_changed', resourceId: ref.productId, detail: '产品价格版本已改变，需重新审批' });
+-        const price = state.priceVersions.find((item) => item.id === ref.priceVersionId && item.tenantId === approval.tenantId && item.productId === ref.productId);
+-        if (!price || price.status !== 'approved' || price.amountMinor === null) errors.push({ code: 'price_version_unapproved', resourceId: ref.productId, detail: '审批绑定的价格已不可用' });
+-      }
+-    } else if (approval) errors.push({ code: 'approval_binding_missing', detail: '旧审批缺少价格绑定，需重新审批' });
+-    if (approval?.brandRevisionIds && brief) {
+-      for (const revisionId of approval.brandRevisionIds) {
+-        const brand = state.brandRevisions.find((item) => item.id === revisionId && item.tenantId === approval.tenantId);
+-        const document = brand ? state.brandDocuments.find((item) => item.id === brand.documentId) : undefined;
+-        if (!brand || brand.status !== 'approved' || (document?.storeId && document.storeId !== brief.storeId)) errors.push({ code: 'brand_revision_changed', resourceId: revisionId, detail: '品牌规则版本已改变或失效' });
+-      }
+-    } else if (approval) errors.push({ code: 'approval_binding_missing', detail: '旧审批缺少品牌版本绑定，需重新审批' });
+-    if (revision && revision.packageData.needs_input.length) errors.push({ code: 'content_needs_input', detail: '内容仍有未解决的输入项' });
+-    if (revision && revision.packageData.variants.some((item) => item.locale === 'bn' && item.review_status !== 'reviewed')) errors.push({ code: 'bn_review_required', detail: '孟语版本未完成复核' });
+-    if (brief && campaign) {
+-      const check = this.publishCheck({ tenantId: approval!.tenantId, storeId: brief.storeId, productIds: brief.productIds, assetIds: brief.assetIds, startAt: campaign.startAt, endAt: campaign.endAt });
+-      if (!check.ok) errors.push(...check.errors);
+-    }
+-    return { ok: errors.length === 0, errors };
++    return checkContentApproval(state, state.contentApprovals.find(a => a.id === approvalId), now);
+   }
+   async approveContent(id: string, actorUserId: string, currentHash: string): Promise<ContentApproval> {
+-    const preflight = this.validateContentExecution(id);
+-    if (!preflight.ok) throw new Error(preflight.errors[0]?.code || 'approval_validation_failed');
+-    return this.mutate((state) => {
+-      const approval = state.contentApprovals.find((item) => item.id === id);
+-      if (!approval) throw new Error('approval_not_found');
+-      const revision = state.contentRevisions.find((item) => item.id === approval.resourceRevisionId);
+-      requireCondition(approval.status === 'pending', 'approval_not_pending', 409);
+-      requireCondition(Boolean(revision && revision.tenantId === approval.tenantId), 'approval_scope_mismatch', 403);
+-      if (!revision || revision.contentHash !== approval.payloadHash || revision.contentHash !== currentHash) { approval.status = 'stale'; throw new Error('stale_approval'); }
+-      const brief = state.contentBriefs.find((item) => item.id === revision.briefId && item.tenantId === approval.tenantId);
+-      const sourceValid = Boolean(brief) && revision.packageData.sources.every((source) => state.brandRevisions.some((brand) => {
+-        const document = state.brandDocuments.find((item) => item.id === brand.documentId);
+-        return brand.id === source.revision_id && brand.tenantId === approval.tenantId && brand.status === 'approved' && (!document?.storeId || document.storeId === brief!.storeId);
+-      }));
+-      if (!sourceValid) throw new Error('invalid_source_reference');
+-      if (revision.packageData.variants.some((item) => item.locale === 'bn' && item.review_status !== 'reviewed')) throw new Error('bn_review_required');
+-      if (Date.parse(approval.expiresAt) <= Date.now()) { approval.status = 'expired'; throw new Error('approval_expired'); }
+-      approval.status = 'approved'; approval.approvedBy = actorUserId; approval.approvedAt = nowIso(); revision.status = 'approved'; return approval;
+-    });
+-  }
+-  async createPublicationIntent(input: Omit<PublicationIntent, 'id' | 'createdAt' | 'status'>): Promise<PublicationIntent> {
+-    return this.mutate((state) => { const intent: PublicationIntent = { ...input, id: randomUUID(), status: input.mode === 'manual' ? 'manual_ready' : 'submitted', createdAt: nowIso() }; state.publicationIntents.push(intent); return intent; });
++    return this.mutate(state => {
++      const approval = state.contentApprovals.find(a => a.id === id);
++      requireCondition(approval, 'approval_not_found', 404);
++      requireCondition(approval.status === 'pending', 'approval_not_pending');
++      const check = checkContentApproval(state, approval, nowIso());
++      requireCondition(check.ok, check.errors[0]?.code || 'approval_validation_failed');
++      const revision = state.contentRevisions.find(r => r.id === approval.resourceRevisionId)!;
++      requireCondition(currentHash === revision.contentHash, 'stale_approval');
++      for (const prior of state.contentApprovals.filter(a => a.resourceRevisionId === revision.id && a.status === 'approved')) prior.status = 'stale';
++      approval.status = 'approved'; approval.approvedBy = actorUserId; approval.approvedAt = nowIso();
++      revision.status = 'approved'; revision.currentApprovalId = approval.id;
++      return approval;
++    });
++  }
++  async createPublicationIntent(input: Pick<PublicationIntent, 'tenantId' | 'storeId' | 'contentRevisionId' | 'channel' | 'mode' | 'createdBy'>): Promise<PublicationIntent> {
++    return this.mutate(state => {
++      const revision = state.contentRevisions.find(r => r.id === input.contentRevisionId && r.tenantId === input.tenantId);
++      const brief = revision && state.contentBriefs.find(b => b.id === revision.briefId && b.tenantId === input.tenantId && b.storeId === input.storeId);
++      requireCondition(revision && brief, 'content_revision_not_found', 404);
++      const approval = state.contentApprovals.find(a => a.id === revision.currentApprovalId && a.tenantId === input.tenantId && a.status === 'approved');
++      requireCondition(approval, 'approval_not_found', 404);
++      const check = checkContentApproval(state, approval, nowIso());
++      requireCondition(check.ok, check.errors[0]?.code || 'approval_validation_failed');
++      requireCondition(input.channel === approval.channel, 'approval_scope_mismatch');
++      requireCondition(input.mode === 'manual', 'live_publication_unimplemented');
++      const intent: PublicationIntent = { ...input, id: randomUUID(), approvalId: approval.id, payloadHash: revision.contentHash, packageData: structuredClone(revision.packageData), status: 'manual_ready', createdAt: nowIso() };
++      state.publicationIntents.push(intent);
++      return intent;
++    });
+   }
+   findPublicationIntent(id: string): PublicationIntent | undefined { return this.requireState().publicationIntents.find((item) => item.id === id); }
+   async addPublicationReceipt(input: Omit<PublicationReceipt, 'id' | 'createdAt'>): Promise<PublicationReceipt> {
+@@ -1071,7 +1044,7 @@
+         approvedBy: null,
+         approvedAt: null,
+         approvalHash: input.approvalHash || null,
+-        policyVersion: input.policyVersion || 'crm-policy-v1',
++        policyVersion: input.policyVersion || 'crm-policy-v2',
+         expiresAt: input.expiresAt || new Date(Date.now() + 7 * 86_400_000).toISOString()
+       };
+       state.outreachCampaigns.push(campaign);
+@@ -1087,6 +1060,9 @@
+     return this.mutate((state) => {
+       const campaign = state.outreachCampaigns.find((item) => item.id === id && item.tenantId === tenantId);
+       if (!campaign) return undefined;
++      for (const attempt of state.messageAttempts.filter(a => a.outreachId === campaign.id && ['queued', 'sent_test'].includes(a.status))) attempt.costMinor ??= campaign.costPerAttemptMinor;
++      for (const intent of state.deliveryIntents.filter(i => i.tenantId === tenantId && (i.outreachId === campaign.id || i.approvalHash === campaign.approvalHash))) { intent.outreachId = campaign.id; intent.costMinor ??= campaign.costPerAttemptMinor; }
++      for (const intent of state.deliveryIntents.filter(i => i.outreachId === campaign.id && i.status === 'pending' && !i.providerReference)) { intent.status = 'blocked'; intent.errorCode = 'outreach_approval_changed'; intent.updatedAt = nowIso(); }
+       Object.assign(campaign, patch);
+       campaign.status = 'pending_approval';
+       campaign.approvedBy = null;
+@@ -1109,15 +1085,7 @@
+     const state = this.requireState();
+     const campaign = state.outreachCampaigns.find((item) => item.id === input.outreachId && item.tenantId === input.tenantId && item.storeId === input.storeId);
+     if (!campaign) throw new Error('outreach_not_found');
+-    const snapshot = state.audienceSnapshots.find((item) => item.id === campaign.audienceSnapshotId && item.tenantId === input.tenantId);
+-    const segment = state.segmentDefinitions.find((item) => item.id === campaign.segmentId && item.tenantId === input.tenantId);
+-    if (!snapshot || !segment) throw new Error('audience_snapshot_not_found');
+-    if (campaign.status !== 'approved' && campaign.status !== 'completed' && campaign.status !== 'blocked') throw new Error('outreach_not_approved');
+-    if (!campaign.templateApproved) throw new Error('template_not_approved');
+-    const exportExpiry = Date.parse(campaign.expiresAt || '');
+-    if (!Number.isFinite(exportExpiry) || exportExpiry <= Date.now()) throw new Error('outreach_approval_expired');
+-    const expectedHash = outreachApprovalHash(campaign, snapshot, segment.version);
+-    if (!campaign.approvalHash || campaign.approvalHash !== expectedHash) throw new Error('stale_outreach_approval');
++    const snapshot = approvedOutreachContext(state, campaign, nowIso());
+     const dispatchTime = this.mode === 'test' && input.now && Number.isFinite(Date.parse(input.now)) ? input.now : nowIso();
+     const quiet = outsideOutreachWindow(state, campaign, dispatchTime);
+     let spent = outreachSpend(state, campaign);
+@@ -1135,7 +1103,7 @@
+     return this.mutate((state) => {
+       const campaign = state.outreachCampaigns.find((item) => item.id === id);
+       if (!campaign) throw new Error('outreach_not_found');
+-      if (campaign.status === 'approved' || campaign.status === 'queued' || campaign.status === 'completed') return campaign;
++      if (['approved', 'queued', 'completed'].includes(campaign.status)) { approvedOutreachContext(state, campaign, nowIso()); return campaign; }
+       if (!['draft', 'pending_approval'].includes(campaign.status)) throw new Error('outreach_not_approvable');
+       if (!campaign.templateApproved) throw new Error('template_not_approved');
+       if (!Number.isSafeInteger(campaign.budgetMinor) || campaign.budgetMinor < 0 || !Number.isSafeInteger(campaign.costPerAttemptMinor) || campaign.costPerAttemptMinor < 0) throw new Error('budget_invalid');
+@@ -1163,14 +1131,7 @@
+     return this.mutate((state) => {
+       const campaign = state.outreachCampaigns.find((item) => item.id === input.outreachId && item.tenantId === input.tenantId && item.storeId === input.storeId);
+       if (!campaign) throw new Error('outreach_not_found');
+-      const snapshot = state.audienceSnapshots.find((item) => item.id === campaign.audienceSnapshotId && item.tenantId === input.tenantId);
+-      const segment = state.segmentDefinitions.find((item) => item.id === campaign.segmentId && item.tenantId === input.tenantId);
+-      if (!snapshot || !segment) throw new Error('audience_snapshot_not_found');
+-      if (!['approved', 'queued', 'completed', 'blocked'].includes(campaign.status)) throw new Error('outreach_not_approved');
+-      const expectedHash = outreachApprovalHash(campaign, snapshot, segment.version);
+-      if (!campaign.approvalHash || campaign.approvalHash !== expectedHash) throw new Error('stale_outreach_approval');
+-      const dispatchExpiry = Date.parse(campaign.expiresAt || '');
+-      if (!Number.isFinite(dispatchExpiry) || dispatchExpiry <= Date.now()) throw new Error('outreach_approval_expired');
++      const snapshot = approvedOutreachContext(state, campaign, nowIso());
+       const dispatchTime = this.mode === 'test' && input.now && Number.isFinite(Date.parse(input.now)) ? input.now : nowIso();
+       const dispatchKey = input.idempotencyKey || `${campaign.id}:${snapshot.policyHash}`;
+       const attempts: MessageAttempt[] = [];
+@@ -1178,8 +1139,13 @@
+       const quiet = outsideOutreachWindow(state, campaign, dispatchTime);
+       for (const memberId of snapshot.memberIds) {
+         const assignment = snapshot.assignments[memberId] || 'treatment';
+-        const previous = state.messageAttempts.find((item) => item.outreachId === campaign.id && item.memberId === memberId && item.status !== 'failed');
+-        if (previous) { attempts.push(previous); continue; }
++        const history = state.messageAttempts.filter(a => a.tenantId === input.tenantId && a.outreachId === campaign.id && a.memberId === memberId);
++        const replay = history.find(a => a.dispatchKey === dispatchKey || (!a.dispatchKey && !input.idempotencyKey));
++        if (replay) { attempts.push(replay); continue; }
++        const existing = existingDelivery(state, campaign, memberId);
++        if (existing?.attempt) { attempts.push(existing.attempt); continue; }
++        // A provider intent already reserves this member. Record only a reference, not another charge.
++        const previous = history.at(-1);
+         let status: MessageAttempt['status'] = 'queued';
+         let reason: string | null = null;
+         let providerReference: string | null = null;
+@@ -1193,10 +1159,10 @@
+           status = 'sent_test'; reason = 'test_outbox_only'; providerReference = `test-outbox:${hashOpaque(dispatchKey).slice(0, 16)}:${hashOpaque(memberId).slice(0, 16)}`;
+           spent += campaign.costPerAttemptMinor;
+         }
+-        const attempt: MessageAttempt = { id: randomUUID(), tenantId: input.tenantId, outreachId: campaign.id, memberId, assignment, status, reason, providerReference, createdAt: dispatchTime };
++        const attempt: MessageAttempt = { id: randomUUID(), tenantId: input.tenantId, outreachId: campaign.id, memberId, assignment, status, reason, providerReference, dispatchKey, approvalHash: campaign.approvalHash!, costMinor: status === 'sent_test' ? campaign.costPerAttemptMinor : 0, deliveryIntentId: existing?.intent?.id, retryOfId: previous?.id, createdAt: dispatchTime };
+         state.messageAttempts.push(attempt); attempts.push(attempt);
+       }
+-      campaign.status = attempts.some((attempt) => attempt.status === 'sent_test') ? 'completed' : attempts.some((attempt) => attempt.status === 'external_blocked') ? 'blocked' : 'completed';
++      refreshOutreachStatus(state, campaign, snapshot);
+       return { campaign, attempts, report: reportFromState(state, campaign, snapshot) };
+     });
+   }
+@@ -1351,38 +1317,36 @@
+   listDeliveryIntents(tenantId: string, storeIds: string[]): DeliveryIntent[] { return this.requireState().deliveryIntents.filter((item) => item.tenantId === tenantId && storeIds.includes(item.storeId)); }
+   findDeliveryIntent(id: string, tenantId: string): DeliveryIntent | undefined { return this.requireState().deliveryIntents.find((item) => item.id === id && item.tenantId === tenantId); }
+   async createDeliveryIntent(input: { tenantId: string; storeId: string; provider: 'whatsapp'; memberId: string; templateName: string; approvalHash: string; idempotencyKey: string; createdBy: string }): Promise<DeliveryIntent> {
+-    return this.mutate((state) => {
+-      const existing = state.deliveryIntents.find((item) => item.tenantId === input.tenantId && item.storeId === input.storeId && item.provider === input.provider && item.idempotencyKey === input.idempotencyKey);
+-      if (existing) return existing;
+-      const approvedOutreach = state.outreachCampaigns.find((campaign) => {
+-        if (campaign.tenantId !== input.tenantId || campaign.storeId !== input.storeId || campaign.channel !== 'whatsapp') return false;
+-        if (!['approved', 'queued', 'completed'].includes(campaign.status) || campaign.approvalHash !== input.approvalHash || campaign.templateId !== input.templateName) return false;
+-        if (campaign.expiresAt && Date.parse(campaign.expiresAt) <= Date.now()) return false;
+-        const snapshot = state.audienceSnapshots.find((item) => item.id === campaign.audienceSnapshotId && item.tenantId === campaign.tenantId);
+-        return Boolean(snapshot?.memberIds.includes(input.memberId));
+-      });
+-      requireCondition(approvedOutreach, 'approved_outreach_required', 409);
+-      const snapshot = state.audienceSnapshots.find((item) => item.id === approvedOutreach.audienceSnapshotId && item.tenantId === input.tenantId);
++    return this.mutate(state => {
++      const replay = state.deliveryIntents.find(i => i.tenantId === input.tenantId && i.storeId === input.storeId && i.provider === input.provider && (i.idempotencyKey === input.idempotencyKey || i.requestKeys?.includes(input.idempotencyKey)));
++      if (replay) {
++        requireCondition(replay.memberId === input.memberId && replay.templateName === input.templateName && replay.approvalHash === input.approvalHash, 'idempotency_key_conflict');
++        return replay;
++      }
++      const campaign = state.outreachCampaigns.find(c => c.tenantId === input.tenantId && c.storeId === input.storeId && c.channel === input.provider && c.approvalHash === input.approvalHash && c.templateId === input.templateName);
++      requireCondition(campaign, 'approved_outreach_required');
+       const dispatchTime = nowIso();
+-      const policy = evaluateMemberDispatch(state, approvedOutreach, {
+-        memberId: input.memberId,
+-        assignment: snapshot?.assignments[input.memberId] || 'treatment',
+-        quiet: outsideOutreachWindow(state, approvedOutreach, dispatchTime),
+-        spent: outreachSpend(state, approvedOutreach),
+-        now: dispatchTime
+-      });
+-      const connector = state.connectorStates.find((item) => item.tenantId === input.tenantId && item.provider === input.provider);
+-      const connectorBlocked = !connector || !connector.enabled || connector.killSwitch || connector.status !== 'active' || state.externalWritesKillSwitch;
++      const snapshot = approvedOutreachContext(state, campaign, dispatchTime);
++      requireCondition(snapshot.memberIds.includes(input.memberId), 'approved_outreach_required');
++      const existing = existingDelivery(state, campaign, input.memberId);
++      if (existing?.intent) {
++        requireCondition(existing.intent.approvalHash === input.approvalHash && existing.intent.templateName === input.templateName, 'delivery_already_dispatched');
++        existing.intent.requestKeys = [...new Set([...(existing.intent.requestKeys || []), input.idempotencyKey])];
++        return existing.intent;
++      }
++      requireCondition(!existing, 'delivery_already_dispatched');
++      const policy = evaluateMemberDispatch(state, campaign, { memberId: input.memberId, assignment: snapshot.assignments[input.memberId] || 'treatment', quiet: outsideOutreachWindow(state, campaign, dispatchTime), spent: outreachSpend(state, campaign), now: dispatchTime });
++      const connector = state.connectorStates.find(c => c.tenantId === input.tenantId && c.provider === input.provider);
++      const connectorBlocked = !connector || !connector.enabled || connector.killSwitch || connector.status !== 'active' || !connector.capabilities.sendTemplate || connector.mode === 'manual' || state.externalWritesKillSwitch;
+       const blocked = policy.status !== 'eligible' || connectorBlocked;
+-      const errorCode = policy.status !== 'eligible'
+-        ? policy.reason
+-        : state.externalWritesKillSwitch ? 'global_kill_switch' : connector?.reason || 'connector_not_active';
+-      const intent: DeliveryIntent = { id: randomUUID(), tenantId: input.tenantId, storeId: input.storeId, provider: input.provider, memberId: input.memberId, templateName: input.templateName.slice(0, 160), approvalHash: input.approvalHash, idempotencyKey: input.idempotencyKey, status: blocked ? 'blocked' : 'pending', providerReference: null, errorCode: blocked ? errorCode : null, createdBy: input.createdBy, createdAt: dispatchTime, updatedAt: dispatchTime };
++      const errorCode = policy.status !== 'eligible' ? policy.reason : state.externalWritesKillSwitch ? 'global_kill_switch' : 'connector_not_active';
++      const intent: DeliveryIntent = { ...input, id: randomUUID(), outreachId: campaign.id, costMinor: blocked ? 0 : campaign.costPerAttemptMinor, requestKeys: [input.idempotencyKey], status: blocked ? 'blocked' : 'pending', providerReference: null, errorCode: blocked ? errorCode : null, createdAt: dispatchTime, updatedAt: dispatchTime };
+       state.deliveryIntents.push(intent);
++      refreshOutreachStatus(state, campaign, snapshot);
+       return intent;
+     });
+   }
+-  async markDeliveryUnknown(id: string, tenantId: string, reason = 'provider_timeout'): Promise<DeliveryIntent> { return this.mutate((state) => { const item = state.deliveryIntents.find((entry) => entry.id === id && entry.tenantId === tenantId); if (!item) throw new Error('delivery_not_found'); if (item.status === 'pending' || item.status === 'accepted') { item.status = 'unknown_delivery'; item.errorCode = reason; item.updatedAt = nowIso(); } return item; }); }
++  async markDeliveryUnknown(id: string, tenantId: string, reason = 'provider_timeout'): Promise<DeliveryIntent> { return this.mutate((state) => { const item = state.deliveryIntents.find((entry) => entry.id === id && entry.tenantId === tenantId); if (!item) throw new Error('delivery_not_found'); if (item.status === 'pending' || item.status === 'accepted') { item.status = 'unknown_delivery'; item.errorCode = reason; item.updatedAt = nowIso(); refreshDeliveryCampaign(state, item); } return item; }); }
+   async processWebhook(input: { provider: 'whatsapp'; tenantId: string | null; providerEventId: string; providerMessageId?: string | null; status: DeliveryStatus; occurredAt: string }): Promise<{ duplicate: boolean; intent: DeliveryIntent | null; event: WebhookEvent }> {
+     return this.mutate((state) => {
+       const duplicate = state.webhookEvents.find((item) => item.provider === input.provider && item.providerEventId === input.providerEventId);
+@@ -1390,18 +1354,34 @@
+       const event: WebhookEvent = { id: randomUUID(), tenantId: input.tenantId, provider: input.provider, providerEventId: input.providerEventId, providerMessageId: input.providerMessageId || null, status: input.status, occurredAt: Number.isFinite(Date.parse(input.occurredAt)) ? new Date(input.occurredAt).toISOString() : nowIso(), receivedAt: nowIso() };
+       state.webhookEvents.push(event);
+       const intent = input.tenantId ? state.deliveryIntents.find((item) => item.tenantId === input.tenantId && (item.providerReference === input.providerMessageId || item.id === input.providerMessageId || (input.providerMessageId && item.idempotencyKey === input.providerMessageId))) : undefined;
+-      if (intent && canAdvanceDelivery(intent.status, input.status)) { intent.status = input.status; intent.providerReference = input.providerMessageId || intent.providerReference; intent.updatedAt = nowIso(); }
++      if (intent && canAdvanceDelivery(intent.status, input.status)) { intent.status = input.status; intent.providerReference = input.providerMessageId || intent.providerReference; intent.updatedAt = nowIso(); refreshDeliveryCampaign(state, intent); }
+       return { duplicate: false, intent: intent || null, event };
+     });
+   }
+ 
+   // ----- Daily control reports (G08) -----
+-  listDailyReports(tenantId: string, storeId?: string | null): DailyReport[] { return this.requireState().dailyReports.filter((item) => item.tenantId === tenantId && (storeId === undefined || item.storeId === storeId)); }
+-  listControlTasks(tenantId: string): ControlTask[] { return this.requireState().controlTasks.filter((item) => item.tenantId === tenantId); }
+-  async completeControlTask(id: string, tenantId: string, actorUserId: string, evidence: string): Promise<ControlTask> { return this.mutate(state => { const task = state.controlTasks.find(item => item.id === id && item.tenantId === tenantId); if (!task) throw new Error('control_task_not_found'); if (!task.storeIds.some(storeId => state.memberships.some(m => m.tenantId === tenantId && m.userId === actorUserId && m.storeIds.includes(storeId) && !m.revokedAt))) throw new Error('control_task_scope_forbidden'); if (!evidence.trim()) throw new Error('task_evidence_required'); task.status = 'done'; task.completionEvidence = evidence.trim().slice(0, 1000); return task; }); }
++  listDailyReports(tenantId: string, storeIds: string[], storeId?: string | null): DailyReport[] {
++    const state = this.requireState();
++    const reports = state.dailyReports.filter(r => (!storeId || r.storeId === storeId) && canReadDailyReport(state, tenantId, storeIds, r));
++    return reports.map(r => ({ ...r, restatedFrom: reports.some(prior => prior.id === r.restatedFrom) ? r.restatedFrom : null }));
++  }
++  listControlTasks(tenantId: string, storeIds: string[]): ControlTask[] {
++    const state = this.requireState();
++    return state.controlTasks.filter(task => canReadControlTask(state, tenantId, storeIds, task));
++  }
++  async completeControlTask(id: string, tenantId: string, actorUserId: string, evidence: string): Promise<ControlTask> {
++    return this.mutate(state => {
++      const task = state.controlTasks.find(t => t.id === id && t.tenantId === tenantId);
++      const membership = state.memberships.find(m => m.tenantId === tenantId && m.userId === actorUserId && !m.revokedAt);
++      requireCondition(task && membership && canReadControlTask(state, tenantId, membership.storeIds, task), 'control_task_not_found', 404);
++      requireCondition(evidence.trim(), 'task_evidence_required');
++      task.status = 'done'; task.completionEvidence = evidence.trim().slice(0, 1000);
++      return task;
++    });
++  }
+   async createControlTask(input: Omit<ControlTask, 'id' | 'createdAt' | 'status'>): Promise<ControlTask> { return this.mutate((state) => { const existing = state.controlTasks.find(item => item.tenantId === input.tenantId && item.ownerUserId === input.ownerUserId && item.title === input.title && item.targetMetric === input.targetMetric && item.storeIds.length === input.storeIds.length && item.storeIds.every(storeId => input.storeIds.includes(storeId)) && ['open','in_progress'].includes(item.status)); if (existing) return existing; const task: ControlTask = { ...input, id: randomUUID(), status: 'open', createdAt: nowIso() }; state.controlTasks.push(task); return task; }); }
+-  async createDailyReport(input: Omit<DailyReport, 'id' | 'version' | 'createdAt' | 'restatedFrom'>): Promise<DailyReport> { return this.mutate((state) => { const prior = state.dailyReports.filter((item) => item.tenantId === input.tenantId && item.storeId === input.storeId).sort((a, b) => b.version - a.version)[0]; const sameDay = prior && prior.asOf.slice(0, 10) === input.asOf.slice(0, 10); const report: DailyReport = { ...input, id: randomUUID(), version: (prior?.version || 0) + 1, restatedFrom: sameDay ? prior.id : null, createdAt: nowIso() }; state.dailyReports.push(report); return report; }); }
+-  async setGlobalKillSwitch(value: boolean): Promise<void> { await this.mutate((state) => { state.externalWritesKillSwitch = value; if (value) for (const intent of state.deliveryIntents.filter((item) => item.status === 'pending' || item.status === 'accepted')) { intent.status = 'blocked'; intent.errorCode = 'global_kill_switch'; intent.updatedAt = nowIso(); } }); }
++  async createDailyReport(input: Omit<DailyReport, 'id' | 'version' | 'createdAt' | 'restatedFrom'>): Promise<DailyReport> { return this.mutate((state) => { const prior = state.dailyReports.filter((item) => item.tenantId === input.tenantId && item.storeId === input.storeId && JSON.stringify([...item.storeIds].sort()) === JSON.stringify([...input.storeIds].sort())).sort((a, b) => b.version - a.version)[0]; const sameDay = prior && prior.asOf.slice(0, 10) === input.asOf.slice(0, 10); const report: DailyReport = { ...input, id: randomUUID(), version: (prior?.version || 0) + 1, restatedFrom: sameDay ? prior.id : null, createdAt: nowIso() }; state.dailyReports.push(report); return report; }); }
++  async setGlobalKillSwitch(value: boolean): Promise<void> { await this.mutate((state) => { state.externalWritesKillSwitch = value; if (value) for (const intent of state.deliveryIntents.filter((item) => item.status === 'pending' || item.status === 'accepted')) { intent.status = intent.status === 'pending' && !intent.providerReference ? 'blocked' : 'unknown_delivery'; intent.errorCode = 'global_kill_switch'; intent.updatedAt = nowIso(); refreshDeliveryCampaign(state, intent); } }); }
+ 
+   outreachReport(id: string, tenantId: string): Record<string, unknown> {
+     const state = this.requireState();
+@@ -1586,47 +1566,6 @@
+   return marketingConsentForChannel(state, tenantId, memberId, 'manual');
+ }
+ 
+-function marketingConsentForChannel(state: RepositoryState, tenantId: string, memberId: string, channel: OutreachCampaign['channel']): boolean {
+-  const applies = (event: ConsentEvent | SuppressionEntry) =>
+-    event.tenantId === tenantId && event.memberId === memberId && event.purpose === 'marketing' &&
+-    (channel === 'manual' || event.channel === channel || event.channel === 'unknown');
+-  const events = state.consentEvents.filter(applies).sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
+-  const latest = events[0];
+-  if (!latest?.granted) return false;
+-  return !state.suppressionEntries.some((entry) => applies(entry) && Date.parse(entry.occurredAt) >= Date.parse(latest.occurredAt));
+-}
+-
+-function outreachSpend(state: RepositoryState, campaign: OutreachCampaign): number {
+-  return state.messageAttempts
+-    .filter((item) => item.outreachId === campaign.id && ['sent_test', 'queued'].includes(item.status))
+-    .reduce((sum) => sum + campaign.costPerAttemptMinor, 0);
+-}
+-
+-function outsideOutreachWindow(state: RepositoryState, campaign: OutreachCampaign, now: string): boolean {
+-  const timezone = state.stores.find((store) => store.id === campaign.storeId)?.timezone || 'Asia/Dhaka';
+-  return isOutsideAllowedWindow(now, campaign.quietStartLocal, campaign.quietEndLocal, timezone);
+-}
+-
+-function evaluateMemberDispatch(
+-  state: RepositoryState,
+-  campaign: OutreachCampaign,
+-  input: { memberId: string; assignment: 'treatment' | 'holdout'; now: string; quiet: boolean; spent: number }
+-) {
+-  const { tenantId, storeId } = campaign;
+-  const member = state.members.find((item) => item.id === input.memberId && item.tenantId === tenantId && item.storeId === storeId);
+-  return evaluateDispatchPolicy({
+-    assignment: input.assignment,
+-    hasContact: Boolean(member?.contactHmac),
+-    contactVerified: Boolean(member?.contactVerified),
+-    verificationExpiresAt: member?.verificationExpiresAt,
+-    consentGranted: member ? marketingConsentForChannel(state, tenantId, member.id, campaign.channel) : false,
+-    frequencyLimited: member ? hasRecentMessage(state, tenantId, member.id, campaign.frequencyCapDays, Date.parse(input.now), campaign.id) : false,
+-    outsideQuietHours: input.quiet,
+-    budgetAvailable: input.spent + campaign.costPerAttemptMinor <= campaign.budgetMinor,
+-    now: input.now
+-  });
+-}
+-
+ function segmentRuleMatches(state: RepositoryState, member: MemberRecord, rule: SegmentRule, asOf: string, eventId: string | null): { ok: boolean; reason: string } {
+   const orders = countableOrdersForMember(state, member);
+   if (rule === 'registered_unpurchased') return orders.length === 0 ? { ok: true, reason: 'registered_without_purchase' } : { ok: false, reason: 'has_purchase' };
+@@ -1671,70 +1610,10 @@
+   return bucket < holdoutPercent * 100 ? 'holdout' : 'treatment';
+ }
+ 
+-function outreachApprovalHash(campaign: OutreachCampaign, snapshot: AudienceSnapshot, segmentVersion: number): string {
+-  const payload = {
+-    outreachId: campaign.id,
+-    tenantId: campaign.tenantId,
+-    storeId: campaign.storeId,
+-    segmentId: campaign.segmentId,
+-    segmentVersion,
+-    audienceSnapshotId: snapshot.id,
+-    audiencePolicyHash: snapshot.policyHash,
+-    channel: campaign.channel,
+-    templateId: campaign.templateId,
+-    templateText: campaign.templateText,
+-    templateApproved: campaign.templateApproved,
+-    budgetMinor: campaign.budgetMinor,
+-    costPerAttemptMinor: campaign.costPerAttemptMinor,
+-    quietStartLocal: campaign.quietStartLocal,
+-    quietEndLocal: campaign.quietEndLocal,
+-    frequencyCapDays: campaign.frequencyCapDays,
+-    policyVersion: campaign.policyVersion,
+-    expiresAt: campaign.expiresAt || null
+-  };
+-  return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+-}
+-
+-function hasRecentMessage(state: RepositoryState, tenantId: string, memberId: string, frequencyCapDays: number, nowMs: number, currentOutreachId: string): boolean {
+-  if (frequencyCapDays <= 0) return false;
+-  const threshold = nowMs - Math.max(0, frequencyCapDays) * 86_400_000;
+-  return state.messageAttempts.some((attempt) => attempt.tenantId === tenantId && attempt.memberId === memberId && attempt.outreachId !== currentOutreachId && ['sent_test', 'queued'].includes(attempt.status) && Date.parse(attempt.createdAt) >= threshold);
+-}
+-
+-function parseLocalMinutes(value: string): number {
+-  const match = /^(\d{1,2}):(\d{2})$/.exec(value || '');
+-  if (!match) return 0;
+-  const hours = Number(match[1]);
+-  const minutes = Number(match[2]);
+-  if (hours > 23 || minutes > 59) return 0;
+-  return hours * 60 + minutes;
+-}
+-
+-function localMinutes(iso: string, timezone: string): number {
+-  try {
+-    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(iso));
+-    const hour = Number(parts.find((part) => part.type === 'hour')?.value || 0);
+-    const minute = Number(parts.find((part) => part.type === 'minute')?.value || 0);
+-    return hour * 60 + minute;
+-  } catch {
+-    const date = new Date(iso);
+-    return date.getUTCHours() * 60 + date.getUTCMinutes();
+-  }
+-}
+-
+-/** Returns true when the current local time is outside the configured send window. */
+-function isOutsideAllowedWindow(iso: string, start: string, end: string, timezone: string): boolean {
+-  const startMinutes = parseLocalMinutes(start || '09:00');
+-  const endMinutes = parseLocalMinutes(end || '21:00');
+-  const current = localMinutes(iso, timezone);
+-  if (startMinutes === endMinutes) return true;
+-  if (startMinutes < endMinutes) return current < startMinutes || current >= endMinutes;
+-  return current < startMinutes && current >= endMinutes;
+-}
+-
+ function reportFromState(state: RepositoryState, campaign: OutreachCampaign, snapshot: AudienceSnapshot): Record<string, unknown> {
+   const attempts = state.messageAttempts.filter((attempt) => attempt.outreachId === campaign.id);
+-  const byMember = new Map(attempts.map((attempt) => [attempt.memberId, attempt]));
++  const byMember = new Map<string, { status: string }>(attempts.map(attempt => [attempt.memberId, attempt]));
++  for (const entry of outreachLedger(state).filter(e => e.outreachId === campaign.id && e.intent)) byMember.set(entry.memberId, { status: entry.intent!.status });
+   const group = (assignment: 'treatment' | 'holdout') => {
+     const assigned = snapshot.memberIds.filter((memberId) => snapshot.assignments[memberId] === assignment);
+     const rows = assigned.map((memberId) => byMember.get(memberId));
+@@ -1746,7 +1625,7 @@
+     const memberRecords = assigned.map((memberId) => state.members.find((member) => member.id === memberId)).filter((member): member is MemberRecord => Boolean(member));
+     const purchases = state.orders.filter((order) => order.tenantId === campaign.tenantId && order.storeId === campaign.storeId && order.active && order.status === 'paid' && memberRecords.some((member) => orderMatchesMember(order, member)) && refundedAmount(state, order) < order.amountPaidMinor);
+     const buyers = new Set(purchases.map((order) => order.memberId || 'anonymous')).size;
+-    return { assigned: assigned.length, attempted: rows.filter(Boolean).length, sent: rows.filter((row) => row?.status === 'sent_test').length, statuses, qualified_order_count: purchases.length, buyer_count: buyers, revenue_minor: purchases.reduce((sum, order) => sum + order.amountPaidMinor - refundedAmount(state, order), 0), conversion_rate: assigned.length ? buyers / assigned.length : null };
++    return { assigned: assigned.length, attempted: rows.filter(Boolean).length, sent: rows.filter(row => row?.status === 'sent_test' || row?.status === 'delivered').length, statuses, qualified_order_count: purchases.length, buyer_count: buyers, revenue_minor: purchases.reduce((sum, order) => sum + order.amountPaidMinor - refundedAmount(state, order), 0), conversion_rate: assigned.length ? buyers / assigned.length : null };
+   };
+   const treatment = group('treatment');
+   const holdout = group('holdout');
+@@ -1754,6 +1633,7 @@
+   return {
+     outreach_id: campaign.id,
+     status: campaign.status,
++    budget: outreachBudget(state, campaign),
+     assigned_count: assigned,
+     treatment,
+     holdout,
+--- previous/packages/domain/src/auth.ts
++++ current/packages/domain/src/auth.ts
+@@ -50,6 +50,10 @@
+   return actor.tenantId === store.tenantId && actor.storeIds.includes(store.id);
+ }
+ 
++export function canAccessStoreScope(allowed: string[], required: string[] | undefined): boolean {
++  return Boolean(required?.length && required.every(id => allowed.includes(id)));
++}
++
+ export function canAccessTenant(actor: ActorContext, tenant: Tenant): boolean {
+   return actor.tenantId === tenant.id;
+ }
+--- previous/packages/domain/src/connectors.ts
++++ current/packages/domain/src/connectors.ts
+@@ -26,6 +26,9 @@
+   templateName: string;
+   approvalHash: string;
+   idempotencyKey: string;
++  requestKeys?: string[];
++  outreachId?: string;
++  costMinor?: number;
+   status: DeliveryStatus;
+   providerReference: string | null;
+   errorCode: string | null;
+--- previous/packages/domain/src/content-policy.ts
++++ current/packages/domain/src/content-policy.ts
+@@ -0,0 +1,94 @@
++import { createHash } from 'node:crypto';
++import type { DatabaseState } from './types';
++import type { ContentApproval, ContentBrief, ContentFacts, ContentPackageData, ContentRevision } from './content';
++import { validatePublishWindow, type PublishCheckInput, type PublishCheckResult } from './brand';
++import { explicitTimestamp } from './validation';
++
++export const contentDigest = (value: unknown): string => createHash('sha256').update(JSON.stringify(value)).digest('hex');
++const sorted = (values: string[]) => [...new Set(values)].sort();
++const sameIds = (a: string[], b: string[]) => JSON.stringify(sorted(a)) === JSON.stringify(sorted(b));
++
++function assetRightsHash(state: DatabaseState, ids: string[]): string {
++  return contentDigest(sorted(ids).map(id => {
++    const asset = state.mediaAssets.find(a => a.id === id);
++    return asset ? { id, checksum: asset.checksum, rightsStatus: asset.rightsStatus, allowedUses: sorted(asset.allowedUses), expiresAt: asset.expiresAt } : { id, missing: true };
++  }));
++}
++
++/** Capture from the exact state supplied to the generator, never from submission time. */
++export function captureContentFacts(state: DatabaseState, brief: ContentBrief, data: ContentPackageData): ContentFacts {
++  return {
++    campaignRevision: state.campaigns.find(c => c.id === brief.campaignId)?.revision || 0,
++    brandRevisionIds: sorted([data.brand_revision_id, ...data.sources.map(s => s.revision_id)]),
++    productPriceRefs: sorted(brief.productIds).map(productId => ({ productId, priceVersionId: state.products.find(p => p.id === productId)?.currentPriceVersionId || '' })),
++    assetIds: sorted(brief.assetIds),
++    assetRightsHash: assetRightsHash(state, brief.assetIds)
++  };
++}
++
++export function checkPublish(state: DatabaseState, input: PublishCheckInput, now: string): PublishCheckResult {
++  const result = validatePublishWindow(new Date(now), input.startAt, input.endAt);
++  const fail = (code: string, resourceId: string, detail: string) => result.errors.push({ code, resourceId, detail });
++  for (const id of input.productIds || []) {
++    const product = state.products.find(p => p.id === id && p.tenantId === input.tenantId && p.storeId === input.storeId);
++    if (!product) { fail('product_not_found', id, '产品不属于当前门店'); continue; }
++    if (product.status !== 'active') fail('product_inactive', id, '产品已停用');
++    const price = state.priceVersions.find(p => p.id === product.currentPriceVersionId && p.productId === id && p.tenantId === input.tenantId);
++    if (!price || price.amountMinor === null || price.status !== 'approved') fail('price_missing_or_unapproved', id, '缺少已批准价格');
++    else if (Date.parse(price.validFrom) > Date.parse(now) || (price.validTo && Date.parse(price.validTo) <= Date.parse(now))) fail('price_outside_validity', id, '价格不在有效期内');
++  }
++  for (const id of input.assetIds || []) {
++    const asset = state.mediaAssets.find(a => a.id === id && a.tenantId === input.tenantId && (!a.storeId || a.storeId === input.storeId));
++    if (!asset) { fail('asset_not_found', id, '素材不属于当前门店'); continue; }
++    if (asset.rightsStatus !== 'approved') fail('asset_rights_missing', id, '素材授权未批准');
++    if (asset.expiresAt && Date.parse(asset.expiresAt) <= Date.parse(now)) fail('asset_rights_expired', id, '素材授权已过期');
++  }
++  return { ...result, ok: result.errors.length === 0 };
++}
++
++export function checkContentFacts(state: DatabaseState, revision: ContentRevision, now: string): PublishCheckResult['errors'] {
++  const errors: PublishCheckResult['errors'] = [];
++  const fail = (code: string, detail: string, resourceId?: string) => errors.push({ code, detail, resourceId });
++  const brief = state.contentBriefs.find(b => b.id === revision.briefId && b.tenantId === revision.tenantId);
++  const campaign = brief && state.campaigns.find(c => c.id === brief.campaignId && c.tenantId === revision.tenantId && c.storeId === brief.storeId);
++  if (!brief || !campaign) return [{ code: 'approval_scope_mismatch', detail: '内容、简报或活动范围已改变' }];
++  const facts = revision.generationFacts;
++  if (!facts) return [{ code: 'generation_facts_missing', detail: '旧内容缺少生成事实版本，请重新生成' }];
++  const data = revision.packageData;
++  if (data.brief_id !== brief.id || data.campaign_id !== campaign.id || data.channel !== brief.channel || data.source_link_id !== brief.sourceLinkId) fail('content_binding_changed', '内容引用的简报、活动、渠道或来源链接已改变');
++  if (!sameIds(brief.productIds, data.product_refs) || !sameIds(brief.productIds, facts.productPriceRefs.map(p => p.productId))) fail('product_binding_changed', '产品清单已改变，请重新生成');
++  if (campaign.revision !== facts.campaignRevision) fail('campaign_revision_changed', '活动已改变，请重新生成');
++  if (!sameIds(brief.assetIds, facts.assetIds) || assetRightsHash(state, brief.assetIds) !== facts.assetRightsHash) fail('asset_binding_changed', '素材或授权已改变，请重新生成');
++  for (const ref of facts.productPriceRefs) {
++    const product = state.products.find(p => p.id === ref.productId && p.tenantId === revision.tenantId && p.storeId === brief.storeId);
++    if (!product || !ref.priceVersionId || product.currentPriceVersionId !== ref.priceVersionId) fail('price_version_changed', '生成时的价格已改变，请重新生成', ref.productId);
++  }
++  if (!sameIds(facts.brandRevisionIds, [data.brand_revision_id, ...data.sources.map(s => s.revision_id)])) fail('invalid_source_reference', '内容出处与生成事实不一致');
++  for (const id of facts.brandRevisionIds) {
++    const brand = state.brandRevisions.find(b => b.id === id && b.tenantId === revision.tenantId);
++    const doc = brand && state.brandDocuments.find(d => d.id === brand.documentId && d.tenantId === revision.tenantId);
++    if (!brand || !doc || brand.status !== 'approved' || (doc.storeId && doc.storeId !== brief.storeId) || (brand.effectiveFrom && Date.parse(brand.effectiveFrom) > Date.parse(now)) || (brand.effectiveTo && Date.parse(brand.effectiveTo) <= Date.parse(now))) fail('brand_revision_changed', '品牌版本已失效或不属于当前门店', id);
++  }
++  if (data.needs_input.length) fail('content_needs_input', '内容仍有未解决输入');
++  if (data.variants.some(v => v.locale === 'bn' && v.review_status !== 'reviewed')) fail('bn_review_required', '孟语版本需要人工复核');
++  errors.push(...checkPublish(state, { tenantId: revision.tenantId, storeId: brief.storeId, productIds: brief.productIds, assetIds: brief.assetIds, startAt: campaign.startAt, endAt: campaign.endAt }, now).errors);
++  return errors;
++}
++
++export function checkContentApproval(state: DatabaseState, approval: ContentApproval | undefined, now: string): { ok: boolean; errors: PublishCheckResult['errors'] } {
++  const errors: PublishCheckResult['errors'] = [];
++  const fail = (code: string, detail: string) => errors.push({ code, detail });
++  if (!approval) return { ok: false, errors: [{ code: 'approval_not_found', detail: '审批不存在' }] };
++  if (!['pending', 'approved'].includes(approval.status)) fail('approval_not_active', '审批不可执行');
++  if (!explicitTimestamp(approval.expiresAt) || Date.parse(approval.expiresAt) <= Date.parse(now)) fail('approval_expired', '审批已过期');
++  const revision = state.contentRevisions.find(r => r.id === approval.resourceRevisionId && r.tenantId === approval.tenantId);
++  if (!revision) fail('approval_scope_mismatch', '审批内容不存在');
++  else {
++    if (approval.payloadHash !== revision.contentHash || contentDigest(revision.packageData) !== revision.contentHash) fail('stale_approval', '内容已改变');
++    if (!revision.generationFacts || approval.factsHash !== contentDigest(revision.generationFacts)) fail('approval_binding_missing', '审批缺少生成事实绑定');
++    const brief = state.contentBriefs.find(b => b.id === revision.briefId);
++    if (brief?.channel !== approval.channel) fail('approval_scope_mismatch', '审批渠道已改变');
++    errors.push(...checkContentFacts(state, revision, now));
++  }
++  return { ok: errors.length === 0, errors };
++}
+--- previous/packages/domain/src/content.ts
++++ current/packages/domain/src/content.ts
+@@ -42,9 +42,19 @@
+   status: ContentStatus;
+   packageData: ContentPackageData;
+   contentHash: string;
++  generationFacts?: ContentFacts;
++  currentApprovalId?: string | null;
+   createdBy: string;
+   createdAt: string;
+   updatedAt: string;
++}
++
++export interface ContentFacts {
++  campaignRevision: number;
++  brandRevisionIds: string[];
++  productPriceRefs: Array<{ productId: string; priceVersionId: string }>;
++  assetIds: string[];
++  assetRightsHash: string;
+ }
+ 
+ export interface ContentApproval {
+@@ -63,6 +73,7 @@
+   productPriceRefs?: Array<{ productId: string; priceVersionId: string }>;
+   assetIds?: string[];
+   policyVersion: string;
++  factsHash?: string;
+   approvedBy: string | null;
+   approvedAt: string | null;
+   expiresAt: string;
+@@ -75,6 +86,9 @@
+   tenantId: string;
+   storeId: string;
+   contentRevisionId: string;
++  approvalId?: string;
++  payloadHash?: string;
++  packageData?: ContentPackageData;
+   channel: string;
+   mode: 'manual' | 'live';
+   status: 'manual_ready' | 'submitted' | 'provider_confirmed' | 'operator_attested' | 'failed' | 'unknown';
+--- previous/packages/domain/src/control-service.ts
++++ current/packages/domain/src/control-service.ts
+@@ -1,54 +1,25 @@
+ import { createHash } from 'node:crypto';
+ import type { ActorContext, DatabaseState } from './types';
+ import { ALLOWED_METRICS, type MetricEvidence, type MetricQueryRequest, type RouterRequest, type RouterResult } from './control';
+-import { computeMetricBundle } from './metric-engine';
+-import { assessMetricQuality } from './metric-quality';
++import { calculateMetrics } from './metric-service';
+ import { explicitTimestamp, requireCondition } from './validation';
+ import { validateRouterRequest, runDeterministicRouter } from './control-runtime';
+ 
+ const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+ const aliases: Record<string, string> = { orders_count: 'qualified_order_count', revenue_minor: 'net_revenue_minor', aov_minor: 'average_order_value_minor', repeat_purchase_rate: 'repeat_30d_rate', mature_30d_repeat_rate: 'repeat_30d_rate' };
+ 
+-export function orderCompleteThrough(state: DatabaseState, tenantId: string, storeIds: string[]): string | null {
+-  const orders = state.orders.filter(o => o.tenantId === tenantId && storeIds.includes(o.storeId));
+-  const sources = [...new Set(orders.map(o => JSON.stringify([o.storeId,o.source])))];
+-  if (!sources.length) return null;
+-  const values = sources.map(key => {
+-    const [storeId, source] = JSON.parse(key);
+-    const batches = state.imports.filter(b => b.tenantId === tenantId && b.storeId === storeId && b.source === source && b.kind === 'orders' && b.status === 'committed');
+-    // Only explicit order-source confirmations are evidence. Member imports
+-    // and refund-only batches cannot advance the order completeness watermark.
+-    return batches.filter(b => b.completeThrough && explicitTimestamp(b.completeThrough)).map(b => b.completeThrough!).sort().at(-1) || null;
+-  });
+-  return values.every(Boolean) ? (values as string[]).sort()[0] : null;
+-}
+-
+ export function queryMetrics(state: DatabaseState, actor: ActorContext, queries: MetricQueryRequest[], defaultAsOf: string): MetricEvidence[] {
+   requireCondition(explicitTimestamp(defaultAsOf), 'as_of_invalid', 400);
+   requireCondition(queries.length <= 5, 'metric_query_limit', 400);
+   return queries.map(query => {
+     requireCondition(query && ALLOWED_METRICS.has(query.metricKey), 'metric_not_allowlisted', 400);
+-    requireCondition(!query.storeId || actor.storeIds.includes(query.storeId), 'not_found', 404);
+-    const storeIds = query.storeId ? [query.storeId] : [...actor.storeIds].sort();
+-    const stores = state.stores.filter(s => s.tenantId === actor.tenantId && storeIds.includes(s.id));
+-    requireCondition(new Set(stores.map(s => s.currency + ':' + s.timezone)).size <= 1, 'mixed_store_currency_or_timezone_requires_single_store', 400);
+     const asOf = query.asOf || defaultAsOf;
+-    requireCondition(explicitTimestamp(asOf), 'as_of_invalid', 400);
+-    const orders = state.orders.filter(o => o.tenantId === actor.tenantId && storeIds.includes(o.storeId) && Date.parse(o.paidAt) <= Date.parse(asOf));
+-    const refunds = state.refunds.filter(o => o.tenantId === actor.tenantId && storeIds.includes(o.storeId) && Date.parse(o.occurredAt) <= Date.parse(asOf));
+-    const members = state.members.filter(o => o.tenantId === actor.tenantId && storeIds.includes(o.storeId) && Date.parse(o.registeredAt) <= Date.parse(asOf));
+-    const attribution = state.attributionEvidence.filter(o => o.tenantId === actor.tenantId && storeIds.includes(o.storeId));
+-    const completeThrough = orderCompleteThrough(state, actor.tenantId, storeIds);
+-    const hasImport = state.imports.some(b => b.tenantId === actor.tenantId && storeIds.includes(b.storeId) && b.kind === 'orders' && b.status === 'committed');
+-    const bundle = computeMetricBundle({ orders, refunds, members, attribution, asOf, completeThrough, timezone: stores[0]?.timezone || 'Asia/Dhaka' });
++    const { storeIds, bundle, freshness, sourceCoverage, sourceRefs, recordRefs, completeThrough } = calculateMetrics(state, actor, query.storeId, asOf);
+     const key = aliases[query.metricKey] || query.metricKey;
+     const metric = bundle.results.find(m => m.metric_key === key);
+-    const freshness = assessMetricQuality({ hasData: orders.length > 0, hasImport, asOf, completeThrough });
+     const quality = freshness.quality;
+-    const sourceRefs = state.imports.filter(b => b.tenantId === actor.tenantId && storeIds.includes(b.storeId) && b.status === 'committed').map(b => b.id);
+-    const recordRefs = { orders: orders.map(o => o.id), refunds: refunds.map(o => o.id), members: members.map(o => o.id) };
+     const value = quality !== 'missing' && typeof metric?.value === 'number' ? metric.value : null;
+-    const evidence = { metricKey: key, value, numerator: quality === 'missing' ? null : metric?.numerator ?? null, denominator: quality === 'missing' ? null : metric?.denominator ?? null, asOf, completeThrough, quality, sourceRefs, storeIds, formulaVersion: 'metric-engine-v2-scoped', missingReason: freshness.missingReason, recordRefs } as const;
++    const evidence = { metricKey: key, value, numerator: quality === 'missing' ? null : metric?.numerator ?? null, denominator: quality === 'missing' ? null : metric?.denominator ?? null, asOf, completeThrough, quality, sourceCoverage, sourceRefs, storeIds, formulaVersion: 'metric-engine-v2-scoped', missingReason: freshness.missingReason, recordRefs } as const;
+     return { ...evidence, id: 'metric_' + digest(evidence).slice(0, 24) };
+   });
+ }
+--- previous/packages/domain/src/control.ts
++++ current/packages/domain/src/control.ts
+@@ -21,6 +21,7 @@
+   completeThrough: string | null;
+   quality: 'verified' | 'provisional' | 'missing';
+   sourceRefs: string[];
++  sourceCoverage?: import('./metric-service').OrderSourceCoverage[];
+ }
+ 
+ export interface ControlTask {
+--- previous/packages/domain/src/crm.ts
++++ current/packages/domain/src/crm.ts
+@@ -59,8 +59,13 @@
+   outreachId: string;
+   memberId: string;
+   assignment: 'treatment' | 'holdout';
+-  status: 'queued' | 'sent_test' | 'skipped_holdout' | 'skipped_suppressed' | 'skipped_unverified' | 'skipped_frequency' | 'skipped_quiet_hours' | 'skipped_budget' | 'external_blocked' | 'failed';
++  status: 'queued' | 'sent_test' | 'skipped_duplicate' | 'skipped_holdout' | 'skipped_suppressed' | 'skipped_unverified' | 'skipped_frequency' | 'skipped_quiet_hours' | 'skipped_budget' | 'external_blocked' | 'failed';
+   reason: string | null;
+   providerReference: string | null;
++  dispatchKey?: string;
++  approvalHash?: string;
++  costMinor?: number;
++  deliveryIntentId?: string;
++  retryOfId?: string;
+   createdAt: string;
+ }
+--- previous/packages/domain/src/dispatch-policy.ts
++++ current/packages/domain/src/dispatch-policy.ts
+@@ -1,5 +1,6 @@
+ export type DispatchDecisionStatus =
+   | 'eligible'
++  | 'skipped_duplicate'
+   | 'skipped_holdout'
+   | 'skipped_unverified'
+   | 'skipped_suppressed'
+--- previous/packages/domain/src/metric-service.ts
++++ current/packages/domain/src/metric-service.ts
+@@ -0,0 +1,52 @@
++import type { ActorContext, DatabaseState } from './types';
++import { computeMetricBundle } from './metric-engine';
++import { assessMetricQuality } from './metric-quality';
++import { explicitTimestamp, requireCondition } from './validation';
++
++export interface OrderSourceCoverage {
++  storeId: string;
++  source: string | null;
++  completeThrough: string | null;
++  status: 'not_imported' | 'unconfirmed' | 'stale' | 'confirmed_zero' | 'complete';
++}
++
++function orderCoverage(state: DatabaseState, tenantId: string, storeIds: string[], asOf: string): OrderSourceCoverage[] {
++  return storeIds.flatMap<OrderSourceCoverage>(storeId => {
++    const orders = state.orders.filter(o => o.tenantId === tenantId && o.storeId === storeId);
++    const batches = state.imports.filter(b => b.tenantId === tenantId && b.storeId === storeId && b.kind === 'orders');
++    const configured = state.stores.find(s => s.id === storeId && s.tenantId === tenantId)?.orderSources || [];
++    const sources = [...new Set([...configured, ...orders.map(o => o.source), ...batches.map(b => b.source)])].sort();
++    if (!sources.length) return [{ storeId, source: null, completeThrough: null, status: 'not_imported' }];
++    return sources.map(source => {
++      const committed = batches.filter(b => b.source === source && b.status === 'committed');
++      const confirmed = committed.filter(b => b.errorCount === 0 && explicitTimestamp(b.completeThrough));
++      const latest = confirmed.map(b => Date.parse(b.completeThrough!)).sort((a, b) => b - a)[0];
++      const completeThrough = latest === undefined ? null : new Date(latest).toISOString();
++      const observed = orders.some(o => o.source === source && Date.parse(o.paidAt) <= Date.parse(asOf));
++      const status = !committed.length && !observed ? 'not_imported' : !completeThrough ? 'unconfirmed' : latest < Date.parse(asOf) ? 'stale' : observed ? 'complete' : 'confirmed_zero';
++      return { storeId, source, completeThrough, status };
++    });
++  });
++}
++
++/** One scoped calculation for HTTP metrics, control queries and stored daily reports. */
++export function calculateMetrics(state: DatabaseState, actor: ActorContext, storeId: string | null | undefined, asOf: string) {
++  requireCondition(explicitTimestamp(asOf), 'as_of_invalid', 400);
++  requireCondition(!storeId || actor.storeIds.includes(storeId), 'not_found', 404);
++  const storeIds = [...new Set(storeId ? [storeId] : actor.storeIds)].sort();
++  const stores = state.stores.filter(s => s.tenantId === actor.tenantId && s.status === 'active' && storeIds.includes(s.id));
++  requireCondition(stores.length === storeIds.length, 'not_found', 404);
++  requireCondition(new Set(stores.map(s => s.currency + ':' + s.timezone)).size <= 1, 'mixed_store_currency_or_timezone_requires_single_store', 400);
++  const visible = (row: { tenantId: string; storeId: string }) => row.tenantId === actor.tenantId && storeIds.includes(row.storeId);
++  const orders = state.orders.filter(o => visible(o) && Date.parse(o.paidAt) <= Date.parse(asOf));
++  requireCondition(orders.every(o => o.currency === stores.find(s => s.id === o.storeId)?.currency), 'order_currency_mismatch', 400);
++  const refunds = state.refunds.filter(r => visible(r) && Date.parse(r.occurredAt) <= Date.parse(asOf));
++  const members = state.members.filter(m => visible(m) && Date.parse(m.registeredAt) <= Date.parse(asOf));
++  const imports = state.imports.filter(b => visible(b) && b.status === 'committed');
++  const sourceCoverage = orderCoverage(state, actor.tenantId, storeIds, asOf);
++  const completeThrough = sourceCoverage.length && sourceCoverage.every(s => s.completeThrough) ? sourceCoverage.map(s => s.completeThrough!).sort()[0] : null;
++  const freshness = assessMetricQuality({ hasData: orders.length > 0, hasImport: imports.some(b => b.kind === 'orders'), asOf, completeThrough });
++  if (freshness.quality === 'provisional' && sourceCoverage.some(s => s.status === 'not_imported')) freshness.missingReason = 'store_sources_incomplete';
++  const bundle = computeMetricBundle({ orders, refunds, members, attribution: state.attributionEvidence.filter(visible), asOf, completeThrough, timezone: stores[0]?.timezone || 'Asia/Dhaka' });
++  return { storeIds, orders, imports, completeThrough, freshness, sourceCoverage, bundle, sourceRefs: imports.map(b => b.id), recordRefs: { orders: orders.map(o => o.id), refunds: refunds.map(r => r.id), members: members.map(m => m.id) } };
++}
+--- previous/packages/domain/src/outreach-ledger.ts
++++ current/packages/domain/src/outreach-ledger.ts
+@@ -0,0 +1,73 @@
++import type { DatabaseState } from './types';
++import type { MessageAttempt, OutreachCampaign, AudienceSnapshot } from './crm';
++import type { DeliveryIntent } from './connectors';
++
++export interface OutreachLedgerEntry {
++  tenantId: string;
++  storeId: string;
++  outreachId: string | null;
++  memberId: string;
++  channel: OutreachCampaign['channel'];
++  costMinor: number | null;
++  createdAt: string;
++  status: 'reserved' | 'unknown' | 'consumed';
++  attempt?: MessageAttempt;
++  intent?: DeliveryIntent;
++}
++
++/** Attempts and provider intents share accounting; linked attempts never charge twice. */
++export function outreachLedger(state: DatabaseState): OutreachLedgerEntry[] {
++  const entries: OutreachLedgerEntry[] = [];
++  for (const attempt of state.messageAttempts) {
++    if (attempt.deliveryIntentId || !['queued', 'sent_test'].includes(attempt.status)) continue;
++    const campaign = state.outreachCampaigns.find(c => c.id === attempt.outreachId && c.tenantId === attempt.tenantId);
++    if (campaign) entries.push({ tenantId: campaign.tenantId, storeId: campaign.storeId, outreachId: campaign.id, memberId: attempt.memberId, channel: campaign.channel, costMinor: attempt.costMinor ?? campaign.costPerAttemptMinor, createdAt: attempt.createdAt, status: attempt.status === 'queued' ? 'reserved' : 'consumed', attempt });
++  }
++  for (const intent of state.deliveryIntents) {
++    if (intent.status === 'blocked' && !intent.providerReference) continue;
++    const campaign = state.outreachCampaigns.find(c => c.tenantId === intent.tenantId && c.storeId === intent.storeId && (intent.outreachId ? c.id === intent.outreachId : c.approvalHash === intent.approvalHash));
++    entries.push({ tenantId: intent.tenantId, storeId: intent.storeId, outreachId: campaign?.id || null, memberId: intent.memberId, channel: intent.provider, costMinor: intent.costMinor ?? campaign?.costPerAttemptMinor ?? null, createdAt: intent.createdAt, status: intent.status === 'delivered' ? 'consumed' : ['pending', 'accepted'].includes(intent.status) ? 'reserved' : 'unknown', intent });
++  }
++  return entries;
++}
++
++const belongs = (entry: OutreachLedgerEntry, campaign: OutreachCampaign) => entry.tenantId === campaign.tenantId && entry.storeId === campaign.storeId && entry.channel === campaign.channel && (entry.outreachId === campaign.id || entry.outreachId === null);
++
++export function outreachBudget(state: DatabaseState, campaign: OutreachCampaign) {
++  const entries = outreachLedger(state).filter(e => belongs(e, campaign));
++  const unknownBindings = entries.filter(e => e.costMinor === null || !e.outreachId).length;
++  const reservedMinor = entries.filter(e => e.status !== 'consumed').reduce((sum, e) => sum + (e.costMinor || 0), 0);
++  const consumedMinor = entries.filter(e => e.status === 'consumed').reduce((sum, e) => sum + (e.costMinor || 0), 0);
++  return { reservedMinor, consumedMinor, unknownBindings, availableMinor: unknownBindings ? 0 : Math.max(0, campaign.budgetMinor - reservedMinor - consumedMinor) };
++}
++
++export function outreachSpend(state: DatabaseState, campaign: OutreachCampaign): number {
++  const budget = outreachBudget(state, campaign);
++  return budget.unknownBindings ? Number.POSITIVE_INFINITY : budget.reservedMinor + budget.consumedMinor;
++}
++
++export function existingDelivery(state: DatabaseState, campaign: OutreachCampaign, memberId: string): OutreachLedgerEntry | undefined {
++  return outreachLedger(state).find(e => belongs(e, campaign) && e.memberId === memberId);
++}
++
++export function hasRecentMessage(state: DatabaseState, campaign: OutreachCampaign, memberId: string, now: string): boolean {
++  if (campaign.frequencyCapDays <= 0) return false;
++  const threshold = Date.parse(now) - campaign.frequencyCapDays * 86400000;
++  return outreachLedger(state).some(e => e.tenantId === campaign.tenantId && e.memberId === memberId && e.outreachId !== campaign.id && (e.status !== 'consumed' || Date.parse(e.createdAt) >= threshold));
++}
++
++export function refreshOutreachStatus(state: DatabaseState, campaign: OutreachCampaign, snapshot: AudienceSnapshot): void {
++  if (!['approved', 'queued', 'completed', 'blocked'].includes(campaign.status)) return;
++  const entries = outreachLedger(state).filter(e => belongs(e, campaign));
++  const attempts = state.messageAttempts.filter(a => a.outreachId === campaign.id);
++  if (entries.some(e => e.status === 'unknown')) campaign.status = 'blocked';
++  else if (entries.some(e => e.status === 'reserved')) campaign.status = 'queued';
++  else if (snapshot.memberIds.filter(id => snapshot.assignments[id] !== 'holdout').every(id => entries.some(e => e.memberId === id && e.status === 'consumed'))) campaign.status = 'completed';
++  else if (attempts.length || state.deliveryIntents.some(i => i.outreachId === campaign.id)) campaign.status = 'blocked';
++}
++
++export function refreshDeliveryCampaign(state: DatabaseState, intent: DeliveryIntent): void {
++  const campaign = state.outreachCampaigns.find(c => c.tenantId === intent.tenantId && c.storeId === intent.storeId && (intent.outreachId ? c.id === intent.outreachId : c.approvalHash === intent.approvalHash));
++  const snapshot = campaign && state.audienceSnapshots.find(s => s.id === campaign.audienceSnapshotId && s.tenantId === campaign.tenantId);
++  if (campaign && snapshot) refreshOutreachStatus(state, campaign, snapshot);
++}
+--- previous/packages/domain/src/outreach-policy.ts
++++ current/packages/domain/src/outreach-policy.ts
+@@ -0,0 +1,115 @@
++import { createHash } from 'node:crypto';
++import type { DatabaseState } from './types';
++import type { AudienceSnapshot, OutreachCampaign } from './crm';
++import type { ConsentEvent, SuppressionEntry } from './growth';
++import { evaluateDispatchPolicy } from './dispatch-policy';
++import { existingDelivery, hasRecentMessage } from './outreach-ledger';
++import { explicitTimestamp, requireCondition } from './validation';
++
++export function approvedOutreachContext(state: DatabaseState, campaign: OutreachCampaign, now: string) {
++  const snapshot = state.audienceSnapshots.find(s => s.id === campaign.audienceSnapshotId && s.tenantId === campaign.tenantId);
++  const segment = state.segmentDefinitions.find(s => s.id === campaign.segmentId && s.tenantId === campaign.tenantId);
++  requireCondition(snapshot && segment && snapshot.segmentId === segment.id, 'audience_snapshot_not_found');
++  requireCondition(!snapshot.storeId || snapshot.storeId === campaign.storeId, 'audience_store_mismatch');
++  requireCondition(['approved', 'queued', 'completed', 'blocked'].includes(campaign.status), 'outreach_not_approved');
++  requireCondition(campaign.templateApproved, 'template_not_approved');
++  requireCondition(explicitTimestamp(campaign.expiresAt) && Date.parse(campaign.expiresAt) > Date.parse(now), 'outreach_approval_expired');
++  requireCondition(campaign.approvalHash && campaign.approvalHash === outreachApprovalHash(campaign, snapshot, segment.version), 'stale_outreach_approval');
++  return snapshot;
++}
++
++export function marketingConsentForChannel(state: DatabaseState, tenantId: string, memberId: string, channel: OutreachCampaign['channel']): boolean {
++  const applies = (event: ConsentEvent | SuppressionEntry) =>
++    event.tenantId === tenantId && event.memberId === memberId && event.purpose === 'marketing' &&
++    (channel === 'manual' || event.channel === channel || event.channel === 'unknown');
++  const events = state.consentEvents.filter(applies).sort((a, b) => Date.parse(b.occurredAt) - Date.parse(a.occurredAt));
++  const latest = events[0];
++  if (!latest?.granted) return false;
++  return !state.suppressionEntries.some((entry) => applies(entry) && Date.parse(entry.occurredAt) >= Date.parse(latest.occurredAt));
++}
++
++export function outsideOutreachWindow(state: DatabaseState, campaign: OutreachCampaign, now: string): boolean {
++  const timezone = state.stores.find((store) => store.id === campaign.storeId)?.timezone || 'Asia/Dhaka';
++  return isOutsideAllowedWindow(now, campaign.quietStartLocal, campaign.quietEndLocal, timezone);
++}
++
++export function evaluateMemberDispatch(
++  state: DatabaseState,
++  campaign: OutreachCampaign,
++  input: { memberId: string; assignment: 'treatment' | 'holdout'; now: string; quiet: boolean; spent: number }
++) {
++  const existing = existingDelivery(state, campaign, input.memberId);
++  if (existing) return { status: 'skipped_duplicate' as const, reason: existing.status === 'unknown' ? 'reconciliation_required' : 'delivery_already_reserved_or_sent' };
++  if (state.externalWritesKillSwitch) return { status: 'external_blocked' as const, reason: 'global_kill_switch' };
++  const { tenantId, storeId } = campaign;
++  const member = state.members.find((item) => item.id === input.memberId && item.tenantId === tenantId && item.storeId === storeId);
++  return evaluateDispatchPolicy({
++    assignment: input.assignment,
++    hasContact: Boolean(member?.contactHmac),
++    contactVerified: Boolean(member?.contactVerified),
++    verificationExpiresAt: member?.verificationExpiresAt,
++    consentGranted: member ? marketingConsentForChannel(state, tenantId, member.id, campaign.channel) : false,
++    frequencyLimited: member ? hasRecentMessage(state, campaign, member.id, input.now) : false,
++    outsideQuietHours: input.quiet,
++    budgetAvailable: input.spent + campaign.costPerAttemptMinor <= campaign.budgetMinor,
++    now: input.now
++  });
++}
++
++export function outreachApprovalHash(campaign: OutreachCampaign, snapshot: AudienceSnapshot, segmentVersion: number): string {
++  const payload = {
++    outreachId: campaign.id,
++    tenantId: campaign.tenantId,
++    storeId: campaign.storeId,
++    segmentId: campaign.segmentId,
++    segmentVersion,
++    audienceSnapshotId: snapshot.id,
++    audiencePolicyHash: snapshot.policyHash,
++    memberIds: [...snapshot.memberIds].sort(),
++    assignments: snapshot.memberIds.slice().sort().map(id => [id, snapshot.assignments[id]]),
++    channel: campaign.channel,
++    templateId: campaign.templateId,
++    templateText: campaign.templateText,
++    templateApproved: campaign.templateApproved,
++    budgetMinor: campaign.budgetMinor,
++    costPerAttemptMinor: campaign.costPerAttemptMinor,
++    quietStartLocal: campaign.quietStartLocal,
++    quietEndLocal: campaign.quietEndLocal,
++    frequencyCapDays: campaign.frequencyCapDays,
++    policyVersion: campaign.policyVersion,
++    expiresAt: campaign.expiresAt || null
++  };
++  return createHash('sha256').update(JSON.stringify(payload)).digest('hex');
++}
++
++function parseLocalMinutes(value: string): number {
++  const match = /^(\d{1,2}):(\d{2})$/.exec(value || '');
++  if (!match) return 0;
++  const hours = Number(match[1]);
++  const minutes = Number(match[2]);
++  if (hours > 23 || minutes > 59) return 0;
++  return hours * 60 + minutes;
++}
++
++function localMinutes(iso: string, timezone: string): number {
++  try {
++    const parts = new Intl.DateTimeFormat('en-GB', { timeZone: timezone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(iso));
++    const hour = Number(parts.find((part) => part.type === 'hour')?.value || 0);
++    const minute = Number(parts.find((part) => part.type === 'minute')?.value || 0);
++    return hour * 60 + minute;
++  } catch {
++    const date = new Date(iso);
++    return date.getUTCHours() * 60 + date.getUTCMinutes();
++  }
++}
++
++/** Returns true when the current local time is outside the configured send window. */
++function isOutsideAllowedWindow(iso: string, start: string, end: string, timezone: string): boolean {
++  const startMinutes = parseLocalMinutes(start || '09:00');
++  const endMinutes = parseLocalMinutes(end || '21:00');
++  const current = localMinutes(iso, timezone);
++  if (startMinutes === endMinutes) return true;
++  if (startMinutes < endMinutes) return current < startMinutes || current >= endMinutes;
++  return current < startMinutes && current >= endMinutes;
++}
++
+--- previous/packages/domain/src/report-policy.ts
++++ current/packages/domain/src/report-policy.ts
+@@ -0,0 +1,36 @@
++import type { DatabaseState } from './types';
++import type { ControlTask, DailyReport } from './control';
++import { canAccessStoreScope } from './auth';
++
++function visibleRecord(state: DatabaseState, tenantId: string, storeIds: string[], id: string): boolean {
++  const row = [...state.imports, ...state.orders, ...state.refunds, ...state.members].find(r => r.id === id);
++  if (row) return row.tenantId === tenantId && storeIds.includes(row.storeId);
++  return false;
++}
++
++function visibleRef(state: DatabaseState, tenantId: string, storeIds: string[], id: string): boolean {
++  if (visibleRecord(state, tenantId, storeIds, id)) return true;
++  const report = state.dailyReports.find(r => r.tenantId === tenantId && r.metrics.some(m => m.id === id));
++  const metric = report?.metrics.find(m => m.id === id);
++  return Boolean(metric && canAccessStoreScope(storeIds, metric.storeIds) && [...metric.sourceRefs, ...Object.values(metric.recordRefs).flat()].every(ref => visibleRecord(state, tenantId, storeIds, ref)));
++}
++
++export function canReadControlTask(state: DatabaseState, tenantId: string, storeIds: string[], task: ControlTask): boolean {
++  return task.tenantId === tenantId && canAccessStoreScope(storeIds, task.storeIds) && task.evidenceRefs.every(id => visibleRef(state, tenantId, task.storeIds, id));
++}
++
++export function canReadDailyReport(state: DatabaseState, tenantId: string, storeIds: string[], report: DailyReport): boolean {
++  if (report.tenantId !== tenantId || !canAccessStoreScope(storeIds, report.storeIds)) return false;
++  if (report.storeId && !report.storeIds.includes(report.storeId)) return false;
++  const refs = [...report.sourceRefs];
++  for (const metric of report.metrics) {
++    if (!canAccessStoreScope(report.storeIds, metric.storeIds)) return false;
++    if (metric.sourceCoverage?.some(source => !metric.storeIds.includes(source.storeId))) return false;
++    refs.push(...metric.sourceRefs, ...Object.values(metric.recordRefs).flat());
++  }
++  refs.push(...report.observations.flatMap(o => o.metricRefs), ...report.hypotheses.flatMap(h => h.evidenceRefs), ...report.advice.flatMap(a => a.evidenceRefs));
++  return refs.every(id => visibleRef(state, tenantId, report.storeIds, id)) && report.taskIds.every(id => {
++    const task = state.controlTasks.find(t => t.id === id);
++    return Boolean(task && canReadControlTask(state, tenantId, report.storeIds, task));
++  });
++}
+--- previous/packages/domain/src/types.ts
++++ current/packages/domain/src/types.ts
+@@ -64,6 +64,7 @@
+   name: string;
+   timezone: string;
+   currency: string;
++  orderSources?: string[];
+   status: 'active' | 'inactive';
+   createdAt: string;
+ }
+--- previous/scripts/capabilities.mjs
++++ current/scripts/capabilities.mjs
+@@ -0,0 +1,27 @@
++import fs from 'node:fs';
++import { createHash } from 'node:crypto';
++
++const evidencePath = 'artifacts/audit-n01-n08/validation.json';
++const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
++const capabilities = JSON.parse(fs.readFileSync('docs/capabilities.json', 'utf8'));
++const changed = evidence.source_files.filter(file => !fs.existsSync(file.path) || createHash('sha256').update(fs.readFileSync(file.path)).digest('hex') !== file.sha256);
++if (changed.length) throw new Error('validation_is_stale: ' + changed.map(file => file.path).join(', '));
++if (evidence.checks.some(check => check.exit_code !== 0)) throw new Error('validation_has_failures');
++const tests = evidence.checks.find(check => check.tests).tests;
++const rows = capabilities.map(c => `| ${c.name} | ${c.status} | ${c.evidence.map(file => `[${file}](../${file})`).join('、')} | ${c.limit} |`);
++const text = `# 能力与验证记录
++
++由 npm run capabilities 生成。能力范围维护在 docs/capabilities.json；测试数量来自实际运行记录，不由文档手填。离线通过只说明所列用例通过。
++
++最近验证：${evidence.recorded_at}；Node ${evidence.node}。${tests.passed} 项通过，${tests.failed} 项失败，${tests.skipped} 项跳过。
++
++[命令、退出码、日志和源码哈希](../${evidencePath})。生成时检查源码是否与验证记录一致，源码变更后需重新验证。
++
++| 能力 | 状态 | 实现或测试证据 | 尚未覆盖 |
++|---|---|---|---|
++${rows.join('\n')}
++
++本轮使用已有依赖，未做干净安装；浏览器点击、生产数据库、真实模型、渠道和客户验收未运行。AI-contract 仅检查合成契约；安全扫描是有限静态检查。
++`;
++fs.writeFileSync('docs/CAPABILITIES.md', text);
++console.log('docs/CAPABILITIES.md generated from recorded validation');
+--- previous/scripts/validate-release.mjs
++++ current/scripts/validate-release.mjs
+@@ -0,0 +1,38 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import { createHash } from 'node:crypto';
++import { spawnSync } from 'node:child_process';
++
++const directory = 'artifacts/audit-n01-n08';
++fs.mkdirSync(directory, { recursive: true });
++const sourceFiles = [];
++function collect(directory) {
++  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
++    const file = path.join(directory, entry.name);
++    if (entry.isDirectory() && entry.name !== 'node_modules') collect(file);
++    else if (entry.isFile()) sourceFiles.push(file);
++  }
++}
++for (const directory of ['apps', 'packages', 'tests', 'scripts', 'fixtures']) collect(directory);
++sourceFiles.push('package.json', 'package-lock.json', 'tsconfig.json', 'docs/capabilities.json');
++const checks = [];
++for (const script of ['typecheck', 'build', 'test', 'security:scan', 'test:ai', 'fixtures:verify']) {
++  const args = ['run', script];
++  const started = new Date().toISOString();
++  const result = spawnSync('npm', args, { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
++  const output = (result.stdout || '') + (result.stderr || '') + (result.error ? String(result.error) : '');
++  const log = `${directory}/${script.replaceAll(':', '-')}.log`;
++  fs.writeFileSync(log, output);
++  const check = { command: `npm ${args.join(' ')}`, started_at: started, finished_at: new Date().toISOString(), exit_code: result.status ?? 1, log };
++  if (script === 'test') {
++    const count = name => [...output.matchAll(new RegExp(`(?:ℹ|#) ${name} (\\d+)`, 'g'))].reduce((sum, match) => sum + Number(match[1]), 0);
++    check.tests = { total: count('tests'), passed: count('pass'), failed: count('fail'), skipped: count('skipped'), cancelled: count('cancelled') };
++    if (!check.tests.total || check.tests.failed || check.tests.skipped || check.tests.cancelled || check.tests.passed !== check.tests.total) check.exit_code = check.exit_code || 1;
++  }
++  checks.push(check);
++  console.log(`${check.command}: exit ${check.exit_code}`);
++}
++const sha256 = file => createHash('sha256').update(fs.readFileSync(file)).digest('hex');
++const evidence = { recorded_at: new Date().toISOString(), node: process.version, source_files: sourceFiles.sort().map(file => ({ path: file, sha256: sha256(file) })), checks, limitations: ['No clean dependency installation was attempted in this run; existing node_modules was used.', 'HTTP tests are not browser interaction acceptance.', 'No production database, live model, external message or customer UAT was exercised.'] };
++fs.writeFileSync(`${directory}/validation.json`, JSON.stringify(evidence, null, 2) + '\n');
++process.exitCode = checks.every(check => check.exit_code === 0) ? 0 : 1;
+--- previous/tests/audit-n01-n08.test.ts
++++ current/tests/audit-n01-n08.test.ts
+@@ -0,0 +1,403 @@
++import test, { type TestContext } from 'node:test';
++import assert from 'node:assert/strict';
++import { JsonRepository } from '../packages/db/src/repository';
++import { startTestApp, TestClient, type RunningTestApp } from '../packages/testing/src/http';
++import type { DatabaseState } from '../packages/domain/src/types';
++import { queryMetrics } from '../packages/domain/src/control-service';
++import { outreachBudget } from '../packages/domain/src/outreach-ledger';
++
++const tenantId = 'ten_demo_01';
++const storeId = 'sto_demo_01';
++const userId = 'usr_demo_owner';
++const asOf = '2026-03-01T00:00:00.000Z';
++const post = (client: TestClient, url: string, body = {}) => client.request(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
++
++async function setup(t: TestContext) {
++  const app = await startTestApp({ seedDemo: true });
++  t.after(() => app.close());
++  const owner = new TestClient(app.baseUrl);
++  assert.equal((await owner.login('owner@demo.adda.local')).response.status, 200);
++  return { app, owner };
++}
++
++async function content(owner: TestClient) {
++  const brand = await post(owner, '/api/brand/documents', { source_type: 'form', source_label: 'audit synthetic', content: JSON.stringify({ brand_name: 'ADDA TEA' }) });
++  assert.equal((await post(owner, `/api/brand/revisions/${brand.body.revision.id}/approve`)).response.status, 200);
++  const product = await post(owner, '/api/products', { store_id: storeId, external_sku: 'AUDIT', names: { en: 'Milk Tea' } });
++  const productId = product.body.item.id as string;
++  assert.equal((await price(owner, productId)).response.status, 201);
++  const asset = await post(owner, '/api/media-assets', { store_id: storeId, storage_key: 'synthetic/audit.jpg', checksum: 'audit', rights_status: 'approved', allowed_uses: ['organic_social'] });
++  const campaign = await post(owner, '/api/campaigns', { name: 'Audit content', objective: 'orders', store_id: storeId, product_ids: [productId], asset_ids: [asset.body.item.id] });
++  const generated = await post(owner, '/api/content/generate', { campaign_id: campaign.body.item.id });
++  assert.equal(generated.response.status, 201);
++  const revisionId = generated.body.revision.id as string;
++  assert.equal((await post(owner, `/api/content/${revisionId}/review-bn`)).response.status, 200);
++  return { productId, revisionId };
++}
++
++function price(owner: TestClient, productId: string, amountMinor = 15000) {
++  return post(owner, `/api/products/${productId}/prices`, { amount_minor: amountMinor, currency: 'BDT', status: 'approved', source_citation: 'synthetic audit price' });
++}
++
++async function approve(owner: TestClient, revisionId: string) {
++  const submitted = await post(owner, '/api/content/submit', { revision_id: revisionId });
++  assert.equal(submitted.response.status, 201, JSON.stringify(submitted.body));
++  assert.equal((await post(owner, `/api/approvals/${submitted.body.approval.id}/approve`)).response.status, 200);
++  return submitted.body.approval.id as string;
++}
++
++function seedOrders(state: DatabaseState, selectedStore: string, amount: number, currency = 'BDT') {
++  const id = `order-${selectedStore}`;
++  state.orders.push({ id, tenantId, storeId: selectedStore, source: 'pos', externalOrderId: id, memberId: null, paidAt: '2026-02-01T00:00:00Z', currency, amountPaidMinor: amount, status: 'paid', revision: 1, sourceRowHash: id, active: true, correctionOfId: null, createdAt: asOf, updatedAt: asOf });
++  state.imports.push({ id: `import-${selectedStore}`, tenantId, storeId: selectedStore, kind: 'orders', source: 'pos', fileName: 'synthetic.csv', fileHash: id, status: 'committed', rowCount: 1, validRowCount: 1, errorCount: 0, completeThrough: asOf, createdBy: userId, createdAt: asOf, committedAt: asOf });
++}
++
++async function secondStore(app: RunningTestApp, currency = 'BDT') {
++  const store = await app.repository.createStore({ tenantId, slug: 'audit-b', name: 'Synthetic B', timezone: 'Asia/Dhaka', currency, status: 'active' });
++  await app.repository.mutate(state => { state.memberships.find(m => m.userId === userId)!.storeIds.push(store.id); });
++  return store.id;
++}
++
++async function outreach(app: RunningTestApp, verified = true, count = 1) {
++  const members = [];
++  for (let i = 0; i < count; i++) {
++    const member = await app.repository.createMember({ tenantId, storeId, externalMemberId: `audit-${i}`, displayName: null, registeredAt: new Date().toISOString(), language: 'en', contact: null, contactHmac: `audit-contact-${i}`, publicAccessTokenHash: null, isSynthetic: true });
++    if (verified) await app.repository.verifyMemberContact(tenantId, member.id, 'synthetic-proof', new Date(Date.now() + 86400000).toISOString());
++    await app.repository.addConsent({ tenantId, memberId: member.id, channel: 'whatsapp', purpose: 'marketing', granted: true, noticeVersion: 'v1', source: 'audit' });
++    members.push(member);
++  }
++  const segment = await app.repository.createSegmentDefinition({ tenantId, storeId, name: 'Audit audience', rule: 'marketing_opt_in', createdBy: userId });
++  const frozen = await app.repository.freezeAudience({ tenantId, storeId, segmentId: segment.id, holdoutPercent: 0, seed: 'audit' });
++  const campaign = await app.repository.createOutreachCampaign({ tenantId, storeId, segmentId: segment.id, audienceSnapshotId: frozen.snapshot.id, channel: 'whatsapp', templateId: 'audit-approved', templateText: 'Synthetic approved template', templateApproved: true, budgetMinor: 1, costPerAttemptMinor: 1, quietStartLocal: '00:00', quietEndLocal: '23:59', frequencyCapDays: 1, status: 'pending_approval', createdBy: userId });
++  const approved = await app.repository.approveOutreachCampaign(campaign.id, userId);
++  await app.repository.setConnectorState({ tenantId, provider: 'whatsapp', mode: 'demo', status: 'active', enabled: true, killSwitch: false, capabilities: { readMetrics: false, reply: false, sendTemplate: true }, reason: 'synthetic offline', checkedAt: new Date().toISOString() });
++  return { campaign: approved, members };
++}
++
++test('N01: a price changed after generation cannot be rebound at submission', async t => {
++  const { owner, app } = await setup(t);
++  const { revisionId, productId } = await content(owner);
++  assert.match(JSON.stringify(app.repository.findContentRevision(revisionId)!.packageData), /150/);
++  assert.equal((await price(owner, productId, 20000)).response.status, 201);
++  const submit = await post(owner, '/api/content/submit', { revision_id: revisionId });
++  assert.equal(submit.response.status, 409);
++  assert.equal(submit.body.error_code, 'price_version_changed');
++  assert.equal(app.repository.snapshot().contentApprovals.length, 0);
++});
++
++test('N02: another repository changes price at the export boundary; no intent is written', async t => {
++  const { owner, app } = await setup(t);
++  const { revisionId, productId } = await content(owner);
++  await approve(owner, revisionId);
++  const other = new JsonRepository(app.repository.filePath, 'test');
++  await other.load();
++  const original = app.repository.createPublicationIntent.bind(app.repository);
++  app.repository.createPublicationIntent = async input => {
++    await other.addPriceVersion({ tenantId, productId, amountMinor: 20000, currency: 'BDT', status: 'approved', sourceCitation: 'concurrent synthetic change', validFrom: '2025-01-01T00:00:00Z', validTo: null, createdBy: userId });
++    return original(input);
++  };
++  const result = await post(owner, '/api/content/export', { revision_id: revisionId });
++  assert.equal(result.response.status, 409);
++  assert.equal(result.body.error_code, 'price_version_changed');
++  assert.equal((await app.repository.load()).publicationIntents.length, 0);
++});
++
++test('N03: reports and tasks require access to every contributing store', async t => {
++  const { app, owner } = await setup(t);
++  const b = await secondStore(app);
++  await app.repository.mutate(state => { seedOrders(state, storeId, 1000); seedOrders(state, b, 99000); });
++  const aggregate = await post(owner, '/api/reports/daily', { as_of: asOf });
++  assert.equal(aggregate.response.status, 201);
++  const task = await app.repository.createControlTask({ tenantId, storeIds: [storeId, b], ownerUserId: userId, title: 'Both stores', dueAt: asOf, targetMetric: 'net_revenue_minor', budgetMinor: null, guardrails: [], evidenceRefs: [`order-${b}`] });
++  const reviewer = new TestClient(app.baseUrl);
++  await reviewer.login('reviewer@demo.adda.local');
++  assert.equal((await reviewer.request(`/api/reports/daily?store_id=${b}`)).response.status, 404);
++  const visible = await reviewer.request('/api/reports/daily');
++  assert.equal(visible.response.status, 200);
++  assert.ok(!visible.body.items.some((r: { id: string }) => r.id === aggregate.body.report.id));
++  assert.ok(!JSON.stringify(visible.body).includes(b));
++  assert.ok(!visible.body.tasks.some((r: { id: string }) => r.id === task.id));
++  const denied = await post(reviewer, `/api/control-tasks/${task.id}/complete`, { evidence: 'not authorized' });
++  assert.notEqual(denied.response.status, 200);
++  assert.equal(app.repository.snapshot().controlTasks.find(r => r.id === task.id)!.status, 'open');
++  assert.equal((await owner.request('/api/reports/daily')).body.items.length, 1);
++});
++
++test('N04: ordinary metrics and queryMetrics both reject mixed currencies', async t => {
++  const { app, owner } = await setup(t);
++  const b = await secondStore(app, 'USD');
++  await app.repository.mutate(state => { seedOrders(state, storeId, 1000); seedOrders(state, b, 99000, 'USD'); });
++  const actor = { tenantId, userId, role: 'OWNER' as const, sessionId: 'test', storeIds: [storeId, b] };
++  assert.throws(() => queryMetrics(app.repository.snapshot(), actor, [{ metricKey: 'net_revenue_minor' }], asOf), /mixed_store_currency_or_timezone/);
++  const result = await owner.request(`/api/metrics?as_of=${asOf}`);
++  assert.equal(result.response.status, 400);
++  assert.equal(result.body.error_code, 'mixed_store_currency_or_timezone_requires_single_store');
++  assert.equal((await owner.request(`/api/metrics?store_id=${storeId}&as_of=${asOf}`)).response.status, 200);
++});
++
++test('N05: an entirely missing store prevents a verified aggregate', async t => {
++  const { app, owner } = await setup(t);
++  const b = await secondStore(app);
++  await app.repository.mutate(state => seedOrders(state, storeId, 1000));
++  const missing = await owner.request(`/api/metrics?store_id=${b}&as_of=${asOf}`);
++  assert.equal(missing.body.quality, 'missing');
++  const aggregate = await owner.request(`/api/metrics?as_of=${asOf}`);
++  assert.equal(aggregate.body.summary.quality, 'provisional');
++  const actor = { tenantId, userId, role: 'OWNER' as const, sessionId: 'test', storeIds: [storeId, b] };
++  assert.equal(queryMetrics(app.repository.snapshot(), actor, [{ metricKey: 'net_revenue_minor' }], asOf)[0].quality, 'provisional');
++});
++
++test('N06: different request keys cannot reserve the same business delivery repeatedly', async t => {
++  const { app, owner } = await setup(t);
++  const { campaign, members } = await outreach(app);
++  const ids = [];
++  for (const key of ['n06-a', 'n06-b', 'n06-c']) {
++    const result = await post(owner, '/api/connectors/whatsapp/intents', { store_id: storeId, member_id: members[0].id, template_name: campaign.templateId, approval_hash: campaign.approvalHash, idempotency_key: key });
++    assert.equal(result.body.intent.status, 'pending');
++    ids.push(result.body.intent.id);
++  }
++  assert.equal(new Set(ids).size, 1);
++  assert.equal(app.repository.snapshot().deliveryIntents.length, 1);
++  const preview = app.repository.outreachExportPreview({ tenantId, storeId, outreachId: campaign.id });
++  assert.notEqual(preview.items[0].status, 'eligible');
++});
++
++test('N07: new explicit retry reevaluates unsent members and keeps prior attempt history', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app, false);
++  const input = { tenantId, storeId, outreachId: campaign.id, allowTestOutbox: true, now: new Date().toISOString() };
++  const first = await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'first' });
++  assert.equal(first.attempts[0].status, 'skipped_unverified');
++  await app.repository.verifyMemberContact(tenantId, members[0].id, 'synthetic-proof', new Date(Date.now() + 86400000).toISOString());
++  assert.equal(app.repository.outreachExportPreview(input).items[0].status, 'eligible');
++  assert.equal((await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'first' })).attempts[0].id, first.attempts[0].id);
++  const retry = await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'explicit-retry' });
++  assert.equal(retry.attempts[0].status, 'sent_test');
++  assert.notEqual(first.campaign.status, 'completed');
++  assert.equal(app.repository.snapshot().messageAttempts.length, 2);
++  const duplicate = await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'do-not-send-again' });
++  assert.equal(duplicate.attempts[0].id, retry.attempts[0].id);
++  assert.equal(app.repository.snapshot().messageAttempts.length, 2);
++});
++
++test('N08: renewed approval replaces expired approval without changing or re-reviewing content', async t => {
++  const { app, owner } = await setup(t);
++  const { revisionId } = await content(owner);
++  const oldId = await approve(owner, revisionId);
++  await app.repository.mutate(state => { state.contentApprovals.find(a => a.id === oldId)!.expiresAt = '2020-01-01T00:00:00Z'; });
++  const newId = await approve(owner, revisionId);
++  assert.equal(app.repository.validateContentExecution(newId).ok, true);
++  const exported = await post(owner, '/api/content/export', { revision_id: revisionId });
++  assert.equal(exported.response.status, 200);
++  assert.equal(exported.body.intent.approval_id, newId);
++});
++
++test('N01/N02: approval also rechecks generation facts inside the write lock', async t => {
++  const { app, owner } = await setup(t);
++  const { revisionId, productId } = await content(owner);
++  const submitted = await post(owner, '/api/content/submit', { revision_id: revisionId });
++  assert.equal(submitted.response.status, 201);
++  const other = new JsonRepository(app.repository.filePath, 'test');
++  await other.load();
++  const approveOriginal = app.repository.approveContent.bind(app.repository);
++  app.repository.approveContent = async (...args) => {
++    await other.addPriceVersion({ tenantId, productId, amountMinor: 20000, currency: 'BDT', status: 'approved', sourceCitation: 'concurrent synthetic change', validFrom: '2025-01-01T00:00:00Z', validTo: null, createdBy: userId });
++    return approveOriginal(...args);
++  };
++  const approved = await post(owner, `/api/approvals/${submitted.body.approval.id}/approve`);
++  assert.equal(approved.response.status, 409);
++  assert.equal(approved.body.error_code, 'price_version_changed');
++  assert.equal((await app.repository.load()).contentApprovals[0].status, 'pending');
++});
++
++test('N01: legacy content without generation provenance cannot acquire a fresh approval', async t => {
++  const { app, owner } = await setup(t);
++  const { revisionId } = await content(owner);
++  await app.repository.mutate(state => { delete state.contentRevisions.find(r => r.id === revisionId)!.generationFacts; });
++  const result = await post(owner, '/api/content/submit', { revision_id: revisionId });
++  assert.equal(result.response.status, 409);
++  assert.equal(result.body.error_code, 'generation_facts_missing');
++});
++
++test('N02: exported payload is the transaction snapshot even if content changes before the HTTP response', async t => {
++  const { app, owner } = await setup(t);
++  const { revisionId } = await content(owner);
++  await approve(owner, revisionId);
++  const originalData = structuredClone(app.repository.findContentRevision(revisionId)!.packageData);
++  const original = app.repository.createPublicationIntent.bind(app.repository);
++  app.repository.createPublicationIntent = async input => {
++    const intent = await original(input);
++    await app.repository.updateContentRevision(revisionId, { ...originalData, operator_notes_zh: 'later edit' }, userId);
++    return intent;
++  };
++  const exported = await post(owner, '/api/content/export', { revision_id: revisionId });
++  assert.equal(exported.response.status, 200);
++  assert.deepEqual(exported.body.package, originalData);
++  assert.deepEqual(app.repository.snapshot().publicationIntents[0].packageData, originalData);
++});
++
++test('N03: authorized single-store reports survive; incomplete or mislabeled scope is hidden', async t => {
++  const { app, owner } = await setup(t);
++  const b = await secondStore(app);
++  await app.repository.mutate(state => { seedOrders(state, storeId, 1000); seedOrders(state, b, 99000); });
++  const single = await post(owner, '/api/reports/daily', { store_id: storeId, as_of: asOf });
++  const aggregate = await post(owner, '/api/reports/daily', { as_of: asOf });
++  await app.repository.mutate(state => { state.dailyReports.find(r => r.id === aggregate.body.report.id)!.storeIds = [storeId]; });
++  const reviewer = new TestClient(app.baseUrl);
++  await reviewer.login('reviewer@demo.adda.local');
++  const visible = await reviewer.request('/api/reports/daily');
++  assert.deepEqual(visible.body.items.map((r: { id: string }) => r.id), [single.body.report.id]);
++  assert.ok(!JSON.stringify(visible.body).includes(b));
++  await app.repository.mutate(state => { state.dailyReports[0].storeIds = []; });
++  assert.equal((await reviewer.request('/api/reports/daily')).body.items.length, 0);
++});
++
++test('N04: mixed timezones are rejected even when every store uses BDT', async t => {
++  const { app, owner } = await setup(t);
++  const b = await secondStore(app);
++  await app.repository.mutate(state => { state.stores.find(s => s.id === b)!.timezone = 'UTC'; });
++  const result = await owner.request(`/api/metrics?as_of=${asOf}`);
++  assert.equal(result.response.status, 400);
++  assert.equal(result.body.error_code, 'mixed_store_currency_or_timezone_requires_single_store');
++});
++
++test('N05: explicit empty order import confirms zero; an expected missing source still blocks verification', async t => {
++  const { app, owner } = await setup(t);
++  const b = await secondStore(app);
++  await app.repository.mutate(state => seedOrders(state, storeId, 1000));
++  const emptyCsv = 'tenant_id,store_id,source,external_order_id,member_id,paid_at,currency,amount_paid_minor,status\n';
++  const staged = await post(owner, '/api/imports/preview', { kind: 'orders', source: 'pos', store_id: b, file_name: 'confirmed-empty.csv', content: emptyCsv, complete_through: asOf });
++  assert.equal(staged.response.status, 201);
++  assert.equal((await post(owner, `/api/imports/${staged.body.import.id}/commit`)).response.status, 200);
++  const zero = await owner.request(`/api/metrics?store_id=${b}&as_of=${asOf}`);
++  assert.equal(zero.body.summary.quality, 'verified');
++  assert.equal(zero.body.items.find((m: { metric_key: string }) => m.metric_key === 'net_revenue_minor').value, 0);
++  assert.equal(zero.body.summary.source_coverage[0].status, 'confirmed_zero');
++  assert.equal((await owner.request(`/api/metrics?as_of=${asOf}`)).body.summary.quality, 'verified');
++  await app.repository.mutate(state => { state.stores.find(s => s.id === b)!.orderSources = ['pos', 'delivery-app']; });
++  const partial = await owner.request(`/api/metrics?as_of=${asOf}`);
++  assert.equal(partial.body.summary.quality, 'provisional');
++  assert.ok(partial.body.summary.source_coverage.some((s: { source: string; status: string }) => s.source === 'delivery-app' && s.status === 'not_imported'));
++});
++
++test('N06: concurrent repositories reserve one budget unit, shared with G06 dispatch', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app, true, 2);
++  const other = new JsonRepository(app.repository.filePath, 'test');
++  await other.load();
++  const input = { tenantId, storeId, provider: 'whatsapp' as const, templateName: campaign.templateId, approvalHash: campaign.approvalHash!, createdBy: userId };
++  const intents = await Promise.all([app.repository.createDeliveryIntent({ ...input, memberId: members[0].id, idempotencyKey: 'concurrent-a' }), other.createDeliveryIntent({ ...input, memberId: members[1].id, idempotencyKey: 'concurrent-b' })]);
++  assert.deepEqual(intents.map(i => i.status).sort(), ['blocked', 'pending']);
++  const state = await app.repository.load();
++  assert.deepEqual(outreachBudget(state, campaign), { reservedMinor: 1, consumedMinor: 0, availableMinor: 0, unknownBindings: 0 });
++  const dispatch = await app.repository.dispatchOutreach({ tenantId, storeId, outreachId: campaign.id, allowTestOutbox: true, idempotencyKey: 'g06-after-g09' });
++  assert.ok(dispatch.attempts.every(a => a.status !== 'sent_test'));
++  assert.equal(outreachBudget(app.repository.snapshot(), campaign).reservedMinor, 1);
++});
++
++test('N06: unknown delivery keeps its reservation and cannot be retried with another request key', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app, true, 2);
++  const input = { tenantId, storeId, provider: 'whatsapp' as const, templateName: campaign.templateId, approvalHash: campaign.approvalHash!, createdBy: userId, memberId: members[0].id };
++  const first = await app.repository.createDeliveryIntent({ ...input, idempotencyKey: 'unknown-first' });
++  await app.repository.markDeliveryUnknown(first.id, tenantId);
++  const retry = await app.repository.createDeliveryIntent({ ...input, idempotencyKey: 'unknown-retry' });
++  assert.equal(retry.id, first.id);
++  assert.equal(retry.status, 'unknown_delivery');
++  await assert.rejects(app.repository.createDeliveryIntent({ ...input, memberId: members[1].id, idempotencyKey: 'unknown-retry' }), /idempotency_key_conflict/);
++  const second = await app.repository.createDeliveryIntent({ ...input, memberId: members[1].id, idempotencyKey: 'unknown-other-member' });
++  assert.equal(second.status, 'blocked');
++  assert.equal(second.errorCode, 'budget_exhausted');
++  assert.equal(outreachBudget(app.repository.snapshot(), campaign).reservedMinor, 1);
++  assert.equal(app.repository.findOutreachCampaign(campaign.id)!.status, 'blocked');
++});
++
++test('N06/N07: blocked intents reserve nothing; an explicit retry can recover after verification', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app, false);
++  const input = { tenantId, storeId, provider: 'whatsapp' as const, templateName: campaign.templateId, approvalHash: campaign.approvalHash!, createdBy: userId, memberId: members[0].id };
++  const blocked = await app.repository.createDeliveryIntent({ ...input, idempotencyKey: 'unverified-first' });
++  assert.equal(blocked.status, 'blocked');
++  assert.equal(outreachBudget(app.repository.snapshot(), campaign).reservedMinor, 0);
++  await app.repository.verifyMemberContact(tenantId, members[0].id, 'proof', new Date(Date.now() + 86400000).toISOString());
++  assert.equal((await app.repository.createDeliveryIntent({ ...input, idempotencyKey: 'unverified-first' })).id, blocked.id);
++  const retried = await app.repository.createDeliveryIntent({ ...input, idempotencyKey: 'verified-retry' });
++  assert.equal(retried.status, 'pending');
++  assert.equal(outreachBudget(app.repository.snapshot(), campaign).reservedMinor, 1);
++});
++
++test('N06: pending provider intents apply frequency limits to other campaigns', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app);
++  await app.repository.createDeliveryIntent({ tenantId, storeId, provider: 'whatsapp', templateName: campaign.templateId, approvalHash: campaign.approvalHash!, createdBy: userId, memberId: members[0].id, idempotencyKey: 'frequency-first' });
++  const next = await app.repository.createOutreachCampaign({ ...campaign, status: 'pending_approval', approvalHash: null });
++  const approved = await app.repository.approveOutreachCampaign(next.id, userId);
++  const preview = app.repository.outreachExportPreview({ tenantId, storeId, outreachId: next.id });
++  assert.equal(preview.items[0].status, 'skipped_frequency');
++  const result = await app.repository.createDeliveryIntent({ tenantId, storeId, provider: 'whatsapp', templateName: next.templateId, approvalHash: approved.approvalHash!, createdBy: userId, memberId: members[0].id, idempotencyKey: 'frequency-second' });
++  assert.equal(result.status, 'blocked');
++  assert.equal(result.errorCode, 'frequency_cap');
++});
++
++test('N01: editing copy cannot refresh generation facts or retain the previous language review', async t => {
++  const { app, owner } = await setup(t);
++  const { revisionId, productId } = await content(owner);
++  await price(owner, productId, 20000);
++  const data = app.repository.findContentRevision(revisionId)!.packageData;
++  await app.repository.updateContentRevision(revisionId, { ...data, operator_notes_zh: 'editorial change' }, userId);
++  assert.equal((await post(owner, '/api/content/submit', { revision_id: revisionId })).body.error_code, 'bn_review_required');
++  await post(owner, `/api/content/${revisionId}/review-bn`);
++  assert.equal((await post(owner, '/api/content/submit', { revision_id: revisionId })).body.error_code, 'price_version_changed');
++  const generated = await post(owner, '/api/content/generate', { campaign_id: data.campaign_id });
++  assert.equal(generated.response.status, 201);
++  await post(owner, `/api/content/${generated.body.revision.id}/review-bn`);
++  await approve(owner, generated.body.revision.id);
++  const exported = await post(owner, '/api/content/export', { revision_id: generated.body.revision.id });
++  assert.equal(exported.response.status, 200);
++  assert.match(JSON.stringify(exported.body.package), /200/);
++});
++
++test('N06: changing approval cancels unsent reservations and preserves consumed cost', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app);
++  const input = { tenantId, storeId, provider: 'whatsapp' as const, memberId: members[0].id, templateName: campaign.templateId, createdBy: userId };
++  const pending = await app.repository.createDeliveryIntent({ ...input, approvalHash: campaign.approvalHash!, idempotencyKey: 'before-change' });
++  await app.repository.updateOutreachCampaign(campaign.id, tenantId, { budgetMinor: 10, costPerAttemptMinor: 2 });
++  const approved = await app.repository.approveOutreachCampaign(campaign.id, userId);
++  assert.equal(app.repository.findDeliveryIntent(pending.id, tenantId)!.status, 'blocked');
++  assert.equal(outreachBudget(app.repository.snapshot(), approved).reservedMinor, 0);
++  const renewed = await app.repository.createDeliveryIntent({ ...input, approvalHash: approved.approvalHash!, idempotencyKey: 'after-change' });
++  assert.equal(renewed.costMinor, 2);
++  await app.repository.processWebhook({ tenantId, provider: 'whatsapp', providerEventId: 'synthetic-delivered', providerMessageId: renewed.id, status: 'delivered', occurredAt: new Date().toISOString() });
++  assert.equal(app.repository.findOutreachCampaign(campaign.id)!.status, 'completed');
++  await app.repository.updateOutreachCampaign(campaign.id, tenantId, { costPerAttemptMinor: 7 });
++  const updated = await app.repository.approveOutreachCampaign(campaign.id, userId);
++  assert.equal(outreachBudget(app.repository.snapshot(), updated).consumedMinor, 2);
++});
++
++test('N06: stopping an accepted delivery preserves an unknown reservation', async t => {
++  const { app } = await setup(t);
++  const { campaign, members } = await outreach(app);
++  const intent = await app.repository.createDeliveryIntent({ tenantId, storeId, provider: 'whatsapp', memberId: members[0].id, templateName: campaign.templateId, approvalHash: campaign.approvalHash!, createdBy: userId, idempotencyKey: 'accepted-before-stop' });
++  await app.repository.processWebhook({ tenantId, provider: 'whatsapp', providerEventId: 'synthetic-accepted', providerMessageId: intent.id, status: 'accepted', occurredAt: new Date().toISOString() });
++  await app.repository.setGlobalKillSwitch(true);
++  assert.equal(app.repository.findDeliveryIntent(intent.id, tenantId)!.status, 'unknown_delivery');
++  assert.equal(outreachBudget(app.repository.snapshot(), campaign).reservedMinor, 1);
++});
++
++test('N07: explicit retry after quiet hours uses current policy, while replay keeps the earlier result', async t => {
++  const { app } = await setup(t);
++  const { campaign } = await outreach(app);
++  await app.repository.updateOutreachCampaign(campaign.id, tenantId, { quietStartLocal: '09:00', quietEndLocal: '21:00' });
++  await app.repository.approveOutreachCampaign(campaign.id, userId);
++  const day = new Date().toISOString().slice(0, 10);
++  const input = { tenantId, storeId, outreachId: campaign.id, allowTestOutbox: true };
++  const first = await app.repository.dispatchOutreach({ ...input, now: `${day}T00:00:00.000Z`, idempotencyKey: 'too-early' });
++  assert.equal(first.attempts[0].status, 'skipped_quiet_hours');
++  const retry = await app.repository.dispatchOutreach({ ...input, now: `${day}T06:00:00.000Z`, idempotencyKey: 'send-window' });
++  assert.equal(retry.attempts[0].status, 'sent_test');
++  const replay = await app.repository.dispatchOutreach({ ...input, now: `${day}T06:00:00.000Z`, idempotencyKey: 'too-early' });
++  assert.equal(replay.attempts[0].id, first.attempts[0].id);
++  assert.equal((retry.report.treatment as { sent: number }).sent, 1);
++  assert.equal(outreachBudget(app.repository.snapshot(), campaign).consumedMinor, 1);
++});
+--- previous/tests/g07-g10.test.ts
++++ current/tests/g07-g10.test.ts
+@@ -64,9 +64,15 @@
+     await client.login('owner@demo.adda.local');
+     const state = await client.request('/api/connectors/whatsapp/state', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'active', mode: 'live', enabled: true, send_template: true }) });
+     assert.equal(state.response.status, 200);
+-    const member = await app.repository.createMember({ tenantId: 'ten_demo_01', storeId: 'sto_demo_01', externalMemberId: 'ext-g09', displayName: 'G09', registeredAt: new Date().toISOString(), language: 'en', contact: null, contactHmac: 'h', publicAccessTokenHash: null, isSynthetic: true });
+-    await app.repository.verifyMemberContact('ten_demo_01', member.id, 'synthetic-verification', new Date(Date.now() + 86_400_000).toISOString());
+-    await app.repository.addConsent({ tenantId: 'ten_demo_01', memberId: member.id, channel: 'whatsapp', purpose: 'marketing', granted: true, noticeVersion: 'v1', source: 'test' });
++    // Distinct business deliveries exercise success, unknown result and stop controls.
++    const recipients = [];
++    for (let index = 0; index < 3; index++) {
++      const member = await app.repository.createMember({ tenantId: 'ten_demo_01', storeId: 'sto_demo_01', externalMemberId: `ext-g09-${index}`, displayName: 'G09', registeredAt: new Date().toISOString(), language: 'en', contact: null, contactHmac: `g09-${index}`, publicAccessTokenHash: null, isSynthetic: true });
++      await app.repository.verifyMemberContact('ten_demo_01', member.id, 'synthetic-verification', new Date(Date.now() + 86_400_000).toISOString());
++      await app.repository.addConsent({ tenantId: 'ten_demo_01', memberId: member.id, channel: 'whatsapp', purpose: 'marketing', granted: true, noticeVersion: 'v1', source: 'test' });
++      recipients.push(member);
++    }
++    const member = recipients[0];
+     const segment = await app.repository.createSegmentDefinition({ tenantId: 'ten_demo_01', name: 'G09 approved audience', rule: 'marketing_opt_in', createdBy: 'usr_demo_owner', storeId: 'sto_demo_01' });
+     const frozen = await app.repository.freezeAudience({ tenantId: 'ten_demo_01', segmentId: segment.id, storeId: 'sto_demo_01', holdoutPercent: 0, seed: 'g09-test' });
+     const campaign = await app.repository.createOutreachCampaign({ tenantId: 'ten_demo_01', storeId: 'sto_demo_01', segmentId: segment.id, audienceSnapshotId: frozen.snapshot.id, channel: 'whatsapp', templateId: 'approved_template', templateText: 'Approved test template', templateApproved: true, budgetMinor: 100, costPerAttemptMinor: 1, quietStartLocal: '00:00', quietEndLocal: '23:59', frequencyCapDays: 1, status: 'pending_approval', createdBy: 'usr_demo_owner' });
+@@ -83,13 +89,16 @@
+     const late = await client.request('/api/connectors/whatsapp/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'x-hub-signature-256': lateSignature }, body: lateAccepted });
+     assert.equal(late.response.status, 202);
+     assert.equal(app.repository.snapshot().deliveryIntents.find(item => item.id === intent.body.intent.id)?.status, 'delivered');
+-    const second = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: member.id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'idem-2' }) });
++    const repeatedBusiness = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: member.id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'same-business-new-key' }) });
++    assert.equal(repeatedBusiness.response.status, 200);
++    assert.equal(repeatedBusiness.body.intent.id, intent.body.intent.id);
++    const second = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: recipients[1].id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'idem-2' }) });
+     assert.equal(second.response.status, 202);
+     const timeout = await client.request('/api/connectors/whatsapp/intents/' + second.body.intent.id + '/timeout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
+     assert.equal(timeout.response.status, 200);
+     assert.equal(timeout.body.retry_allowed, false);
+     assert.equal(timeout.body.intent.status, 'unknown_delivery');
+-    const retry = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: member.id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'idem-2' }) });
++    const retry = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: recipients[1].id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'idem-2' }) });
+     assert.equal(retry.response.status, 409);
+     assert.equal(retry.body.intent.status, 'unknown_delivery');
+     const duplicate = await client.request('/api/connectors/whatsapp/webhook', { method: 'POST', headers: { 'content-type': 'application/json', 'x-hub-signature-256': signature }, body: payload });
+@@ -102,7 +111,7 @@
+     assert.equal((await platform.login(platformUser.email, 'platform-password')).response.status, 200);
+     const kill = await platform.request('/api/connectors/kill-switch', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ enabled: true }) });
+     assert.equal(kill.response.status, 200);
+-    const blockedIntent = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: member.id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'idem-3' }) });
++    const blockedIntent = await client.request('/api/connectors/whatsapp/intents', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', member_id: recipients[2].id, template_name: 'approved_template', approval_hash: approvedCampaign.approvalHash, idempotency_key: 'idem-3' }) });
+     assert.equal(blockedIntent.response.status, 409);
+     assert.equal(blockedIntent.body.intent.status, 'blocked');
+   } finally { await app.close(); }
+--- previous/PACK_VALIDATION.md
++++ current/PACK_VALIDATION.md
+@@ -1,11 +1,9 @@
+-# 执行包校验记录
++# 源码包验证
+ 
+-校验日期：2026-09-22。
++当前能力范围和测试数量以 `docs/CAPABILITIES.md` 为准，生成依据是 `artifacts/audit-n01-n08/validation.json` 中的实际命令、退出码、日志和源码哈希。
+ 
+-原始规格夹具校验已通过：`node scripts/verify-fixtures.mjs` 精确匹配预置指标，JSON/Schema 与 G00–G10 依赖引用自洽。该结果本身不等于应用验收。
++本包包含 N01–N08 离线修复及回归。原始规格校验、早期 G00–G10 和首轮审查结果保存在相应历史目录，不能把历史日志当成本次生产验收。
+ 
+-## 执行后更新（2026-09-22）
++当前仍是离线原型。生产数据库、实际业务 worker、模型技能、初始化和客户界面有内部开发缺口；真实渠道和客户 UAT 还需要外部条件。仅配置密钥不足以完成交付。
+ 
+-工作区已落地 G00–G10 的 TypeScript 离线切片。最终门禁记录在 `artifacts/G07`–`artifacts/G10`：类型检查、构建、48 个单元/目标/集成/E2E 测试、G07–G10 回归、AI 合成边界、fixture 校验、秘密扫描、备份恢复、worker once 和性能测量均通过。
+-
+-当前仍未完成：PostgreSQL/Prisma 生产适配、staging、真实 WABA 授权发送和回执、真实客户数据/指标新鲜度协议、真人孟语审核、真实任务集、部署及甲方 UAT 签字。因此交付级别仍为 DEMO_READY，不能写成 CORE/LIVE/PRODUCTION_READY。
++`SOURCE_MANIFEST.json` 校验本包全部文件；`MANIFEST.json` 是原始规格包的历史清单。

@@ -1,0 +1,7 @@
+npm run test:g07-g10
+exit 0
+Offline only: webhook HMAC rejection, duplicate event idempotency, delivered monotonic state and kill switch. Real WABA credentials/recipient acceptance: external_blocked.
+
+node --test --import tsx tests/whatsapp-remediation.test.ts
+exit 0 (4 tests)
+Offline protocol slice: nested entry/changes/value/statuses normalization, stable status-event IDs, unknown-status handling and unauthenticated verify-token challenge. Real WABA endpoint verification and provider receipt: external_blocked.

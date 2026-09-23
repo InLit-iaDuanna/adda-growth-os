@@ -1,0 +1,17 @@
+{
+  "orders": {
+    "preview": "separate from commit",
+    "duplicate_file": "idempotent existing batch",
+    "active_order_count_after_fixture": 11,
+    "duplicate_external_order_count": 1
+  },
+  "correction": {
+    "active_revision_count": 1,
+    "history_preserved": true
+  },
+  "refunds": {
+    "duplicate_adjustment": "deduplicated",
+    "over_refund": "rejected with refund_exceeds_order"
+  },
+  "quality": "synthetic/offline evidence"
+}

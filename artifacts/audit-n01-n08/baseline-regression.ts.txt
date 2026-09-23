@@ -1,0 +1,193 @@
+import test, { type TestContext } from 'node:test';
+import assert from 'node:assert/strict';
+import { JsonRepository } from '../packages/db/src/repository';
+import { startTestApp, TestClient, type RunningTestApp } from '../packages/testing/src/http';
+import type { DatabaseState } from '../packages/domain/src/types';
+import { queryMetrics } from '../packages/domain/src/control-service';
+
+const tenantId = 'ten_demo_01';
+const storeId = 'sto_demo_01';
+const userId = 'usr_demo_owner';
+const asOf = '2026-03-01T00:00:00.000Z';
+const post = (client: TestClient, url: string, body = {}) => client.request(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+
+async function setup(t: TestContext) {
+  const app = await startTestApp({ seedDemo: true });
+  t.after(() => app.close());
+  const owner = new TestClient(app.baseUrl);
+  assert.equal((await owner.login('owner@demo.adda.local')).response.status, 200);
+  return { app, owner };
+}
+
+async function content(owner: TestClient) {
+  const brand = await post(owner, '/api/brand/documents', { source_type: 'form', source_label: 'audit synthetic', content: JSON.stringify({ brand_name: 'ADDA TEA' }) });
+  assert.equal((await post(owner, `/api/brand/revisions/${brand.body.revision.id}/approve`)).response.status, 200);
+  const product = await post(owner, '/api/products', { store_id: storeId, external_sku: 'AUDIT', names: { en: 'Milk Tea' } });
+  const productId = product.body.item.id as string;
+  assert.equal((await price(owner, productId)).response.status, 201);
+  const asset = await post(owner, '/api/media-assets', { store_id: storeId, storage_key: 'synthetic/audit.jpg', checksum: 'audit', rights_status: 'approved', allowed_uses: ['organic_social'] });
+  const campaign = await post(owner, '/api/campaigns', { name: 'Audit content', objective: 'orders', store_id: storeId, product_ids: [productId], asset_ids: [asset.body.item.id] });
+  const generated = await post(owner, '/api/content/generate', { campaign_id: campaign.body.item.id });
+  assert.equal(generated.response.status, 201);
+  const revisionId = generated.body.revision.id as string;
+  assert.equal((await post(owner, `/api/content/${revisionId}/review-bn`)).response.status, 200);
+  return { productId, revisionId };
+}
+
+function price(owner: TestClient, productId: string, amountMinor = 15000) {
+  return post(owner, `/api/products/${productId}/prices`, { amount_minor: amountMinor, currency: 'BDT', status: 'approved', source_citation: 'synthetic audit price' });
+}
+
+async function approve(owner: TestClient, revisionId: string) {
+  const submitted = await post(owner, '/api/content/submit', { revision_id: revisionId });
+  assert.equal(submitted.response.status, 201, JSON.stringify(submitted.body));
+  assert.equal((await post(owner, `/api/approvals/${submitted.body.approval.id}/approve`)).response.status, 200);
+  return submitted.body.approval.id as string;
+}
+
+function seedOrders(state: DatabaseState, selectedStore: string, amount: number, currency = 'BDT') {
+  const id = `order-${selectedStore}`;
+  state.orders.push({ id, tenantId, storeId: selectedStore, source: 'pos', externalOrderId: id, memberId: null, paidAt: '2026-02-01T00:00:00Z', currency, amountPaidMinor: amount, status: 'paid', revision: 1, sourceRowHash: id, active: true, correctionOfId: null, createdAt: asOf, updatedAt: asOf });
+  state.imports.push({ id: `import-${selectedStore}`, tenantId, storeId: selectedStore, kind: 'orders', source: 'pos', fileName: 'synthetic.csv', fileHash: id, status: 'committed', rowCount: 1, validRowCount: 1, errorCount: 0, completeThrough: asOf, createdBy: userId, createdAt: asOf, committedAt: asOf });
+}
+
+async function secondStore(app: RunningTestApp, currency = 'BDT') {
+  const store = await app.repository.createStore({ tenantId, slug: 'audit-b', name: 'Synthetic B', timezone: 'Asia/Dhaka', currency, status: 'active' });
+  await app.repository.mutate(state => { state.memberships.find(m => m.userId === userId)!.storeIds.push(store.id); });
+  return store.id;
+}
+
+async function outreach(app: RunningTestApp, verified = true, count = 1) {
+  const members = [];
+  for (let i = 0; i < count; i++) {
+    const member = await app.repository.createMember({ tenantId, storeId, externalMemberId: `audit-${i}`, displayName: null, registeredAt: new Date().toISOString(), language: 'en', contact: null, contactHmac: `audit-contact-${i}`, publicAccessTokenHash: null, isSynthetic: true });
+    if (verified) await app.repository.verifyMemberContact(tenantId, member.id, 'synthetic-proof', new Date(Date.now() + 86400000).toISOString());
+    await app.repository.addConsent({ tenantId, memberId: member.id, channel: 'whatsapp', purpose: 'marketing', granted: true, noticeVersion: 'v1', source: 'audit' });
+    members.push(member);
+  }
+  const segment = await app.repository.createSegmentDefinition({ tenantId, storeId, name: 'Audit audience', rule: 'marketing_opt_in', createdBy: userId });
+  const frozen = await app.repository.freezeAudience({ tenantId, storeId, segmentId: segment.id, holdoutPercent: 0, seed: 'audit' });
+  const campaign = await app.repository.createOutreachCampaign({ tenantId, storeId, segmentId: segment.id, audienceSnapshotId: frozen.snapshot.id, channel: 'whatsapp', templateId: 'audit-approved', templateText: 'Synthetic approved template', templateApproved: true, budgetMinor: 1, costPerAttemptMinor: 1, quietStartLocal: '00:00', quietEndLocal: '23:59', frequencyCapDays: 1, status: 'pending_approval', createdBy: userId });
+  const approved = await app.repository.approveOutreachCampaign(campaign.id, userId);
+  await app.repository.setConnectorState({ tenantId, provider: 'whatsapp', mode: 'demo', status: 'active', enabled: true, killSwitch: false, capabilities: { readMetrics: false, reply: false, sendTemplate: true }, reason: 'synthetic offline', checkedAt: new Date().toISOString() });
+  return { campaign: approved, members };
+}
+
+test('N01: a price changed after generation cannot be rebound at submission', async t => {
+  const { owner, app } = await setup(t);
+  const { revisionId, productId } = await content(owner);
+  assert.match(JSON.stringify(app.repository.findContentRevision(revisionId)!.packageData), /150/);
+  assert.equal((await price(owner, productId, 20000)).response.status, 201);
+  const submit = await post(owner, '/api/content/submit', { revision_id: revisionId });
+  assert.equal(submit.response.status, 409);
+  assert.equal(submit.body.error_code, 'price_version_changed');
+  assert.equal(app.repository.snapshot().contentApprovals.length, 0);
+});
+
+test('N02: another repository changes price at the export boundary; no intent is written', async t => {
+  const { owner, app } = await setup(t);
+  const { revisionId, productId } = await content(owner);
+  await approve(owner, revisionId);
+  const other = new JsonRepository(app.repository.filePath, 'test');
+  await other.load();
+  const original = app.repository.createPublicationIntent.bind(app.repository);
+  app.repository.createPublicationIntent = async input => {
+    await other.addPriceVersion({ tenantId, productId, amountMinor: 20000, currency: 'BDT', status: 'approved', sourceCitation: 'concurrent synthetic change', validFrom: '2025-01-01T00:00:00Z', validTo: null, createdBy: userId });
+    return original(input);
+  };
+  const result = await post(owner, '/api/content/export', { revision_id: revisionId });
+  assert.equal(result.response.status, 409);
+  assert.equal(result.body.error_code, 'price_version_changed');
+  assert.equal((await app.repository.load()).publicationIntents.length, 0);
+});
+
+test('N03: reports and tasks require access to every contributing store', async t => {
+  const { app, owner } = await setup(t);
+  const b = await secondStore(app);
+  await app.repository.mutate(state => { seedOrders(state, storeId, 1000); seedOrders(state, b, 99000); });
+  const aggregate = await post(owner, '/api/reports/daily', { as_of: asOf });
+  assert.equal(aggregate.response.status, 201);
+  const task = await app.repository.createControlTask({ tenantId, storeIds: [storeId, b], ownerUserId: userId, title: 'Both stores', dueAt: asOf, targetMetric: 'net_revenue_minor', budgetMinor: null, guardrails: [], evidenceRefs: [`order-${b}`] });
+  const reviewer = new TestClient(app.baseUrl);
+  await reviewer.login('reviewer@demo.adda.local');
+  assert.equal((await reviewer.request(`/api/reports/daily?store_id=${b}`)).response.status, 404);
+  const visible = await reviewer.request('/api/reports/daily');
+  assert.equal(visible.response.status, 200);
+  assert.ok(!visible.body.items.some((r: { id: string }) => r.id === aggregate.body.report.id));
+  assert.ok(!JSON.stringify(visible.body).includes(b));
+  assert.ok(!visible.body.tasks.some((r: { id: string }) => r.id === task.id));
+  const denied = await post(reviewer, `/api/control-tasks/${task.id}/complete`, { evidence: 'not authorized' });
+  assert.notEqual(denied.response.status, 200);
+  assert.equal(app.repository.snapshot().controlTasks.find(r => r.id === task.id)!.status, 'open');
+  assert.equal((await owner.request('/api/reports/daily')).body.items.length, 1);
+});
+
+test('N04: ordinary metrics and queryMetrics both reject mixed currencies', async t => {
+  const { app, owner } = await setup(t);
+  const b = await secondStore(app, 'USD');
+  await app.repository.mutate(state => { seedOrders(state, storeId, 1000); seedOrders(state, b, 99000, 'USD'); });
+  const actor = { tenantId, userId, role: 'OWNER' as const, sessionId: 'test', storeIds: [storeId, b] };
+  assert.throws(() => queryMetrics(app.repository.snapshot(), actor, [{ metricKey: 'net_revenue_minor' }], asOf), /mixed_store_currency_or_timezone/);
+  const result = await owner.request(`/api/metrics?as_of=${asOf}`);
+  assert.equal(result.response.status, 400);
+  assert.equal(result.body.error_code, 'mixed_store_currency_or_timezone_requires_single_store');
+  assert.equal((await owner.request(`/api/metrics?store_id=${storeId}&as_of=${asOf}`)).response.status, 200);
+});
+
+test('N05: an entirely missing store prevents a verified aggregate', async t => {
+  const { app, owner } = await setup(t);
+  const b = await secondStore(app);
+  await app.repository.mutate(state => seedOrders(state, storeId, 1000));
+  const missing = await owner.request(`/api/metrics?store_id=${b}&as_of=${asOf}`);
+  assert.equal(missing.body.quality, 'missing');
+  const aggregate = await owner.request(`/api/metrics?as_of=${asOf}`);
+  assert.equal(aggregate.body.summary.quality, 'provisional');
+  const actor = { tenantId, userId, role: 'OWNER' as const, sessionId: 'test', storeIds: [storeId, b] };
+  assert.equal(queryMetrics(app.repository.snapshot(), actor, [{ metricKey: 'net_revenue_minor' }], asOf)[0].quality, 'provisional');
+});
+
+test('N06: different request keys cannot reserve the same business delivery repeatedly', async t => {
+  const { app, owner } = await setup(t);
+  const { campaign, members } = await outreach(app);
+  const ids = [];
+  for (const key of ['n06-a', 'n06-b', 'n06-c']) {
+    const result = await post(owner, '/api/connectors/whatsapp/intents', { store_id: storeId, member_id: members[0].id, template_name: campaign.templateId, approval_hash: campaign.approvalHash, idempotency_key: key });
+    assert.equal(result.body.intent.status, 'pending');
+    ids.push(result.body.intent.id);
+  }
+  assert.equal(new Set(ids).size, 1);
+  assert.equal(app.repository.snapshot().deliveryIntents.length, 1);
+  const preview = app.repository.outreachExportPreview({ tenantId, storeId, outreachId: campaign.id });
+  assert.notEqual(preview.items[0].status, 'eligible');
+});
+
+test('N07: new explicit retry reevaluates unsent members and keeps prior attempt history', async t => {
+  const { app } = await setup(t);
+  const { campaign, members } = await outreach(app, false);
+  const input = { tenantId, storeId, outreachId: campaign.id, allowTestOutbox: true, now: new Date().toISOString() };
+  const first = await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'first' });
+  assert.equal(first.attempts[0].status, 'skipped_unverified');
+  await app.repository.verifyMemberContact(tenantId, members[0].id, 'synthetic-proof', new Date(Date.now() + 86400000).toISOString());
+  assert.equal(app.repository.outreachExportPreview(input).items[0].status, 'eligible');
+  assert.equal((await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'first' })).attempts[0].id, first.attempts[0].id);
+  const retry = await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'explicit-retry' });
+  assert.equal(retry.attempts[0].status, 'sent_test');
+  assert.notEqual(first.campaign.status, 'completed');
+  assert.equal(app.repository.snapshot().messageAttempts.length, 2);
+  const duplicate = await app.repository.dispatchOutreach({ ...input, idempotencyKey: 'do-not-send-again' });
+  assert.equal(duplicate.attempts[0].id, retry.attempts[0].id);
+  assert.equal(app.repository.snapshot().messageAttempts.length, 2);
+});
+
+test('N08: renewed approval replaces expired approval without changing or re-reviewing content', async t => {
+  const { app, owner } = await setup(t);
+  const { revisionId } = await content(owner);
+  const oldId = await approve(owner, revisionId);
+  await app.repository.mutate(state => { state.contentApprovals.find(a => a.id === oldId)!.expiresAt = '2020-01-01T00:00:00Z'; });
+  const newId = await approve(owner, revisionId);
+  assert.equal(app.repository.validateContentExecution(newId).ok, true);
+  const exported = await post(owner, '/api/content/export', { revision_id: revisionId });
+  assert.equal(exported.response.status, 200);
+  assert.equal(exported.body.intent.approval_id, newId);
+});
+

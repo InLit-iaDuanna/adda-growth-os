@@ -1,0 +1,12 @@
+G01 evidence recorded 2026-09-22 (UTC)
+
+npm run typecheck                         -> exit 0
+npm run test:g01                          -> exit 0 (5 passed, 0 failed)
+npm test                                  -> exit 0 (18 passed, 0 failed across unit/G01/integration/e2e)
+npm run build                             -> exit 0
+
+G01 tests exercise actual repository/API behavior, not fixture-only rendering:
+A06 empty Brand Brain needs_input
+A07 approved-only facts and conflict approval rejection
+A08 price version mutation invalidates old reference
+A13 publish checks for rights, expiry, inactive/unpriced products

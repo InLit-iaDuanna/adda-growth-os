@@ -1,0 +1,9 @@
+G02 evidence recorded 2026-09-22 (UTC)
+
+npm run typecheck       -> exit 0
+npm run test:g02        -> exit 0 (6 passed, 0 failed)
+npm run build           -> exit 0
+npm test                -> pending final combined regression after this checkpoint
+npm run fixtures:verify -> exit 0 (specification-only verifier)
+
+The G02 tests import the synthetic CSVs through preview/commit APIs, then call the metric service over HTTP. They do not read expected_metrics.json as the response source.

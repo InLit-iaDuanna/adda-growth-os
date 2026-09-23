@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    environment:
+      APP_MODE: production
+      SESSION_SECRET: ${SESSION_SECRET:?set a long random secret}
+      ADDA_DATA_DIR: /app/data
+    ports:
+      - "3000:3000"
+    volumes:
+      - adda-data:/app/data
+    depends_on:
+      worker:
+        condition: service_started
+  worker:
+    build: .
+    command: ["node", "dist/apps/worker/src/index.js"]
+    environment:
+      APP_MODE: production
+      SESSION_SECRET: ${SESSION_SECRET:?set a long random secret}
+      ADDA_DATA_DIR: /app/data
+    volumes:
+      - adda-data:/app/data
+volumes:
+  adda-data:

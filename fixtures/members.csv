@@ -1,0 +1,7 @@
+tenant_id,store_id,id,display_name,registered_at,language,contact,is_synthetic
+DEMO_TENANT_ADDA,DEMO_STORE_001,M001,DEMO M001,2026-08-01T09:00:00+06:00,en,demo-m001@example.invalid,True
+DEMO_TENANT_ADDA,DEMO_STORE_001,M002,DEMO M002,2026-08-01T09:00:00+06:00,en,demo-m002@example.invalid,True
+DEMO_TENANT_ADDA,DEMO_STORE_001,M003,DEMO M003,2026-08-05T09:00:00+06:00,en,demo-m003@example.invalid,True
+DEMO_TENANT_ADDA,DEMO_STORE_001,M004,DEMO M004,2026-09-10T09:00:00+06:00,en,demo-m004@example.invalid,True
+DEMO_TENANT_ADDA,DEMO_STORE_001,M005,DEMO M005,2026-09-01T09:00:00+06:00,en,demo-m005@example.invalid,True
+DEMO_TENANT_ADDA,DEMO_STORE_001,M006,DEMO M006,2026-09-20T09:00:00+06:00,en,demo-m006@example.invalid,True

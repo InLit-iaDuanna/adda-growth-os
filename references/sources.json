@@ -1,0 +1,83 @@
+{
+  "checked_on": "2026-09-22",
+  "sources": [
+    {
+      "id": "S01",
+      "title": "Codex AGENTS.md",
+      "url": "https://developers.openai.com/codex/guides/agents-md",
+      "use": "官方项目指令发现机制；用于 AGENTS.md，不保证一轮完成整个项目。"
+    },
+    {
+      "id": "S02",
+      "title": "Codex execution plans",
+      "url": "https://developers.openai.com/cookbook/articles/codex_exec_plans",
+      "use": "官方关于持续计划和可验证行为的指导；本包采用自行编写的计划模板。"
+    },
+    {
+      "id": "S03",
+      "title": "WhatsApp Business Messaging Policy",
+      "url": "https://business.whatsapp.com/policy",
+      "use": "同意、退出、模板、24小时窗口、自动响应人工升级。"
+    },
+    {
+      "id": "S04",
+      "title": "TikTok Content Sharing Guidelines",
+      "url": "https://developers.tiktok.com/doc/content-sharing-guidelines",
+      "use": "未审核客户端限制以及不接受仅内部团队上传用途。"
+    },
+    {
+      "id": "S05",
+      "title": "Google Business Profile API prerequisites",
+      "url": "https://developers.google.com/my-business/content/prereqs",
+      "use": "API 申请条件、60天已验证活跃档案要求及批准流程。"
+    },
+    {
+      "id": "S06",
+      "title": "Postiz",
+      "url": "https://github.com/gitroomhq/postiz-app",
+      "use": "参考内容日历、发布状态和渠道 adapter；README 声明 AGPL-3.0，不直接复制进闭源项目。"
+    },
+    {
+      "id": "S07",
+      "title": "Chatwoot",
+      "url": "https://github.com/chatwoot/chatwoot",
+      "use": "参考统一会话、标签、工单与人工协作；LICENSE 区分 enterprise/，其他相关代码 MIT Expat，第三方各自授权。"
+    },
+    {
+      "id": "S08",
+      "title": "Twenty",
+      "url": "https://github.com/twentyhq/twenty",
+      "use": "参考 CRM 对象、视图、联系人和工作流；不是奶茶会员系统的现成替代，复制前另核具体许可。"
+    },
+    {
+      "id": "S09",
+      "title": "Vercel AI SDK",
+      "url": "https://github.com/vercel/ai",
+      "use": "TypeScript、多模型 provider、结构化生成；本方案的模型应用层候选。"
+    },
+    {
+      "id": "S10",
+      "title": "AI SDK tool calling",
+      "url": "https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling",
+      "use": "类型化工具与批准机制；应用仍须独立服务端授权和持久化审批。"
+    },
+    {
+      "id": "S11",
+      "title": "pg-boss",
+      "url": "https://github.com/timgit/pg-boss",
+      "use": "PostgreSQL 后台任务队列；不能因此推导第三方发送端到端只发生一次。"
+    },
+    {
+      "id": "S12",
+      "title": "Better Auth",
+      "url": "https://github.com/better-auth/better-auth",
+      "use": "TypeScript 认证组件；使用实际稳定版本并落实业务资源权限。"
+    },
+    {
+      "id": "S13",
+      "title": "Langfuse",
+      "url": "https://github.com/langfuse/langfuse",
+      "use": "可选模型 tracing/评测参考；官方说明除 ee 文件夹外 MIT。"
+    }
+  ]
+}

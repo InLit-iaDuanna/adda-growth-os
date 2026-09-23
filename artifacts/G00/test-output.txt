@@ -1,0 +1,17 @@
+G00 automated result summary (2026-09-22 UTC)
+
+test:unit       4 passed, 0 failed
+test:integration 6 passed, 0 failed
+test:e2e        3 passed, 0 failed
+test:ai         30 synthetic cases checked, 24 safety-boundary cases
+build           passed
+fixture verifier passed; it remains specification-only and is not used as product acceptance evidence
+
+Covered behaviors:
+- empty production onboarding with no demo credentials/revenue (A01)
+- persistent campaign after service restart (A02)
+- cross-tenant isolation (A03)
+- ungranted store isolation (A04)
+- CASHIER export/budget/integration denial (A05)
+- zh-CN/en admin and en/bn consumer shells with mobile viewport (A57)
+- HMAC session, CSRF, stable error codes, explicit connector modes

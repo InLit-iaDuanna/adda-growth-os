@@ -1,0 +1,9 @@
+G04 automated result summary (2026-09-22 UTC)
+
+A09 passed — editable zh-CN/en/bn package, shot list, subtitles, CTA, citations persisted after GET
+A10 passed — unreviewed bn blocks submit; LOCAL_REVIEWER review unlocks it
+A11/A47 passed — approval payload hash and approved citations bind execution; edits stale old approval; invalid schema rejected
+A12 passed — manual export is manual_ready/published=false; operator attestation is separate evidence
+A13/A14/A46 passed — rights check and unsafe instruction fail closed; manual edit path returned
+
+Provider mode is deterministic-fake/demo, never claimed live model quality.
