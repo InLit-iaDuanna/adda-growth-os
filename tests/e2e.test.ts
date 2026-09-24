@@ -29,11 +29,21 @@ test('A57: admin and consumer shells expose required language choices and mobile
   const admin = await client.request('/');
   assert.match(admin.body, /zh-CN/);
   assert.match(admin.body, /English/);
+  assert.match(admin.body, /SUIWU 随物/);
+  assert.match(admin.body, /suiwu-lotus-mark\.png/);
+  assert.match(admin.body, /4da38778134ae0fc6f4fb0046521903b\.jpg/);
   assert.match(admin.body, /width=device-width/);
   const consumer = await client.request('/s/du-gate-demo/join');
   assert.match(consumer.body, /English/);
   assert.match(consumer.body, /বাংলা/);
+  assert.match(consumer.body, /SUIWU 随物旗下品牌/);
   assert.match(consumer.body, /width=device-width/);
+  const manifest = await client.request('/assets/brand/manifest.json');
+  assert.equal(manifest.response.status, 200);
+  assert.equal(manifest.body.brand_owner, 'SUIWU 随物');
+  const logo = await client.request('/assets/brand/7846e5a3d39a673b230a47f52f4532ca.jpg');
+  assert.equal(logo.response.status, 200);
+  assert.equal(logo.response.headers.get('content-type'), 'image/jpeg');
 });
 
 test('health and readiness are explicit and connectors remain unconfigured', async () => {

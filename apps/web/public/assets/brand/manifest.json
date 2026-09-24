@@ -1,0 +1,21 @@
+{
+  "brand_owner": "SUIWU 随物",
+  "sub_brand": "ADDA",
+  "source": "甲方提供素材（微信临时文件导入）",
+  "rights_status": "needs_confirmation",
+  "usage": "产品界面视觉参考与本地演示素材；发布前需确认授权范围",
+  "assets": [
+    {"file":"suiwu-lotus-mark.png","role":"suiwu_logo_mark"},
+    {"file":"99b0b4ec1602cc2760ffed5944b53444.jpg","role":"suiwu_logo_lockup"},
+    {"file":"7846e5a3d39a673b230a47f52f4532ca.jpg","role":"suiwu_logo_wordmark"},
+    {"file":"f78fd9085f6bde2ab8101aac1de72da9.jpg","role":"brand_hero_dark"},
+    {"file":"4da38778134ae0fc6f4fb0046521903b.jpg","role":"water_ripple_background"},
+    {"file":"ad7fdca9a4c96a588bcf4a1b32e51dfc.jpg","role":"lotus_water_detail"},
+    {"file":"4c530d2deb3ef020035785473069f515.jpg","role":"lotus_feature"},
+    {"file":"583b1a5a3cce643fd29cd8e93235b652.jpg","role":"leaf_detail"},
+    {"file":"b61c22e45b9bc13ec6650a7056c185fe.jpg","role":"leaf_water_detail"},
+    {"file":"63e564576dd8f9b297c3cdaf228f1880.jpg","role":"lotus_bud"},
+    {"file":"7f5f1d7210bc53f6614ac0118b902044.jpg","role":"store_reference_01"},
+    {"file":"32f4c3f995e1c6f5ff85ab9dc5cc7025.jpg","role":"store_reference_02"}
+  ]
+}

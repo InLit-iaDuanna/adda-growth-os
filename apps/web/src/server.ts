@@ -1,4 +1,6 @@
 import http, { type IncomingMessage, type Server, type ServerResponse } from 'node:http';
+import { readFile } from 'node:fs/promises';
+import { resolve, extname } from 'node:path';
 import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import { URL } from 'node:url';
 import { readConfig, validateConfig, connectorSnapshot, type AppConfig } from '../../../packages/adapters/src/config';
@@ -30,6 +32,8 @@ import { DomainError, timestampInput, requireTimeRange } from '../../../packages
 import { renderAdminPage, renderConsumerPage } from './ui';
 
 const MAX_BODY_BYTES = 256 * 1024;
+const PUBLIC_ROOT = resolve(process.cwd(), 'apps/web/public/assets');
+const PUBLIC_TYPES: Record<string, string> = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.json': 'application/json; charset=utf-8' };
 
 function sessionCookie(config: AppConfig, value: string, maxAge: number): string {
   // Production requires HTTPS; local modes support HTTP.
@@ -95,6 +99,20 @@ async function route(
   if (method === 'OPTIONS') {
     res.writeHead(204, { 'access-control-allow-origin': 'same-origin', 'access-control-allow-headers': 'content-type,x-csrf-token' });
     res.end();
+    return;
+  }
+
+  const assetMatch = pathname.match(/^\/assets\/(.+)$/);
+  if (method === 'GET' && assetMatch) {
+    const relative = decodeURIComponent(assetMatch[1]);
+    if (relative.includes('\0') || relative.split('/').some((part) => part === '..')) { res.writeHead(400); res.end('invalid_asset_path'); return; }
+    const filePath = resolve(PUBLIC_ROOT, relative);
+    if (!filePath.startsWith(`${PUBLIC_ROOT}/`)) { res.writeHead(400); res.end('invalid_asset_path'); return; }
+    try {
+      const body = await readFile(filePath);
+      res.writeHead(200, { 'content-type': PUBLIC_TYPES[extname(filePath).toLowerCase()] || 'application/octet-stream', 'cache-control': 'public, max-age=3600', 'x-content-type-options': 'nosniff' });
+      res.end(body);
+    } catch { res.writeHead(404); res.end('asset_not_found'); }
     return;
   }
 
