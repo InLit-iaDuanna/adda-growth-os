@@ -46,6 +46,8 @@ D039（2026-09-24 前端结构重构）：将后台/顾客页 CSS 与共享 HTML
 
 D040（2026-09-24 甲方素材）：SUIWU 随物作为母品牌，ADDA 作为子品牌；甲方提供的 JPG 进入本地品牌资源清单，授权范围确认前状态保持 `needs_confirmation`，仅用于界面演示与参考。
 
+D041（2026-09-25 CodeBuddy CLI provider）：真实模型调用采用显式 `AI_PROVIDER=codebuddy_cli` 开关，默认仍为 `deterministic_offline`。CodeBuddy 每次以独立会话、单回合、无工具、超时和输出上限运行；内容写作与增长 Agent 使用不同角色提示词。服务端只把当前租户/门店的冻结批准事实和指标交给模型，并锁定来源、身份、预算、权限和孟语复核状态；JSON 或领域合同失败返回 `external_blocked`/`ai_output_invalid`，不回退成确定性假成功。真实冒烟只使用合成 demo 数据，证据保存在 `artifacts/G04/` 和 `artifacts/G08/`。持久化后台 control-run worker 仍保持离线确定性执行，待异步 provider bridge 单独验收。
+
 
 ## D2026-09-25 — Uploaded-source unified implementation
 

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "scope": "whole uploaded application / local file-dev integration",
-  "recorded_at": "2026-09-25T16:29:51.090Z",
+  "recorded_at": "2026-09-25T18:39:26.534Z",
   "toolchain": {
     "node": "v22.22.0",
     "npm": "10.9.4",
-    "typescript": "not_installed",
-    "node_types": "not_installed",
-    "tsx": "not_installed",
+    "typescript": "5.9.3",
+    "node_types": "22.20.4",
+    "tsx": "4.23.15",
     "platform": "darwin",
     "arch": "arm64"
   },
@@ -76,7 +76,7 @@
     },
     {
       "path": "apps/web/src/server.ts",
-      "sha256": "c580c71edda3f5f2a435e4db83a32879b725b3f4bf976bfd34b5788fa08f59ae"
+      "sha256": "52dffeb9de1e92c2c5924e472e47d6d6b481ca1a6d158609a1d611ae36239b8f"
     },
     {
       "path": "apps/web/src/ui.ts",
@@ -228,15 +228,19 @@
     },
     {
       "path": "package.json",
-      "sha256": "4d727080c0d1dc81e603cdb94ebb7eb10f2d3184d130108c7b563b0dece2d8ac"
+      "sha256": "0c8a5577284af407971a063be84b51e3172e4faa86413d845679407927ba7f7e"
     },
     {
       "path": "packages/adapters/package.json",
       "sha256": "552048e49a72dfcee1e630a3e97fbe0ec78d2a749f05b552b27241ef3bfc44d7"
     },
     {
+      "path": "packages/adapters/src/codebuddy.ts",
+      "sha256": "5bd88279c6c2a03d28502f75a5a7afa29f981dfa3e7502830185885be30ae48a"
+    },
+    {
       "path": "packages/adapters/src/config.ts",
-      "sha256": "59a4c82b61d124c1aefc57f3405318c1080e8adb31226181c63a559f8f14a7c3"
+      "sha256": "16f45175dfe933f872a4005f6a36fdc397d30e8bd05c1d9389e47169d65357c3"
     },
     {
       "path": "packages/adapters/src/control-worker.ts",
@@ -380,7 +384,7 @@
     },
     {
       "path": "packages/testing/src/http.ts",
-      "sha256": "501e03dfd8b20e1ce3bdcf957e7bcca772b88aef0652400b2a97cfcfa561a453"
+      "sha256": "5a3e5a6889182f95b62a64c6c1e7a17a0bc531dce481f9955e1c2cab6ef36059"
     },
     {
       "path": "packages/ui/package.json",
@@ -417,6 +421,10 @@
     {
       "path": "scripts/restore.ts",
       "sha256": "90fb203c37113ba707f83555ed1b3a48e00fc499e79adb501018fbb490db5038"
+    },
+    {
+      "path": "scripts/run-codebuddy-roles.mjs",
+      "sha256": "8f9fb890433c14192fdc77f0c09e98248d9fb15401055305e29bdddb78556dd9"
     },
     {
       "path": "scripts/security-scan.mjs",
@@ -473,6 +481,10 @@
     {
       "path": "tests/browser_unified.py",
       "sha256": "c961fb561e77d7b995a1defc4690ec7ec7b1ac37aa531b151a80ba6f45b7661d"
+    },
+    {
+      "path": "tests/codebuddy-provider.test.ts",
+      "sha256": "5b87d0494065d1a5088cd276cae02504c3078dd51af6eaffcffcfeac88d21ca9"
     },
     {
       "path": "tests/e2e.test.ts",
@@ -558,42 +570,42 @@
   "checks": [
     {
       "command": "npm run lint",
-      "started_at": "2026-09-25T16:29:49.264Z",
-      "finished_at": "2026-09-25T16:29:49.597Z",
-      "exit_code": 127,
-      "passed": false,
+      "started_at": "2026-09-25T18:39:00.003Z",
+      "finished_at": "2026-09-25T18:39:01.646Z",
+      "exit_code": 0,
+      "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/lint.log",
-      "log_sha256": "964c3eeb4802a627cdbdae3b0335a6a896f3cc0ee41fdb963678aa971fabd393"
+      "log_sha256": "aeeebd6b5fa6d01c5561041747e15fa510ca99ec44c0e9555b8aa8f6453aceb4"
     },
     {
       "command": "npm run typecheck",
-      "started_at": "2026-09-25T16:29:49.601Z",
-      "finished_at": "2026-09-25T16:29:49.834Z",
-      "exit_code": 127,
-      "passed": false,
+      "started_at": "2026-09-25T18:39:01.648Z",
+      "finished_at": "2026-09-25T18:39:03.289Z",
+      "exit_code": 0,
+      "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/typecheck.log",
-      "log_sha256": "a3dce3a9c88d0084b9565476869cbfa19053329e6a6f13df5bf0162a8d2584f1"
+      "log_sha256": "9c70ce5af264cb124b313b4ef52c73ad638d6dde700c4d774207eadb4da27acf"
     },
     {
       "command": "npm run build",
-      "started_at": "2026-09-25T16:29:49.834Z",
-      "finished_at": "2026-09-25T16:29:50.010Z",
-      "exit_code": 127,
-      "passed": false,
+      "started_at": "2026-09-25T18:39:03.290Z",
+      "finished_at": "2026-09-25T18:39:05.219Z",
+      "exit_code": 0,
+      "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/build.log",
-      "log_sha256": "65555a1f63b4d6a2af788d4ec0637d4916e21ab5ead8f7e0b874f0ec61e78c6c"
+      "log_sha256": "be9a97b9fdcb69f73a42e992a6334241cf867e384e2517bebdac1ed4f273c611"
     },
     {
       "command": "npm run test",
-      "started_at": "2026-09-25T16:29:50.011Z",
-      "finished_at": "2026-09-25T16:29:50.362Z",
-      "exit_code": 127,
-      "passed": false,
+      "started_at": "2026-09-25T18:39:05.220Z",
+      "finished_at": "2026-09-25T18:39:26.039Z",
+      "exit_code": 0,
+      "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/test.log",
-      "log_sha256": "da9ec2842bd9e7f152c698a170bffc7d9b90cada48a1833327fd0c67d1233c59",
+      "log_sha256": "7d37e3113f374794935ca0b92060141fe4efc7cd84c49e4a000193e78b217d9e",
       "tests": {
-        "total": 0,
-        "passed": 0,
+        "total": 147,
+        "passed": 147,
         "failed": 0,
         "skipped": 0,
         "cancelled": 0
@@ -601,8 +613,8 @@
     },
     {
       "command": "npm run test:ai",
-      "started_at": "2026-09-25T16:29:50.362Z",
-      "finished_at": "2026-09-25T16:29:50.556Z",
+      "started_at": "2026-09-25T18:39:26.039Z",
+      "finished_at": "2026-09-25T18:39:26.202Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/test-ai.log",
@@ -610,8 +622,8 @@
     },
     {
       "command": "npm run fixtures:verify",
-      "started_at": "2026-09-25T16:29:50.556Z",
-      "finished_at": "2026-09-25T16:29:50.834Z",
+      "started_at": "2026-09-25T18:39:26.202Z",
+      "finished_at": "2026-09-25T18:39:26.372Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/fixtures-verify.log",
@@ -619,12 +631,12 @@
     },
     {
       "command": "npm run security:scan",
-      "started_at": "2026-09-25T16:29:50.835Z",
-      "finished_at": "2026-09-25T16:29:51.084Z",
+      "started_at": "2026-09-25T18:39:26.372Z",
+      "finished_at": "2026-09-25T18:39:26.529Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/security-scan.log",
-      "log_sha256": "52b486bbb930b56861827ac4763ec7020447857cd3e5cb5ddc9801f693054d59"
+      "log_sha256": "5073eda3d10c0ef8eddc5ca0859dffbba01a65a01338aaaf8bd9eba4c0ef7d9f"
     }
   ],
   "limits": {

@@ -47,6 +47,7 @@
     "test:validation-evidence": "node --test tests/validation-evidence.test.mjs",
     "test:usability-regressions": "node --test --import tsx tests/usability-regressions.test.ts",
     "test:codebuddy-ai": "node scripts/test-codebuddy-ai.mjs",
+    "ai:roles": "npm run build && node scripts/run-codebuddy-roles.mjs",
     "test:compiled": "node scripts/test-compiled.mjs",
     "test:unified": "npm run build && node --test dist/tests/ab-workspace.test.js dist/tests/unified-backend.test.js",
     "test:browser": "node scripts/browser-tests.mjs",

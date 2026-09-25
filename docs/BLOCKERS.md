@@ -14,7 +14,7 @@
 
 - PostgreSQL 适配器、生产事务和迁移尚未实现。Docker 可用也不能替代这些开发工作。
 - worker 已支持 maintenance 与持久化只读 control run，后者已验证并发、取消和进程中断恢复。真正业务发送、最终发送前重验、外部成功但本地无回执时的恢复与对账尚未接通。
-- 真实模型尚未接入业务技能；缺超时、成本记录和真实任务评测。
+- CodeBuddy CLI 已通过显式开关接入内容写作和同步 Agent 路由，带超时、输出上限和领域合同校验；仍缺模型成本结算、异步 worker bridge、真实任务评测和人工语言验收。默认演示继续使用离线确定性 provider。
 - 缺受控的生产 OWNER 创建/邀请入口。演示界面已覆盖主要本地操作，但生产环境仍不能独立完成约定业务流程。
 - 触达失败或未知结果会保守保留额度；尚无人工对账及释放预算的界面。不能用新请求键强行重发。
 
@@ -32,4 +32,4 @@ B01–B05 和验收记录 A01 使用合成数据、HTTP/仓储及临时工程测
 
 ## 2026-09-23 本地界面复审
 
-独立的 [项目复审报告](../reports/PROJECT_REVIEW_2026-09-23.md)记录了 Computer Use 对九个后台模块、顾客流程和手机视口的操作，以及 CodeBuddy CLI 对合成事实的真实模型冒烟测试。该测试不构成业务运行时模型接入、真实渠道发送、生产数据库或客户 UAT 的证据。最新自动化门槛见 [验证记录](../artifacts/audit-b01-b05/validation.json)。
+独立的 [项目复审报告](../reports/PROJECT_REVIEW_2026-09-23.md)记录了 Computer Use 对九个后台模块、顾客流程和手机视口的操作；本轮 CodeBuddy CLI 业务运行时和四角色合成证据分别见 [G04](../artifacts/G04/codebuddy-runtime.json)、[G04 角色报告](../artifacts/G04/codebuddy-roles.json) 与 [G08](../artifacts/G08/codebuddy-agent-runtime.json)。这些记录不构成真人孟语验收、真实渠道发送、生产数据库或客户 UAT 的证据。最新自动化门槛见 [验证记录](../artifacts/audit-b01-b05/validation.json)。

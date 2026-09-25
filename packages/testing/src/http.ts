@@ -24,7 +24,12 @@ export async function startTestApp(options: { mode?: 'test' | 'production' | 'de
     sessionTtlSeconds: 3600,
     workerHeartbeatSeconds: 10,
     allowTestOutbox: mode === 'test',
-    databaseAdapter: 'file-dev'
+    databaseAdapter: 'file-dev',
+    aiProvider: 'deterministic_offline',
+    codebuddyBin: 'codebuddy',
+    codebuddyModel: 'deepseek-v4.1-flash',
+    codebuddyTimeoutMs: 120_000,
+    codebuddyMaxOutputBytes: 2_000_000
   };
   const repository = new JsonRepository(dataFile, mode);
   await repository.ensure();

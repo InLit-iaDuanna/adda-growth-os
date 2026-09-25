@@ -17,20 +17,22 @@ import {
 import type { ActorContext, Campaign } from '../../../packages/domain/src/types';
 import type { BrandDocument, BrandRevision, SourceType } from '../../../packages/domain/src/brand';
 import type { SourceLink } from '../../../packages/domain/src/growth';
-import type { ContentPackageData } from '../../../packages/domain/src/content';
+import { validateContentPackage, type ContentPackageData } from '../../../packages/domain/src/content';
+import type { ContentGenerationInput } from '../../../packages/domain/src/content-provider';
 import type { OutreachCampaign, SegmentRule } from '../../../packages/domain/src/crm';
 import { captureContentFacts } from '../../../packages/domain/src/content-policy';
 import { generateDeterministicContent } from '../../../packages/domain/src/content-provider';
+import { runCodeBuddyRole } from '../../../packages/adapters/src/codebuddy';
 import { JsonRepository, verifyPassword, nowIso } from '../../../packages/db/src/repository';
 import { parseMembersCsv, parseOrdersCsv, parseRefundsCsv, type ImportKind } from '../../../packages/domain/src/imports';
 import { calculateMetrics } from '../../../packages/domain/src/metric-service';
-import type { RouterRequest } from '../../../packages/domain/src/control';
+import type { RouterRequest, RouterResult } from '../../../packages/domain/src/control';
 import { runDeterministicRouter } from '../../../packages/domain/src/control-runtime';
-import { queryMetrics, runControl } from '../../../packages/domain/src/control-service';
+import { prepareControlInput, queryMetrics, runControl, validateControlOutput, type ControlEvidence } from '../../../packages/domain/src/control-service';
 import { parseControlRequest } from '../../../packages/domain/src/control-request';
 import { commandControlRun, listControlRuns } from '../../../packages/domain/src/control-runs';
 import { ATTRIBUTION_MODEL } from '../../../packages/domain/src/attribution-policy';
-import { DomainError, timestampInput, requireTimeRange } from '../../../packages/domain/src/validation';
+import { DomainError, explicitTimestamp, timestampInput, requireTimeRange } from '../../../packages/domain/src/validation';
 import { renderAdminPage, renderConsumerPage } from './ui';
 
 const MAX_BODY_BYTES = 256 * 1024;
@@ -509,7 +511,29 @@ async function route(
     if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'control_read_forbidden');
     if (!checkCsrf(req, context)) return csrfFailure(res, requestId);
     const body = await readJson(req);
-    try { const input = parseControlRequest(body); const result = runControl(repository.snapshot(), context.actor, input, nowIso()); sendJson(res, 200, { result, model: { mode: 'deterministic_offline', external_call: false } }); }
+    try {
+      const input = parseControlRequest(body);
+      const asOf = nowIso();
+      if (config.aiProvider === 'codebuddy_cli') {
+        const evidence = prepareControlInput(repository.snapshot(), context.actor, input, asOf);
+        const live = await runCodeBuddyRole(config, { role: 'agent_planner', conversationId: `agent-${requestId}`, prompt: buildAgentPrompt(evidence) });
+        if (!live.ok) {
+          sendJson(res, 503, { status: 'external_blocked', error_code: 'ai_provider_unavailable', provider_error: live.errorCode, message: live.message, retryable: ['timeout', 'process_failed'].includes(live.errorCode), model: { mode: 'codebuddy_cli', role: 'agent_planner', external_call: true, conversation_id: live.conversationId } });
+          return;
+        }
+        const result = normalizeAgentResult(live.value, evidence);
+        try { validateControlOutput(result, evidence); }
+        catch (error) {
+          const code = error instanceof DomainError ? error.code : 'ai_output_invalid';
+          sendJson(res, 422, { status: 'failed', error_code: code, errors: [code], retryable: false, model: { mode: 'codebuddy_cli', role: 'agent_planner', external_call: true, conversation_id: live.conversationId } });
+          return;
+        }
+        sendJson(res, 200, { result, model: { mode: 'codebuddy_cli', role: 'agent_planner', external_call: true, conversation_id: live.conversationId, model: live.model, elapsed_ms: live.elapsedMs } });
+        return;
+      }
+      const result = runControl(repository.snapshot(), context.actor, input, asOf);
+      sendJson(res, 200, { result, model: { mode: 'deterministic_offline', external_call: false } });
+    }
     catch (error) { if (!(error instanceof DomainError)) throw error; sendJson(res, error.status, { error_code: error.code, errors: [error.code], retryable: false }); }
     return;
   }
@@ -922,13 +946,34 @@ async function route(
     const brandNameFact = state.brandFacts.find((fact) => fact.revisionId === approvedRevision.id && (fact.key === 'brand_name' || fact.key.endsWith('.brand_name')) && fact.status === 'approved');
     const sourceLinkId = typeof body.source_link_id === 'string' && state.sourceLinks.some((item) => item.id === body.source_link_id && item.tenantId === context.actor.tenantId && item.campaignId === campaign.id) ? body.source_link_id : null;
     const brief = await repository.createContentBrief({ tenantId: context.actor.tenantId, storeId: campaign.storeId, campaignId: campaign.id, targetMetric: typeof body.target_metric === 'string' ? body.target_metric : 'verified_orders', contentPillar: typeof body.content_pillar === 'string' ? body.content_pillar : 'Campus Adda', channel: typeof body.channel === 'string' ? body.channel : 'manual', productIds: requestedProductIds, assetIds: Array.isArray(body.asset_ids) ? body.asset_ids.filter((item: unknown): item is string => typeof item === 'string') : (campaign.assetIds || []), sourceLinkId, createdBy: context.actor.userId });
-    const generated = generateDeterministicContent({ briefId: brief.id, campaignId: campaign.id, brandRevisionId: approvedRevision.id, brandName: brandNameFact?.value || '', productRefs, channel: brief.channel, contentPillar: brief.contentPillar, targetMetric: brief.targetMetric, sourceLinkId, sourceExcerpt: brandNameFact?.value || 'approved brand revision', hasApprovedAssets: brief.assetIds.length > 0 && brief.assetIds.every((assetId) => state.mediaAssets.some((asset) => asset.id === assetId && asset.rightsStatus === 'approved')) }, unsafeInstruction);
-    if (!generated.ok || !generated.packageData) {
-      sendJson(res, 422, { status: 'failed', error_code: generated.errorCode || 'content_generation_failed', manual_edit_available: true, reason: generated.manualEditReason || 'provider returned no schema-valid package' });
+    const generationInput: ContentGenerationInput = { briefId: brief.id, campaignId: campaign.id, brandRevisionId: approvedRevision.id, brandName: brandNameFact?.value || '', productRefs, channel: brief.channel, contentPillar: brief.contentPillar, targetMetric: brief.targetMetric, sourceLinkId, sourceExcerpt: brandNameFact?.value || 'approved brand revision', hasApprovedAssets: brief.assetIds.length > 0 && brief.assetIds.every((assetId) => state.mediaAssets.some((asset) => asset.id === assetId && asset.rightsStatus === 'approved')) };
+    // Reuse the deterministic guard only for prompt-safety and required-input calculation.
+    const guard = generateDeterministicContent(generationInput, unsafeInstruction);
+    if (!guard.ok || !guard.packageData) {
+      sendJson(res, 422, { status: 'failed', error_code: guard.errorCode || 'content_generation_blocked', manual_edit_available: true, reason: guard.manualEditReason || 'approved facts or instruction safety check failed' });
       return;
     }
-    const revision = await repository.createContentRevision({ briefId: brief.id, tenantId: context.actor.tenantId, packageData: generated.packageData, generationFacts: captureContentFacts(state, brief, generated.packageData), createdBy: context.actor.userId });
-    sendJson(res, 201, { brief: publicContentBrief(brief), revision: publicContentRevision(revision), provider: { mode: 'demo', name: 'deterministic-fake', live: false } });
+    let packageData: ContentPackageData;
+    let provider: Record<string, unknown>;
+    if (config.aiProvider === 'codebuddy_cli') {
+      const live = await runCodeBuddyRole(config, { role: 'content_writer', conversationId: `content-${requestId}`, prompt: buildContentPrompt(generationInput, guard.packageData.needs_input, unsafeInstruction) });
+      if (!live.ok) {
+        sendJson(res, 503, { status: 'external_blocked', error_code: 'ai_provider_unavailable', provider_error: live.errorCode, message: live.message, retryable: ['timeout', 'process_failed'].includes(live.errorCode), manual_edit_available: true, model: { mode: 'codebuddy_cli', role: 'content_writer', external_call: true, conversation_id: live.conversationId } });
+        return;
+      }
+      const normalizedPackage = normalizeLiveContentPackage(live.value, generationInput, guard.packageData.needs_input);
+      if (!normalizedPackage) {
+        sendJson(res, 422, { status: 'failed', error_code: 'ai_output_invalid', manual_edit_available: true, reason: 'CodeBuddy 返回的内容包未通过领域合同校验', model: { mode: 'codebuddy_cli', role: 'content_writer', external_call: true, conversation_id: live.conversationId } });
+        return;
+      }
+      packageData = normalizedPackage;
+      provider = { mode: 'live', name: 'codebuddy-cli', role: 'content_writer', model: live.model, live: true, conversation_id: live.conversationId, elapsed_ms: live.elapsedMs };
+    } else {
+      packageData = guard.packageData;
+      provider = { mode: 'demo', name: 'deterministic-fake', live: false };
+    }
+    const revision = await repository.createContentRevision({ briefId: brief.id, tenantId: context.actor.tenantId, packageData, generationFacts: captureContentFacts(state, brief, packageData), createdBy: context.actor.userId });
+    sendJson(res, 201, { brief: publicContentBrief(brief), revision: publicContentRevision(revision), provider });
     return;
   }
 
@@ -1837,6 +1882,136 @@ function publicImport(batch: any): Record<string, unknown> {
 
 function publicImportError(error: any): Record<string, unknown> {
   return { row_number: error.rowNumber, code: error.code, message: error.message };
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+function stringItems(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.trim().length > 0).map((item) => item.trim()) : [];
+}
+
+function buildContentPrompt(input: ContentGenerationInput, requiredNeedsInput: string[], operatorInstruction: string): string {
+  const locked = {
+    brief_id: input.briefId, campaign_id: input.campaignId, brand_revision_id: input.brandRevisionId,
+    target_metric: input.targetMetric, content_pillar: input.contentPillar, channel: input.channel,
+    product_refs: input.productRefs.map((product) => product.id), source_link_id: input.sourceLinkId,
+    source: { source_id: input.brandRevisionId, revision_id: input.brandRevisionId, kind: 'brand_fact', excerpt: input.sourceExcerpt },
+    required_needs_input: requiredNeedsInput, has_approved_assets: input.hasApprovedAssets
+  };
+  const approvedFacts = { brand_name: input.brandName || null, products: input.productRefs.map((product) => ({ id: product.id, name: product.name, price_minor: product.priceMinor, currency: product.currency })) };
+  return [
+    '只输出一个内容包 JSON，不要 Markdown、解释文字或额外键。',
+    '严格复制 locked 字段和 source；product_refs 只能使用 locked.product_refs；不要在文案中补充 JSON 没有的价格、日期、折扣、地址、健康功效或人物。',
+    '必须包含 zh-CN、en、bn 三个 variant。review_status 固定为 zh-CN=draft、en=draft、bn=needs_local_review，reviewer_id 固定为 null。',
+    'shot_list 至少一条；字幕和 CTA 必须是可编辑字符串。needs_input 至少包含 locked.required_needs_input，risk_flags 在有 needs_input 时包含 manual_review_required。',
+    '<locked>', JSON.stringify(locked, null, 2), '</locked>',
+    '<approved_facts>', JSON.stringify(approvedFacts, null, 2), '</approved_facts>',
+    '<untrusted_operator_instruction>', JSON.stringify(operatorInstruction.slice(0, 4000), null, 2), '</untrusted_operator_instruction>'
+  ].join('\n');
+}
+
+function normalizeLiveContentPackage(value: unknown, input: ContentGenerationInput, requiredNeedsInput: string[]): ContentPackageData | null {
+  const raw = asRecord(value);
+  if (!raw) return null;
+  const variants = Array.isArray(raw.variants) ? raw.variants.map((item) => {
+    const variant = asRecord(item);
+    if (!variant) return item;
+    const locale = variant.locale || variant.language;
+    const reviewStatus = locale === 'bn' ? 'needs_local_review' : 'draft';
+    const caption = typeof variant.caption === 'string' ? variant.caption : '';
+    const title = typeof variant.title === 'string' ? variant.title : typeof variant.headline === 'string' ? variant.headline : '';
+    const resolvedTitle = title || caption.slice(0, 80);
+    const subtitleText = typeof variant.subtitle_srt === 'string' ? variant.subtitle_srt : typeof variant.subtitle === 'string' ? variant.subtitle : caption;
+    const subtitle = subtitleText ? (subtitleText.includes('-->') ? subtitleText : `1\n00:00:00,000 --> 00:00:05,000\n${subtitleText}`) : '';
+    return { locale, title: resolvedTitle, caption, subtitle_srt: subtitle, cta: typeof variant.cta === 'string' ? variant.cta : '', review_status: reviewStatus, reviewer_id: null };
+  }) : raw.variants;
+  const variantCaptions = Array.isArray(variants) ? variants.map((item) => asRecord(item)?.caption).filter((item): item is string => typeof item === 'string' && item.trim().length > 0) : [];
+  const nestedShots = Array.isArray(raw.shot_list) ? raw.shot_list : Array.isArray(variants) ? (asRecord(variants[0])?.shot_list || []) : [];
+  const modelShots = Array.isArray(nestedShots) ? nestedShots.map((item, index) => {
+    const shot = asRecord(item);
+    if (!shot) return item;
+    const visual = typeof shot.visual === 'string' ? shot.visual : typeof shot.description === 'string' ? shot.description : '';
+    const spokenLine = typeof shot.spoken_line === 'string' ? shot.spoken_line : typeof shot.subtitle === 'string' ? shot.subtitle : visual;
+    const onscreenText = typeof shot.onscreen_text === 'string' ? shot.onscreen_text : typeof shot.subtitle === 'string' ? shot.subtitle : '';
+    return { index: Number.isSafeInteger(shot.index) ? shot.index : index + 1, duration_seconds: typeof shot.duration_seconds === 'number' ? shot.duration_seconds : 5, visual, spoken_line: spokenLine, onscreen_text: onscreenText, rights_needed: Array.isArray(shot.rights_needed) ? shot.rights_needed : ['asset_use_approved'] };
+  }) : raw.shot_list;
+  const candidate: Record<string, unknown> = {
+    brief_id: input.briefId, campaign_id: input.campaignId, brand_revision_id: input.brandRevisionId,
+    target_metric: input.targetMetric, content_pillar: input.contentPillar, channel: input.channel,
+    product_refs: input.productRefs.map((product) => product.id), source_link_id: input.sourceLinkId,
+    hook_variants: stringItems(raw.hook_variants).length ? stringItems(raw.hook_variants) : variantCaptions.slice(0, 3),
+    shot_list: modelShots,
+    operator_notes_zh: typeof raw.operator_notes_zh === 'string' && raw.operator_notes_zh.trim() ? raw.operator_notes_zh : '仅使用已批准事实和素材；孟语必须由指定复核人确认。',
+    sources: [{ source_id: input.brandRevisionId, revision_id: input.brandRevisionId, kind: 'brand_fact', excerpt: input.sourceExcerpt }],
+    variants,
+    needs_input: [...new Set([...requiredNeedsInput, ...stringItems(raw.needs_input)])],
+    risk_flags: [...new Set([...stringItems(raw.risk_flags), ...(requiredNeedsInput.length ? ['manual_review_required'] : [])])]
+  };
+  const errors = validateContentPackage(candidate);
+  if (errors.length) return null;
+  const normalizedVariants = candidate.variants as Array<Record<string, unknown>>;
+  const locales = normalizedVariants.map((variant) => variant.locale);
+  if (normalizedVariants.length !== 3 || new Set(locales).size !== 3 || !['zh-CN', 'en', 'bn'].every((locale) => locales.includes(locale))) return null;
+  for (const variant of normalizedVariants) {
+    if (typeof variant.title !== 'string' || !variant.title.trim() || typeof variant.caption !== 'string' || typeof variant.subtitle_srt !== 'string' || typeof variant.cta !== 'string' || !variant.cta.trim() || variant.reviewer_id !== null) return null;
+  }
+  const shots = candidate.shot_list as Array<Record<string, unknown>>;
+  if (!shots.every((shot) => shot && typeof shot === 'object' && Number.isSafeInteger(shot.index) && typeof shot.duration_seconds === 'number' && typeof shot.visual === 'string' && typeof shot.spoken_line === 'string' && typeof shot.onscreen_text === 'string' && Array.isArray(shot.rights_needed) && shot.rights_needed.every((item) => typeof item === 'string'))) return null;
+  return candidate as unknown as ContentPackageData;
+}
+
+function buildAgentPrompt(evidence: ControlEvidence): string {
+  const request = { ...evidence.request, prompt: evidence.request.prompt.slice(0, 4000) };
+  const locked = {
+    skill: evidence.request.skill, as_of: evidence.asOf, owner_user_id: evidence.ownerUserId, tenant_scope: evidence.tenantId,
+    store_ids: evidence.storeIds, budget_minor: 0, max_steps: evidence.request.maxSteps ?? 6, max_retries: evidence.request.maxRetries ?? 2,
+    deadline_seconds: evidence.request.deadlineSeconds ?? 180, metric_evidence: evidence.metrics, source_records: evidence.records,
+    required_needs_input: evidence.needsInput, allowed_reference_ids: [...evidence.metrics.map((metric) => metric.id), ...evidence.records.map((record) => record.id)]
+  };
+  return [
+    '只输出 RouterResult JSON，不要 Markdown 或解释文字。',
+    '输出必须是合法 JSON 对象，双引号包裹键和值；不要代码围栏、注释、NaN、尾逗号或对象外文字。可以复制下面的最小骨架，再填入观察和建议。',
+    'locked 字段是服务端事实，必须原样使用；metricEvidence、sourceRecords、skill、limits 不得改写。',
+    '观察、假设和 proposedActions 的 sourceRefs/evidenceRefs 只能引用 allowed_reference_ids；最多 3 个建议。每个建议必须完整包含 title、ownerUserId、dueAt、budgetMinor、guardrails、evidenceRefs 六个字段：ownerUserId 必须是 locked.owner_user_id，budgetMinor 必须为 0，dueAt 使用完整 ISO 8601 时间（例如 2026-10-01T09:00:00.000Z），guardrails 和 evidenceRefs 使用字符串数组；不确定时 proposedActions 输出空数组。',
+    '如果 required_needs_input 非空，status 必须是 needs_input；不能执行发送、支付、导出、SQL、shell 或任何外部动作。',
+    '<locked>', JSON.stringify(locked, null, 2), '</locked>',
+    '<request_data>', JSON.stringify(request, null, 2), '</request_data>',
+    '<json_skeleton>', JSON.stringify({ skill: evidence.request.skill, status: evidence.needsInput.length ? 'needs_input' : 'completed', observations: [], hypotheses: [], proposedActions: [], metricEvidence: evidence.metrics, sourceRecords: evidence.records, needsInput: evidence.needsInput, limits: { maxSteps: evidence.request.maxSteps ?? 6, maxRetries: evidence.request.maxRetries ?? 2, deadlineSeconds: evidence.request.deadlineSeconds ?? 180, budgetMinor: 0 } }, null, 2), '</json_skeleton>'
+  ].join('\n');
+}
+
+function normalizeAgentResult(value: unknown, evidence: ControlEvidence): RouterResult {
+  const raw = asRecord(value) || {};
+  const allowedRefs = new Set([...evidence.metrics.map((metric) => metric.id), ...evidence.records.map((record) => record.id)]);
+  const observations = Array.isArray(raw.observations) ? raw.observations.filter((item) => {
+    const row = asRecord(item);
+    return Boolean(row && typeof row.text === 'string' && Array.isArray(row.sourceRefs) && row.sourceRefs.every((ref) => typeof ref === 'string' && allowedRefs.has(ref)));
+  }) : [];
+  const hypotheses = Array.isArray(raw.hypotheses) ? raw.hypotheses.filter((item) => {
+    const row = asRecord(item);
+    return Boolean(row && typeof row.text === 'string' && Array.isArray(row.evidenceRefs) && row.evidenceRefs.every((ref) => typeof ref === 'string' && allowedRefs.has(ref)));
+  }) : [];
+  const actionInput = Array.isArray(raw.proposedActions) ? raw.proposedActions : [];
+  const proposedActions = actionInput.filter((item) => {
+    const action = asRecord(item);
+    return Boolean(action && typeof action.title === 'string' && explicitTimestamp(action.dueAt) && Array.isArray(action.guardrails) && action.guardrails.every((guardrail) => typeof guardrail === 'string') && Array.isArray(action.evidenceRefs) && action.evidenceRefs.every((ref) => typeof ref === 'string' && allowedRefs.has(ref)));
+  }).slice(0, 3).map((item) => ({ ...item as Record<string, unknown>, ownerUserId: evidence.ownerUserId, budgetMinor: 0 }));
+  const droppedModelOutput = observations.length !== (Array.isArray(raw.observations) ? raw.observations.length : 0) || hypotheses.length !== (Array.isArray(raw.hypotheses) ? raw.hypotheses.length : 0) || proposedActions.length !== actionInput.length;
+  const needsInput = [...new Set([...evidence.needsInput, ...stringItems(raw.needsInput), ...(droppedModelOutput ? ['model_output_needs_review'] : [])])];
+  const status = needsInput.length ? 'needs_input' : raw.status;
+  return {
+    skill: evidence.request.skill,
+    status,
+    observations,
+    hypotheses,
+    proposedActions,
+    metricEvidence: evidence.metrics,
+    sourceRecords: evidence.records,
+    needsInput,
+    limits: { maxSteps: evidence.request.maxSteps ?? 6, maxRetries: evidence.request.maxRetries ?? 2, deadlineSeconds: evidence.request.deadlineSeconds ?? 180, budgetMinor: 0 }
+  } as unknown as RouterResult;
 }
 
 function sendJson(res: ServerResponse, status: number, payload: unknown): void {

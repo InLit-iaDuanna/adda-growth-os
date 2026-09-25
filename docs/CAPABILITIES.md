@@ -8,7 +8,7 @@ DOM + 真实 HTTP 桥检查 **89** 项通过；它不是原生浏览器 E2E。[�
 
 | 能力 | 当前状态 | 实现/测试 | 边界 |
 |---|---|---|---|
-| 持久化只读 Agent 编排 | 完整应用 HTTP / 文件并发回归通过 | [packages/domain/src/control-runs.ts](../packages/domain/src/control-runs.ts)、[packages/adapters/src/control-worker.ts](../packages/adapters/src/control-worker.ts)、[tests/unified-backend.test.ts](../tests/unified-backend.test.ts) | 固定四个流程、七种确定性只读技能；真实模型调用和外部动作不在此执行器内。 |
+| 持久化只读 Agent 编排 | 完整应用 HTTP / 文件并发回归通过 | [packages/domain/src/control-runs.ts](../packages/domain/src/control-runs.ts)、[packages/adapters/src/control-worker.ts](../packages/adapters/src/control-worker.ts)、[tests/unified-backend.test.ts](../tests/unified-backend.test.ts) | 固定四个流程、七种只读技能；持久化后台执行器仍为确定性模式，真实 provider 走独立的同步路由。 |
 | SUIWU / ADDA 多端统一 | 统一源码、真实 API、DOM 检查通过 | [packages/ui/src/theme.ts](../packages/ui/src/theme.ts)、[apps/web/src/ui/admin-page.ts](../apps/web/src/ui/admin-page.ts)、[apps/web/src/ui/consumer-page.ts](../apps/web/src/ui/consumer-page.ts)、[tests/browser_unified.py](../tests/browser_unified.py) | 运营、审核、收银与顾客 H5；89 项 DOM/HTTP 桥检查不是浏览器原生 Cookie、导航和存储验收。 |
 | 批准历史与重复领券 | 真实 HTTP / 仓储并发回归通过 | [tests/unified-backend.test.ts](../tests/unified-backend.test.ts)、[packages/db/src/repository.ts](../packages/db/src/repository.ts) | 历史批准内容 append-only；同会员同优惠一次领取，重复请求重用令牌；真实供应商副作用仍关闭。 |
 | 报表与任务门店权限 | 离线回归通过 | [tests/audit-n01-n08.test.ts](../tests/audit-n01-n08.test.ts)、[packages/domain/src/report-policy.ts](../packages/domain/src/report-policy.ts) | 已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。 |
@@ -22,8 +22,8 @@ DOM + 真实 HTTP 桥检查 **89** 项通过；它不是原生浏览器 E2E。[�
 | WhatsApp 协议 | 本地协议测试通过 | [tests/whatsapp-remediation.test.ts](../tests/whatsapp-remediation.test.ts)、[tests/g07-g10.test.ts](../tests/g07-g10.test.ts) | 无真实 WABA 联调；发送适配器未接入业务 worker。 |
 | 生产数据库 | 内部未实现 | [packages/adapters/src/config.ts](../packages/adapters/src/config.ts) | 当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。 |
 | 发送与对账 worker | 内部未实现 | [apps/worker/src/index.ts](../apps/worker/src/index.ts) | 现已支持持久化只读 control run 与 maintenance；真实渠道发送、最终发送前授权和人工回执对账 worker 仍未接通。 |
-| 真实模型技能 | 内部未实现 | [packages/domain/src/content-provider.ts](../packages/domain/src/content-provider.ts) | 使用确定性生成；缺 provider 接入、成本记录及真人评测。 |
+| CodeBuddy CLI 真实模型技能 | 合成数据运行通过 | [packages/adapters/src/codebuddy.ts](../packages/adapters/src/codebuddy.ts)、[apps/web/src/server.ts](../apps/web/src/server.ts)、[artifacts/G04/codebuddy-runtime.json](../artifacts/G04/codebuddy-runtime.json)、[artifacts/G08/codebuddy-agent-runtime.json](../artifacts/G08/codebuddy-agent-runtime.json) | 显式 `AI_PROVIDER=codebuddy_cli` 后，content_writer 和 agent_planner 通过无工具单回合会话运行；默认离线。缺模型成本结算、异步 worker bridge、真人任务/孟语质量验收。 |
 | 生产初始化与客户界面 | 部分实现 | [apps/web/src/ui.ts](../apps/web/src/ui.ts)、[tests/e2e.test.ts](../tests/e2e.test.ts) | 运营、语言审核、收银和顾客端已共用主题并连接实际 API；受控生产 OWNER 初始化/邀请未实现；原生浏览器导航验收待执行。 |
 | 真实渠道与客户验收 | 内部开发及外部条件均待完成 | [docs/BLOCKERS.md](../docs/BLOCKERS.md) | 需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。 |
 
-旧证据及旧规格保留，不代表本轮生产验收。历史生成页面见 CAPABILITIES_HISTORY_PRE_UNIFIED.md；原 `validate:release` / `capabilities` 脚本仍为历史格式的全门槛校验，须完成其实际运行后才能生成相应记录。本次本地记录使用 `validate:unified`。真实模型、外部渠道、生产数据库和客户 UAT 均没有因此变为完成。
+旧证据及旧规格保留，不代表本轮生产验收。历史生成页面见 CAPABILITIES_HISTORY_PRE_UNIFIED.md；原 `validate:release` / `capabilities` 脚本仍为历史格式的全门槛校验，须完成其实际运行后才能生成相应记录。本次本地记录使用 `validate:unified`。CodeBuddy 的合成运行已验证，但模型成本结算、异步桥接、外部渠道、生产数据库和客户 UAT 均没有因此变为完成。

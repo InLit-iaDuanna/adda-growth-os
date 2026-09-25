@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-25T18:24:55Z",
+  "scope": "synthetic demo tenant only",
+  "provider": "codebuddy-cli",
+  "model": "deepseek-v4.1-flash",
+  "commands": [
+    {
+      "command": "AI_PROVIDER=codebuddy_cli CODEBUDDY_TIMEOUT_MS=180000 APP_MODE=demo PORT=3110 ADDA_DATA_FILE=./data/local-demo.json node dist/apps/web/src/server.js",
+      "purpose": "start an isolated local web process with the live provider explicitly enabled",
+      "observed": "listening on 127.0.0.1:3110"
+    },
+    {
+      "command": "authenticated POST /api/content/generate with the synthetic campaign, approved synthetic brand revision, approved synthetic price and approved synthetic asset",
+      "http_status": 201,
+      "provider_mode": "live",
+      "role": "content_writer",
+      "revision_status": "needs_local_review",
+      "observed": "三语言草稿已持久化；来源、活动、产品、素材由服务端绑定；bn 未自动通过复核"
+    },
+    {
+      "command": "authenticated POST /api/control/route with skill=growth_analyst and allowed_tools=[metric_query]",
+      "http_status": 200,
+      "provider_mode": "codebuddy_cli",
+      "role": "agent_planner",
+      "result_status": "needs_input",
+      "observed": "指标缺少导入水位，模型建议被限制为零预算人工复核；metricEvidence/sourceRecords 使用服务端冻结值"
+    }
+  ],
+  "failed_attempts_preserved": [
+    { "provider_error": "timeout", "http_status": 503, "reason": "模型响应超过当次配置的超时" },
+    { "error_code": "ai_output_invalid", "http_status": 422, "reason": "模型返回字段不符合内容合同，未写入 revision" }
+  ],
+  "limits": [
+    "本记录只使用合成 demo 数据，不是客户数据或生产验收",
+    "没有发送消息、支付、导出联系人或其他外部副作用",
+    "CodeBuddy CLI 运行依赖本机登录和模型可用性，超时/格式失败保持 external_blocked 或 ai_output_invalid"
+  ]
+}

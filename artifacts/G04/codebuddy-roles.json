@@ -1,0 +1,224 @@
+{
+  "generated_at": "2026-09-25T18:40:18.122Z",
+  "provider": "codebuddy-cli",
+  "model": "deepseek-v4.1-flash",
+  "synthetic_only": true,
+  "conversations": [
+    {
+      "role": "data_generator",
+      "conversationId": "demo-data-generator",
+      "model": "deepseek-v4.1-flash",
+      "ok": true,
+      "value": {
+        "tenant": "synthetic_demo_only",
+        "store": "synthetic_store_only",
+        "dataset_kind": "synthetic_campaign_rows",
+        "requires_external_action": false,
+        "rows": [
+          {
+            "id": "camp_row_synthetic_001",
+            "campaign": "Campus Adda",
+            "status": "synthetic_draft",
+            "value": 0
+          },
+          {
+            "id": "camp_row_synthetic_002",
+            "campaign": "Campus Adda",
+            "status": "synthetic_draft",
+            "value": 0
+          },
+          {
+            "id": "camp_row_synthetic_003",
+            "campaign": "Campus Adda",
+            "status": "synthetic_draft",
+            "value": 0
+          }
+        ],
+        "field_notes": {
+          "value": "Placeholder only; 0 means no figure is asserted. Not a price, revenue, count goal, discount or any real operating metric.",
+          "status": "synthetic_draft is a non-live label; no dispatch, spend or approval is implied."
+        },
+        "provenance": {
+          "source_id": "brand_rev_synthetic_01",
+          "source_excerpt": "Synthetic approved fact: brand name ADDA TEA.",
+          "product_id": "prod_synthetic_tea",
+          "product_name": "Approved tea",
+          "price_minor": null,
+          "currency": "BDT"
+        },
+        "omitted_claims": [
+          "price",
+          "date",
+          "discount",
+          "address",
+          "performance_metric",
+          "real_person"
+        ],
+        "needs_input": [
+          "What does `value` represent (metric name and unit) and in what range should synthetic placeholders fall?"
+        ]
+      },
+      "elapsedMs": 8499
+    },
+    {
+      "role": "agent_planner",
+      "conversationId": "demo-agent-planner",
+      "model": "deepseek-v4.1-flash",
+      "ok": true,
+      "value": {
+        "skill": "growth_analyst",
+        "status": "needs_input",
+        "observations": [],
+        "hypotheses": [],
+        "proposedActions": [],
+        "metricEvidence": [],
+        "sourceRecords": [],
+        "needsInput": [
+          "synthetic_metric_only"
+        ],
+        "limits": {
+          "maxSteps": 6,
+          "maxRetries": 2,
+          "deadlineSeconds": 180,
+          "budgetMinor": 0
+        },
+        "locked": {
+          "tenant": "synthetic_demo_only",
+          "store": "synthetic_store_only",
+          "brand_name": "ADDA TEA",
+          "campaign": "Campus Adda",
+          "product": {
+            "id": "prod_synthetic_tea",
+            "name": "Approved tea",
+            "price_minor": null,
+            "currency": "BDT"
+          },
+          "source_id": "brand_rev_synthetic_01",
+          "source_excerpt": "Synthetic approved fact: brand name ADDA TEA.",
+          "restrictions": [
+            "no real people",
+            "no price/date/discount/address claims",
+            "no external actions"
+          ]
+        },
+        "allowed_reference_ids": [
+          "metric_synthetic_01"
+        ]
+      },
+      "elapsedMs": 7277
+    },
+    {
+      "role": "content_writer",
+      "conversationId": "demo-content-writer",
+      "model": "deepseek-v4.1-flash",
+      "ok": true,
+      "value": {
+        "package_id": "pkg_synthetic_campus_adda_01",
+        "tenant": "synthetic_demo_only",
+        "store": "synthetic_store_only",
+        "brand_name": "ADDA TEA",
+        "campaign": "Campus Adda",
+        "product": {
+          "id": "prod_synthetic_tea",
+          "name": "Approved tea",
+          "price_minor": null,
+          "currency": "BDT"
+        },
+        "source_binding": {
+          "source_id": "brand_rev_synthetic_01",
+          "source_excerpt": "Synthetic approved fact: brand name ADDA TEA.",
+          "approved_claims": [
+            "Brand name is ADDA TEA."
+          ],
+          "excluded_claims": [
+            "price",
+            "date",
+            "discount",
+            "address",
+            "health_benefit",
+            "person",
+            "endorsement"
+          ]
+        },
+        "restrictions": [
+          "no real people",
+          "no price/date/discount/address claims",
+          "no external actions"
+        ],
+        "status": "draft_unapproved",
+        "editable": true,
+        "external_actions": {
+          "enabled": false,
+          "note": "No dispatch, publish or send intent is created by this package."
+        },
+        "locales": [
+          {
+            "language": "zh-CN",
+            "needs_local_review": false,
+            "content": {
+              "headline": "ADDA TEA 校园 Adda",
+              "body": "ADDA TEA 推出校园 Adda 主题内容。本期内容以合成演示数据生成，仅用于内部审阅，尚未批准发布。",
+              "cta": "待审批后确认",
+              "notes": "未包含价格、日期、折扣、地址、健康功效或人物信息。"
+            },
+            "review": {
+              "required": false,
+              "reviewer": null,
+              "reason": null
+            }
+          },
+          {
+            "language": "en",
+            "needs_local_review": false,
+            "content": {
+              "headline": "ADDA TEA Campus Adda",
+              "body": "ADDA TEA presents Campus Adda themed content. This draft is generated from synthetic demo data for internal review only and is not approved for publishing.",
+              "cta": "To be confirmed after approval",
+              "notes": "No price, date, discount, address, health benefit or person reference is included."
+            },
+            "review": {
+              "required": false,
+              "reviewer": null,
+              "reason": null
+            }
+          },
+          {
+            "language": "bn",
+            "needs_local_review": true,
+            "content": {
+              "headline": "ADDA TEA ক্যাম্পাস আড্ডা",
+              "body": "ADDA TEA-এর ক্যাম্পাস আড্ডা বিষয়ক খসড়া। এই খসড়াটি কেবল সিন্থেটিক ডেমো ডেটা থেকে তৈরি এবং অভ্যন্তরীণ পর্যালোচনার জন্য, প্রকাশের জন্য অনুমোদিত নয়।",
+              "cta": "অনুমোদনের পরে নিশ্চিত করা হবে",
+              "notes": "মূল্য, তারিখ, ছাড়, ঠিকানা, স্বাস্থ্য-সংক্রান্ত দাবি বা কোনো ব্যক্তির উল্লেখ নেই।"
+            },
+            "review": {
+              "required": true,
+              "reviewer": null,
+              "reason": "Bengali copy is machine-drafted and must be reviewed and approved by a qualified local reviewer before any use. No new brand facts may be added during review."
+            }
+          }
+        ]
+      },
+      "elapsedMs": 9975
+    },
+    {
+      "role": "reviewer",
+      "conversationId": "demo-reviewer",
+      "model": "deepseek-v4.1-flash",
+      "ok": true,
+      "value": {
+        "status": "needs_input",
+        "issues": [
+          "未提供任何授权事实（authorized facts）集合，无法核验草稿内容是否被引用或越界。",
+          "source_id 为 brand_rev_synthetic_01，属合成/未验证来源，缺少可追溯的已批准证据。",
+          "草稿混用英文与孟加拉文，其中孟加拉文片段（意为“价格经批准后再发布”）涉及价格发布条件，但无对应经批准的授权依据。",
+          "草稿声明 'Approved tea' 含批准语义，缺少绑定内容哈希/受众快照的批准记录，且模型不得自行批准。"
+        ],
+        "evidence_refs": [
+          "source_id:brand_rev_synthetic_01"
+        ]
+      },
+      "elapsedMs": 7988
+    }
+  ]
+}

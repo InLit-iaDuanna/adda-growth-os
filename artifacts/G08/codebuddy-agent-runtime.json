@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-25T18:24:55Z",
+  "scope": "synthetic demo tenant only",
+  "provider": "codebuddy-cli",
+  "role": "agent_planner",
+  "model": "deepseek-v4.1-flash",
+  "http_status": 200,
+  "result_status": "needs_input",
+  "conversation_id_pattern": "agent-<request-id>",
+  "contract_checks": [
+    "skill is server-selected",
+    "metricEvidence is the frozen query result",
+    "sourceRecords is the frozen authorized record set",
+    "proposedActions are capped at three and budgetMinor is forced to zero",
+    "invalid model references/actions are dropped and add model_output_needs_review",
+    "no tool call or external write is available to CodeBuddy"
+  ],
+  "command": "AI_PROVIDER=codebuddy_cli CODEBUDDY_TIMEOUT_MS=60000 authenticated POST /api/control/route",
+  "limits": [
+    "The live model result is a draft for human review; it does not create a task or send anything.",
+    "Missing metrics remain needs_input and are never replaced with estimated values."
+  ]
+}

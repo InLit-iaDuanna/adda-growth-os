@@ -1,6 +1,7 @@
 import path from 'node:path';
 
 export type AppMode = 'production' | 'demo' | 'test';
+export type AiProviderMode = 'deterministic_offline' | 'codebuddy_cli';
 
 export interface AppConfig {
   mode: AppMode;
@@ -18,6 +19,12 @@ export interface AppConfig {
   whatsappPhoneNumberId?: string;
   whatsappGraphVersion?: string;
   externalWritesEnabled?: boolean;
+  /** The deterministic provider is the safe default. Live CLI calls are opt-in. */
+  aiProvider: AiProviderMode;
+  codebuddyBin: string;
+  codebuddyModel: string;
+  codebuddyTimeoutMs: number;
+  codebuddyMaxOutputBytes: number;
 }
 
 function asMode(value: string | undefined): AppMode {
@@ -28,6 +35,10 @@ function asMode(value: string | undefined): AppMode {
 function asPositiveInt(value: string | undefined, fallback: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+}
+
+function asAiProvider(value: string | undefined): AiProviderMode {
+  return value === 'codebuddy_cli' ? 'codebuddy_cli' : 'deterministic_offline';
 }
 
 /**
@@ -54,7 +65,12 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     whatsappAccessToken: env.WHATSAPP_ACCESS_TOKEN || '',
     whatsappPhoneNumberId: env.WHATSAPP_PHONE_NUMBER_ID || '',
     whatsappGraphVersion: env.WHATSAPP_GRAPH_VERSION || 'v23.0',
-    externalWritesEnabled: env.LIVE_EXTERNAL_WRITES === 'true'
+    externalWritesEnabled: env.LIVE_EXTERNAL_WRITES === 'true',
+    aiProvider: asAiProvider(env.AI_PROVIDER),
+    codebuddyBin: env.CODEBUDDY_BIN || 'codebuddy',
+    codebuddyModel: env.CODEBUDDY_MODEL || 'deepseek-v4.1-flash',
+    codebuddyTimeoutMs: asPositiveInt(env.CODEBUDDY_TIMEOUT_MS, 120_000),
+    codebuddyMaxOutputBytes: asPositiveInt(env.CODEBUDDY_MAX_OUTPUT_BYTES, 2_000_000)
   };
 }
 
@@ -67,6 +83,10 @@ export function validateConfig(config: AppConfig): string[] {
     errors.push('test outbox is disabled in production');
   }
   if (config.databaseAdapter === 'postgres') errors.push('postgres_adapter_not_implemented_use_file_dev_explicitly');
+  if (!config.codebuddyBin.trim()) errors.push('codebuddy_binary_required');
+  if (!config.codebuddyModel.trim()) errors.push('codebuddy_model_required');
+  if (config.codebuddyTimeoutMs < 1_000 || config.codebuddyTimeoutMs > 600_000) errors.push('codebuddy_timeout_out_of_range');
+  if (config.codebuddyMaxOutputBytes < 16_384 || config.codebuddyMaxOutputBytes > 10_000_000) errors.push('codebuddy_output_limit_out_of_range');
   if (config.mode === 'production' && config.externalWritesEnabled && (!config.whatsappAppSecret || !config.whatsappAccessToken || !config.whatsappPhoneNumberId)) errors.push('live_external_writes_require_whatsapp_credentials');
   return errors;
 }
@@ -74,6 +94,7 @@ export function validateConfig(config: AppConfig): string[] {
 export function connectorSnapshot(config: AppConfig): Record<string, unknown> {
   return {
     whatsapp: { mode: 'unconfigured', enabled: false, reason: 'credentials_and_approved_template_required' },
+    ai: { mode: config.aiProvider, enabled: config.aiProvider === 'codebuddy_cli', provider: config.aiProvider === 'codebuddy_cli' ? 'codebuddy-cli' : 'deterministic-fake', model: config.aiProvider === 'codebuddy_cli' ? config.codebuddyModel : null, external_call: config.aiProvider === 'codebuddy_cli' },
     pos: { mode: 'manual', enabled: true, reason: 'CSV import adapter is available; live connector not configured' },
     testOutbox: { mode: config.allowTestOutbox ? 'demo' : 'disabled', enabled: config.allowTestOutbox }
   };
