@@ -1,0 +1,730 @@
+TAP version 13
+# Subtest: AB: control HTTP preserves explicit store scope and rejects missing tools
+ok 1 - AB: control HTTP preserves explicit store scope and rejects missing tools
+  ---
+  duration_ms: 308.599456
+  type: 'test'
+  ...
+# Subtest: AB: persisted checkpoints fence simultaneous commands and survive repository reload
+ok 2 - AB: persisted checkpoints fence simultaneous commands and survive repository reload
+  ---
+  duration_ms: 249.011886
+  type: 'test'
+  ...
+# Subtest: AB: new writes require session and CSRF; failed authentication changes nothing
+ok 3 - AB: new writes require session and CSRF; failed authentication changes nothing
+  ---
+  duration_ms: 234.894615
+  type: 'test'
+  ...
+# Subtest: AB: SSR installs A+B while preserving existing business routes and branding
+ok 4 - AB: SSR installs A+B while preserving existing business routes and branding
+  ---
+  duration_ms: 174.722769
+  type: 'test'
+  ...
+# Subtest: B01: source-scoped order numbers count as distinct cross-day purchases
+ok 5 - B01: source-scoped order numbers count as distinct cross-day purchases
+  ---
+  duration_ms: 323.561766
+  type: 'test'
+  ...
+# Subtest: B02: a first-party touch 31 days before purchase stays unknown
+ok 6 - B02: a first-party touch 31 days before purchase stays unknown
+  ---
+  duration_ms: 298.071951
+  type: 'test'
+  ...
+# Subtest: B03: ambiguous external order references are rejected without attribution writes
+ok 7 - B03: ambiguous external order references are rejected without attribution writes
+  ---
+  duration_ms: 244.977311
+  type: 'test'
+  ...
+# Subtest: B04: malformed price dates are rejected before creating a version
+ok 8 - B04: malformed price dates are rejected before creating a version
+  ---
+  duration_ms: 243.525863
+  type: 'test'
+  ...
+# Subtest: B05: malformed asset expiry is rejected before creating an asset
+ok 9 - B05: malformed asset expiry is rejected before creating an asset
+  ---
+  duration_ms: 198.92827
+  type: 'test'
+  ...
+# Subtest: B02 control: a touch two days before purchase is attributed
+ok 10 - B02 control: a touch two days before purchase is attributed
+  ---
+  duration_ms: 250.003304
+  type: 'test'
+  ...
+# Subtest: B05 control: a valid but expired asset blocks submission and export
+ok 11 - B05 control: a valid but expired asset blocks submission and export
+  ---
+  duration_ms: 280.88299
+  type: 'test'
+  ...
+# Subtest: B01/B03: bound identity survives another source, corrections and scoped refunds
+ok 12 - B01/B03: bound identity survives another source, corrections and scoped refunds
+  ---
+  duration_ms: 244.757917
+  type: 'test'
+  ...
+# Subtest: B03: legacy ambiguous evidence stays unknown, including cancelled-source collisions
+ok 13 - B03: legacy ambiguous evidence stays unknown, including cancelled-source collisions
+  ---
+  duration_ms: 245.680918
+  type: 'test'
+  ...
+# Subtest: B03: explicit source or internal ID resolves one order; mismatches never write evidence
+ok 14 - B03: explicit source or internal ID resolves one order; mismatches never write evidence
+  ---
+  duration_ms: 263.293738
+  type: 'test'
+  ...
+# Subtest: B02: seven-day boundaries, latest eligible touch and post-purchase evidence
+ok 15 - B02: seven-day boundaries, latest eligible touch and post-purchase evidence
+  ---
+  duration_ms: 229.507204
+  type: 'test'
+  ...
+# Subtest: B02: verified order evidence has priority and is bounded by report as-of, not touch age
+ok 16 - B02: verified order evidence has priority and is bounded by report as-of, not touch age
+  ---
+  duration_ms: 276.357002
+  type: 'test'
+  ...
+# Subtest: B03: coupon matching rejects ambiguous orders and saves the exact source
+ok 17 - B03: coupon matching rejects ambiguous orders and saves the exact source
+  ---
+  duration_ms: 313.168902
+  type: 'test'
+  ...
+# Subtest: B04/B05: date input types, calendar values and reversed intervals cannot change saved state
+ok 18 - B04/B05: date input types, calendar values and reversed intervals cannot change saved state
+  ---
+  duration_ms: 272.664467
+  type: 'test'
+  ...
+# Subtest: B04/B05: repository writes and idempotent asset lookup also validate dates
+ok 19 - B04/B05: repository writes and idempotent asset lookup also validate dates
+  ---
+  duration_ms: 238.884393
+  type: 'test'
+  ...
+# Subtest: B04/B05: brand, campaign and attribution routes reject malformed dates
+ok 20 - B04/B05: brand, campaign and attribution routes reject malformed dates
+  ---
+  duration_ms: 254.502127
+  type: 'test'
+  ...
+# Subtest: B04/B05: an otherwise valid legacy approval with invalid price dates cannot export
+ok 21 - B04/B05: an otherwise valid legacy approval with invalid price dates cannot export
+  ---
+  duration_ms: 254.893365
+  type: 'test'
+  ...
+# Subtest: B04/B05: an otherwise valid legacy approval with invalid asset dates cannot export
+ok 22 - B04/B05: an otherwise valid legacy approval with invalid asset dates cannot export
+  ---
+  duration_ms: 245.30468
+  type: 'test'
+  ...
+# Subtest: B04/B05: an otherwise valid legacy approval with invalid brand dates cannot export
+ok 23 - B04/B05: an otherwise valid legacy approval with invalid brand dates cannot export
+  ---
+  duration_ms: 234.975272
+  type: 'test'
+  ...
+# Subtest: B04/B05: null expiry permits manual export; starts and ends obey exact boundaries
+ok 24 - B04/B05: null expiry permits manual export; starts and ends obey exact boundaries
+  ---
+  duration_ms: 273.942052
+  type: 'test'
+  ...
+# Subtest: N01: a price changed after generation cannot be rebound at submission
+ok 25 - N01: a price changed after generation cannot be rebound at submission
+  ---
+  duration_ms: 380.03357
+  type: 'test'
+  ...
+# Subtest: N02: another repository changes price at the export boundary; no intent is written
+ok 26 - N02: another repository changes price at the export boundary; no intent is written
+  ---
+  duration_ms: 307.584937
+  type: 'test'
+  ...
+# Subtest: N03: reports and tasks require access to every contributing store
+ok 27 - N03: reports and tasks require access to every contributing store
+  ---
+  duration_ms: 251.799453
+  type: 'test'
+  ...
+# Subtest: N04: ordinary metrics and queryMetrics both reject mixed currencies
+ok 28 - N04: ordinary metrics and queryMetrics both reject mixed currencies
+  ---
+  duration_ms: 245.722756
+  type: 'test'
+  ...
+# Subtest: N05: an entirely missing store prevents a verified aggregate
+ok 29 - N05: an entirely missing store prevents a verified aggregate
+  ---
+  duration_ms: 270.435895
+  type: 'test'
+  ...
+# Subtest: N06: different request keys cannot reserve the same business delivery repeatedly
+ok 30 - N06: different request keys cannot reserve the same business delivery repeatedly
+  ---
+  duration_ms: 234.363045
+  type: 'test'
+  ...
+# Subtest: N07: new explicit retry reevaluates unsent members and keeps prior attempt history
+ok 31 - N07: new explicit retry reevaluates unsent members and keeps prior attempt history
+  ---
+  duration_ms: 265.572436
+  type: 'test'
+  ...
+# Subtest: N08: renewed approval replaces expired approval without changing or re-reviewing content
+ok 32 - N08: renewed approval replaces expired approval without changing or re-reviewing content
+  ---
+  duration_ms: 268.185571
+  type: 'test'
+  ...
+# Subtest: N01/N02: approval also rechecks generation facts inside the write lock
+ok 33 - N01/N02: approval also rechecks generation facts inside the write lock
+  ---
+  duration_ms: 244.921002
+  type: 'test'
+  ...
+# Subtest: N01: legacy content without generation provenance cannot acquire a fresh approval
+ok 34 - N01: legacy content without generation provenance cannot acquire a fresh approval
+  ---
+  duration_ms: 253.798504
+  type: 'test'
+  ...
+# Subtest: N02: exported payload is the transaction snapshot even if content changes before the HTTP response
+ok 35 - N02: exported payload is the transaction snapshot even if content changes before the HTTP response
+  ---
+  duration_ms: 287.725691
+  type: 'test'
+  ...
+# Subtest: N03: authorized single-store reports survive; incomplete or mislabeled scope is hidden
+ok 36 - N03: authorized single-store reports survive; incomplete or mislabeled scope is hidden
+  ---
+  duration_ms: 297.591372
+  type: 'test'
+  ...
+# Subtest: N04: mixed timezones are rejected even when every store uses BDT
+ok 37 - N04: mixed timezones are rejected even when every store uses BDT
+  ---
+  duration_ms: 249.341264
+  type: 'test'
+  ...
+# Subtest: N05: explicit empty order import confirms zero; an expected missing source still blocks verification
+ok 38 - N05: explicit empty order import confirms zero; an expected missing source still blocks verification
+  ---
+  duration_ms: 243.16121
+  type: 'test'
+  ...
+# Subtest: N06: concurrent repositories reserve one budget unit, shared with G06 dispatch
+ok 39 - N06: concurrent repositories reserve one budget unit, shared with G06 dispatch
+  ---
+  duration_ms: 233.175999
+  type: 'test'
+  ...
+# Subtest: N06: unknown delivery keeps its reservation and cannot be retried with another request key
+ok 40 - N06: unknown delivery keeps its reservation and cannot be retried with another request key
+  ---
+  duration_ms: 267.448916
+  type: 'test'
+  ...
+# Subtest: N06/N07: blocked intents reserve nothing; an explicit retry can recover after verification
+ok 41 - N06/N07: blocked intents reserve nothing; an explicit retry can recover after verification
+  ---
+  duration_ms: 212.146788
+  type: 'test'
+  ...
+# Subtest: N06: pending provider intents apply frequency limits to other campaigns
+ok 42 - N06: pending provider intents apply frequency limits to other campaigns
+  ---
+  duration_ms: 219.568989
+  type: 'test'
+  ...
+# Subtest: N01: editing copy cannot refresh generation facts or retain the previous language review
+ok 43 - N01: editing copy cannot refresh generation facts or retain the previous language review
+  ---
+  duration_ms: 269.023355
+  type: 'test'
+  ...
+# Subtest: N06: changing approval cancels unsent reservations and preserves consumed cost
+ok 44 - N06: changing approval cancels unsent reservations and preserves consumed cost
+  ---
+  duration_ms: 257.851643
+  type: 'test'
+  ...
+# Subtest: N06: stopping an accepted delivery preserves an unknown reservation
+ok 45 - N06: stopping an accepted delivery preserves an unknown reservation
+  ---
+  duration_ms: 232.902088
+  type: 'test'
+  ...
+# Subtest: N07: explicit retry after quiet hours uses current policy, while replay keeps the earlier result
+ok 46 - N07: explicit retry after quiet hours uses current policy, while replay keeps the earlier result
+  ---
+  duration_ms: 244.384458
+  type: 'test'
+  ...
+# Subtest: R01: tenant owner cannot change the platform-wide kill switch
+ok 47 - R01: tenant owner cannot change the platform-wide kill switch
+  ---
+  duration_ms: 317.87524
+  type: 'test'
+  ...
+# Subtest: R02: reviewer cannot smuggle an unauthorized campaign edit with approval status
+ok 48 - R02: reviewer cannot smuggle an unauthorized campaign edit with approval status
+  ---
+  duration_ms: 283.74695
+  type: 'test'
+  ...
+# Subtest: R07/R08: dispatch preview and intent creation share contact and holdout policy
+ok 49 - R07/R08: dispatch preview and intent creation share contact and holdout policy
+  ---
+  duration_ms: 262.940243
+  type: 'test'
+  ...
+# Subtest: A01: a fresh production database shows onboarding and no demo business data
+ok 50 - A01: a fresh production database shows onboarding and no demo business data
+  ---
+  duration_ms: 67.58588
+  type: 'test'
+  ...
+# Subtest: A57: admin and consumer shells expose required language choices and mobile viewport
+ok 51 - A57: admin and consumer shells expose required language choices and mobile viewport
+  ---
+  duration_ms: 190.553633
+  type: 'test'
+  ...
+# Subtest: health and readiness are explicit and connectors remain unconfigured
+ok 52 - health and readiness are explicit and connectors remain unconfigured
+  ---
+  duration_ms: 184.154418
+  type: 'test'
+  ...
+# Subtest: A06: empty Brand Brain exposes needs_input and does not invent prices or launch date
+ok 53 - A06: empty Brand Brain exposes needs_input and does not invent prices or launch date
+  ---
+  duration_ms: 283.301231
+  type: 'test'
+  ...
+# Subtest: A07: only an approved, current revision is returned by default
+ok 54 - A07: only an approved, current revision is returned by default
+  ---
+  duration_ms: 42.551163
+  type: 'test'
+  ...
+# Subtest: A08: changing a price version marks an old brand reference stale
+ok 55 - A08: changing a price version marks an old brand reference stale
+  ---
+  duration_ms: 44.218942
+  type: 'test'
+  ...
+# Subtest: A13: publish check blocks missing/expired rights and unapproved prices
+ok 56 - A13: publish check blocks missing/expired rights and unapproved prices
+  ---
+  duration_ms: 17.449085
+  type: 'test'
+  ...
+# Subtest: expired brand revisions cannot be approved
+ok 57 - expired brand revisions cannot be approved
+  ---
+  duration_ms: 10.656834
+  type: 'test'
+  ...
+# Subtest: A15: importing the same CSV twice is idempotent
+ok 58 - A15: importing the same CSV twice is idempotent
+  ---
+  duration_ms: 392.364313
+  type: 'test'
+  ...
+# Subtest: A16: a changed order is a correction, not a second active sale
+ok 59 - A16: a changed order is a correction, not a second active sale
+  ---
+  duration_ms: 46.56483
+  type: 'test'
+  ...
+# Subtest: A17: malformed rows and over-refunds are isolated with stable row errors
+ok 60 - A17: malformed rows and over-refunds are isolated with stable row errors
+  ---
+  duration_ms: 31.490172
+  type: 'test'
+  ...
+# Subtest: A18/A19/A21/A22/A23: code-calculated golden metrics match expected values
+ok 61 - A18/A19/A21/A22/A23: code-calculated golden metrics match expected values
+  ---
+  duration_ms: 83.547672
+  type: 'test'
+  ...
+# Subtest: A20: business-day comparisons use the store timezone, not server timezone
+ok 62 - A20: business-day comparisons use the store timezone, not server timezone
+  ---
+  duration_ms: 0.616406
+  type: 'test'
+  ...
+# Subtest: A64: missing source watermark is explicitly provisional
+ok 63 - A64: missing source watermark is explicitly provisional
+  ---
+  duration_ms: 238.330234
+  type: 'test'
+  ...
+# Subtest: A24/A25/A27: opaque source link records touch without treating it as an order
+ok 64 - A24/A25/A27: opaque source link records touch without treating it as an order
+  ---
+  duration_ms: 331.074889
+  type: 'test'
+  ...
+# Subtest: A28/A29: registration works without marketing opt-in; verification is explicit
+ok 65 - A28/A29: registration works without marketing opt-in; verification is explicit
+  ---
+  duration_ms: 14.062859
+  type: 'test'
+  ...
+# Subtest: A30/A31: coupon reservation is not revenue and 20 concurrent requests yield one success
+ok 66 - A30/A31: coupon reservation is not revenue and 20 concurrent requests yield one success
+  ---
+  duration_ms: 104.413879
+  type: 'test'
+  ...
+# Subtest: A30: reservation cannot match until authoritative POS import exists
+ok 67 - A30: reservation cannot match until authoritative POS import exists
+  ---
+  duration_ms: 22.212213
+  type: 'test'
+  ...
+# Subtest: A32: expired and wrong-store coupons are rejected with stable errors
+ok 68 - A32: expired and wrong-store coupons are rejected with stable errors
+  ---
+  duration_ms: 13.332232
+  type: 'test'
+  ...
+# Subtest: production verification does not fake a verified contact
+ok 69 - production verification does not fake a verified contact
+  ---
+  duration_ms: 10.78334
+  type: 'test'
+  ...
+# Subtest: A09: deterministic provider produces editable zh-CN/en/bn package with shots, subtitles and sources
+ok 70 - A09: deterministic provider produces editable zh-CN/en/bn package with shots, subtitles and sources
+  ---
+  duration_ms: 393.287766
+  type: 'test'
+  ...
+# Subtest: A10: bn review is required before submit/approval
+ok 71 - A10: bn review is required before submit/approval
+  ---
+  duration_ms: 13.528176
+  type: 'test'
+  ...
+# Subtest: A11/A47: approval binds content hash and valid approved citations
+ok 72 - A11/A47: approval binds content hash and valid approved citations
+  ---
+  duration_ms: 18.809538
+  type: 'test'
+  ...
+# Subtest: A12: manual export is not published; operator evidence is separate
+ok 73 - A12: manual export is not published; operator evidence is separate
+  ---
+  duration_ms: 47.816851
+  type: 'test'
+  ...
+# Subtest: A13/A14/A46: missing rights/unsafe instructions fail closed with manual edit path
+ok 74 - A13/A14/A46: missing rights/unsafe instructions fail closed with manual edit path
+  ---
+  duration_ms: 17.336777
+  type: 'test'
+  ...
+# Subtest: A33: partner/KOC requires a source and starts as identified
+ok 75 - A33: partner/KOC requires a source and starts as identified
+  ---
+  duration_ms: 362.226518
+  type: 'test'
+  ...
+# Subtest: A34: event capacity, registration and check-in counts are separate and idempotent
+ok 76 - A34: event capacity, registration and check-in counts are separate and idempotent
+  ---
+  duration_ms: 55.677045
+  type: 'test'
+  ...
+# Subtest: A35/A36: referral qualification excludes self/duplicates/prior buyers and rewards stay manual
+ok 77 - A35/A36: referral qualification excludes self/duplicates/prior buyers and rewards stay manual
+  ---
+  duration_ms: 31.492936
+  type: 'test'
+  ...
+# Subtest: A35: existing buyer and full refund make referral not payable
+ok 78 - A35: existing buyer and full refund make referral not payable
+  ---
+  duration_ms: 39.127212
+  type: 'test'
+  ...
+# Subtest: A28/A37: segment rules use real behavior and preview never returns contacts
+ok 79 - A28/A37: segment rules use real behavior and preview never returns contacts
+  ---
+  duration_ms: 327.453672
+  type: 'test'
+  ...
+# Subtest: A38/A40: frozen audience keeps stable holdout, excludes post-freeze opt-out and new members
+ok 80 - A38/A40: frozen audience keeps stable holdout, excludes post-freeze opt-out and new members
+  ---
+  duration_ms: 75.632645
+  type: 'test'
+  ...
+# Subtest: A39: template, budget, quiet hours and frequency cap are server-side policies
+ok 81 - A39: template, budget, quiet hours and frequency cap are server-side policies
+  ---
+  duration_ms: 160.387581
+  type: 'test'
+  ...
+# Subtest: A40/A48: production dispatch does not fake delivery
+ok 82 - A40/A48: production dispatch does not fake delivery
+  ---
+  duration_ms: 21.846259
+  type: 'test'
+  ...
+# Subtest: G07 feedback risk escalation, dedupe, correction, reply approval and manual task
+ok 83 - G07 feedback risk escalation, dedupe, correction, reply approval and manual task
+  ---
+  duration_ms: 356.705186
+  type: 'test'
+  ...
+# Subtest: G08 router blocks prompt injection and daily report is versioned with at most three tasks
+ok 84 - G08 router blocks prompt injection and daily report is versioned with at most three tasks
+  ---
+  duration_ms: 252.483837
+  type: 'test'
+  ...
+# Subtest: G09 webhook signature, idempotency, monotonic status and kill switch are enforced
+ok 85 - G09 webhook signature, idempotency, monotonic status and kill switch are enforced
+  ---
+  duration_ms: 373.440825
+  type: 'test'
+  ...
+# Subtest: G07 ordinary case cannot close before manual reply task evidence
+ok 86 - G07 ordinary case cannot close before manual reply task evidence
+  ---
+  duration_ms: 234.608932
+  type: 'test'
+  ...
+# Subtest: G09 adapter blocks live writes by default and maps provider references
+ok 87 - G09 adapter blocks live writes by default and maps provider references
+  ---
+  duration_ms: 0.910898
+  type: 'test'
+  ...
+# Subtest: A02: authenticated campaign creation persists to disk
+ok 88 - A02: authenticated campaign creation persists to disk
+  ---
+  duration_ms: 322.212069
+  type: 'test'
+  ...
+# Subtest: A02: campaign survives a web server restart
+ok 89 - A02: campaign survives a web server restart
+  ---
+  duration_ms: 106.328404
+  type: 'test'
+  ...
+# Subtest: A03: another tenant cannot read or enumerate the first tenant campaign
+ok 90 - A03: another tenant cannot read or enumerate the first tenant campaign
+  ---
+  duration_ms: 96.077334
+  type: 'test'
+  ...
+# Subtest: A04: same-tenant ungranted store is hidden
+ok 91 - A04: same-tenant ungranted store is hidden
+  ---
+  duration_ms: 9.083811
+  type: 'test'
+  ...
+# Subtest: A05: CASHIER is blocked from sensitive operations
+ok 92 - A05: CASHIER is blocked from sensitive operations
+  ---
+  duration_ms: 9.726497
+  type: 'test'
+  ...
+# Subtest: writes require the session CSRF token
+ok 93 - writes require the session CSRF token
+  ---
+  duration_ms: 40.694205
+  type: 'test'
+  ...
+# Subtest: production login and logout cookies include Secure
+ok 94 - production login and logout cookies include Secure
+  ---
+  duration_ms: 171.505481
+  type: 'test'
+  ...
+# Subtest: running jobs are protected by owner leases and only expired leases recover
+ok 95 - running jobs are protected by owner leases and only expired leases recover
+  ---
+  duration_ms: 25.156721
+  type: 'test'
+  ...
+# Subtest: legacy running jobs without lease metadata are recovered once
+ok 96 - legacy running jobs without lease metadata are recovered once
+  ---
+  duration_ms: 11.918159
+  type: 'test'
+  ...
+# Subtest: R10: same external member id in different stores remains two canonical members
+ok 97 - R10: same external member id in different stores remains two canonical members
+  ---
+  duration_ms: 263.58955
+  type: 'test'
+  ...
+# Subtest: R10: an order carrying an internal member id resolves to that member only
+ok 98 - R10: an order carrying an internal member id resolves to that member only
+  ---
+  duration_ms: 0.283936
+  type: 'test'
+  ...
+# Subtest: R10: ambiguous external ids are left unlinked instead of merged
+ok 99 - R10: ambiguous external ids are left unlinked instead of merged
+  ---
+  duration_ms: 0.247101
+  type: 'test'
+  ...
+# Subtest: R11: a watermark older than as_of is provisional in the shared quality model
+ok 100 - R11: a watermark older than as_of is provisional in the shared quality model
+  ---
+  duration_ms: 0.636556
+  type: 'test'
+  ...
+# Subtest: R11: /api/metrics does not label stale complete_through as verified
+ok 101 - R11: /api/metrics does not label stale complete_through as verified
+  ---
+  duration_ms: 52.048337
+  type: 'test'
+  ...
+# Subtest: production is the safe default and rejects a missing session secret
+ok 102 - production is the safe default and rejects a missing session secret
+  ---
+  duration_ms: 0.894914
+  type: 'test'
+  ...
+# Subtest: CASHIER cannot export, edit budget, approve or manage channels
+ok 103 - CASHIER cannot export, edit budget, approve or manage channels
+  ---
+  duration_ms: 0.248353
+  type: 'test'
+  ...
+# Subtest: real domain metric code reproduces the golden fixture
+ok 104 - real domain metric code reproduces the golden fixture
+  ---
+  duration_ms: 21.528822
+  type: 'test'
+  ...
+# Subtest: demo seed is idempotent and production refuses it
+ok 105 - demo seed is idempotent and production refuses it
+  ---
+  duration_ms: 178.741754
+  type: 'test'
+  ...
+# Subtest: invalid empty CSV cannot certify zero revenue
+ok 106 - invalid empty CSV cannot certify zero revenue
+  ---
+  duration_ms: 281.859097
+  type: 'test'
+  ...
+# Subtest: same CSV bytes in two POS sources create separate import batches
+ok 107 - same CSV bytes in two POS sources create separate import batches
+  ---
+  duration_ms: 213.232403
+  type: 'test'
+  ...
+# Subtest: campaign with missing objective cannot be approved or issue offers
+ok 108 - campaign with missing objective cannot be approved or issue offers
+  ---
+  duration_ms: 217.510753
+  type: 'test'
+  ...
+# Subtest: changing an approved campaign returns it to approval
+ok 109 - changing an approved campaign returns it to approval
+  ---
+  duration_ms: 203.544614
+  type: 'test'
+  ...
+# Subtest: store manager cannot self-approve prices, assets, or outreach copy
+ok 110 - store manager cannot self-approve prices, assets, or outreach copy
+  ---
+  duration_ms: 237.313383
+  type: 'test'
+  ...
+# Subtest: public marketing opt-in without a channel grants no WhatsApp permission
+ok 111 - public marketing opt-in without a channel grants no WhatsApp permission
+  ---
+  duration_ms: 209.814089
+  type: 'test'
+  ...
+# Subtest: check-in requires an open event and a registration
+ok 112 - check-in requires an open event and a registration
+  ---
+  duration_ms: 219.787868
+  type: 'test'
+  ...
+# Subtest: a prior purchase imported after referral creation stays ineligible
+ok 113 - a prior purchase imported after referral creation stays ineligible
+  ---
+  duration_ms: 214.600047
+  type: 'test'
+  ...
+# Subtest: outreach with only holdout members is not marked completed
+ok 114 - outreach with only holdout members is not marked completed
+  ---
+  duration_ms: 0.356936
+  type: 'test'
+  ...
+# Subtest: migration repairs a previously completed all-holdout outreach
+ok 115 - migration repairs a previously completed all-holdout outreach
+  ---
+  duration_ms: 216.750537
+  type: 'test'
+  ...
+# Subtest: large CSV preview follows the advertised import size and validates quiet hours
+ok 116 - large CSV preview follows the advertised import size and validates quiet hours
+  ---
+  duration_ms: 244.349275
+  type: 'test'
+  ...
+# Subtest: R05: real WhatsApp nested status envelopes normalize as a stable batch
+ok 117 - R05: real WhatsApp nested status envelopes normalize as a stable batch
+  ---
+  duration_ms: 2.717661
+  type: 'test'
+  ...
+# Subtest: R05: unknown provider status remains unknown_delivery and does not look successful
+ok 118 - R05: unknown provider status remains unknown_delivery and does not look successful
+  ---
+  duration_ms: 0.228994
+  type: 'test'
+  ...
+# Subtest: R06: verify-token challenge is independent from operator authentication
+ok 119 - R06: verify-token challenge is independent from operator authentication
+  ---
+  duration_ms: 216.606555
+  type: 'test'
+  ...
+# Subtest: R05: POST accepts signed nested payloads and records each status without external send
+ok 120 - R05: POST accepts signed nested payloads and records each status without external send
+  ---
+  duration_ms: 166.669245
+  type: 'test'
+  ...
+1..120
+# tests 120
+# suites 0
+# pass 120
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8925.019734

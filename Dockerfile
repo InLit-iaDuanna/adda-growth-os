@@ -14,6 +14,7 @@ ENV NODE_ENV=production APP_MODE=production HOST=0.0.0.0 PORT=3000
 COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/apps/web/public ./apps/web/public
 COPY --from=build /app/fixtures ./fixtures
 RUN mkdir -p /app/data && chown -R node:node /app
 USER node

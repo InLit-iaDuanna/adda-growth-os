@@ -1,0 +1,1763 @@
+TAP version 13
+# Subtest: AB: control HTTP preserves explicit store scope and rejects missing tools
+ok 1 - AB: control HTTP preserves explicit store scope and rejects missing tools
+  ---
+  duration_ms: 315.153401
+  type: 'test'
+  ...
+# Subtest: AB: persisted checkpoints fence simultaneous commands and survive repository reload
+ok 2 - AB: persisted checkpoints fence simultaneous commands and survive repository reload
+  ---
+  duration_ms: 313.7203
+  type: 'test'
+  ...
+# Subtest: AB: new writes require session and CSRF; failed authentication changes nothing
+ok 3 - AB: new writes require session and CSRF; failed authentication changes nothing
+  ---
+  duration_ms: 236.726617
+  type: 'test'
+  ...
+# Subtest: AB: SSR installs A+B while preserving existing business routes and branding
+ok 4 - AB: SSR installs A+B while preserving existing business routes and branding
+  ---
+  duration_ms: 225.818736
+  type: 'test'
+  ...
+# Subtest: B01: source-scoped order numbers count as distinct cross-day purchases
+ok 5 - B01: source-scoped order numbers count as distinct cross-day purchases
+  ---
+  duration_ms: 378.307682
+  type: 'test'
+  ...
+# Subtest: B02: a first-party touch 31 days before purchase stays unknown
+ok 6 - B02: a first-party touch 31 days before purchase stays unknown
+  ---
+  duration_ms: 239.801364
+  type: 'test'
+  ...
+# Subtest: B03: ambiguous external order references are rejected without attribution writes
+ok 7 - B03: ambiguous external order references are rejected without attribution writes
+  ---
+  duration_ms: 273.943216
+  type: 'test'
+  ...
+# Subtest: B04: malformed price dates are rejected before creating a version
+ok 8 - B04: malformed price dates are rejected before creating a version
+  ---
+  duration_ms: 286.28211
+  type: 'test'
+  ...
+# Subtest: B05: malformed asset expiry is rejected before creating an asset
+ok 9 - B05: malformed asset expiry is rejected before creating an asset
+  ---
+  duration_ms: 205.52423
+  type: 'test'
+  ...
+# Subtest: B02 control: a touch two days before purchase is attributed
+ok 10 - B02 control: a touch two days before purchase is attributed
+  ---
+  duration_ms: 211.555137
+  type: 'test'
+  ...
+# Subtest: B05 control: a valid but expired asset blocks submission and export
+ok 11 - B05 control: a valid but expired asset blocks submission and export
+  ---
+  duration_ms: 258.198272
+  type: 'test'
+  ...
+# Subtest: B01/B03: bound identity survives another source, corrections and scoped refunds
+ok 12 - B01/B03: bound identity survives another source, corrections and scoped refunds
+  ---
+  duration_ms: 253.683842
+  type: 'test'
+  ...
+# Subtest: B03: legacy ambiguous evidence stays unknown, including cancelled-source collisions
+ok 13 - B03: legacy ambiguous evidence stays unknown, including cancelled-source collisions
+  ---
+  duration_ms: 220.279493
+  type: 'test'
+  ...
+# Subtest: B03: explicit source or internal ID resolves one order; mismatches never write evidence
+ok 14 - B03: explicit source or internal ID resolves one order; mismatches never write evidence
+  ---
+  duration_ms: 279.455209
+  type: 'test'
+  ...
+# Subtest: B02: seven-day boundaries, latest eligible touch and post-purchase evidence
+ok 15 - B02: seven-day boundaries, latest eligible touch and post-purchase evidence
+  ---
+  duration_ms: 243.838617
+  type: 'test'
+  ...
+# Subtest: B02: verified order evidence has priority and is bounded by report as-of, not touch age
+ok 16 - B02: verified order evidence has priority and is bounded by report as-of, not touch age
+  ---
+  duration_ms: 212.334137
+  type: 'test'
+  ...
+# Subtest: B03: coupon matching rejects ambiguous orders and saves the exact source
+ok 17 - B03: coupon matching rejects ambiguous orders and saves the exact source
+  ---
+  duration_ms: 232.57353
+  type: 'test'
+  ...
+# Subtest: B04/B05: date input types, calendar values and reversed intervals cannot change saved state
+ok 18 - B04/B05: date input types, calendar values and reversed intervals cannot change saved state
+  ---
+  duration_ms: 273.604302
+  type: 'test'
+  ...
+# Subtest: B04/B05: repository writes and idempotent asset lookup also validate dates
+ok 19 - B04/B05: repository writes and idempotent asset lookup also validate dates
+  ---
+  duration_ms: 260.577195
+  type: 'test'
+  ...
+# Subtest: B04/B05: brand, campaign and attribution routes reject malformed dates
+ok 20 - B04/B05: brand, campaign and attribution routes reject malformed dates
+  ---
+  duration_ms: 225.573389
+  type: 'test'
+  ...
+# Subtest: B04/B05: an otherwise valid legacy approval with invalid price dates cannot export
+ok 21 - B04/B05: an otherwise valid legacy approval with invalid price dates cannot export
+  ---
+  duration_ms: 262.193051
+  type: 'test'
+  ...
+# Subtest: B04/B05: an otherwise valid legacy approval with invalid asset dates cannot export
+ok 22 - B04/B05: an otherwise valid legacy approval with invalid asset dates cannot export
+  ---
+  duration_ms: 245.801365
+  type: 'test'
+  ...
+# Subtest: B04/B05: an otherwise valid legacy approval with invalid brand dates cannot export
+ok 23 - B04/B05: an otherwise valid legacy approval with invalid brand dates cannot export
+  ---
+  duration_ms: 291.692205
+  type: 'test'
+  ...
+# Subtest: B04/B05: null expiry permits manual export; starts and ends obey exact boundaries
+ok 24 - B04/B05: null expiry permits manual export; starts and ends obey exact boundaries
+  ---
+  duration_ms: 249.109328
+  type: 'test'
+  ...
+# Subtest: N01: a price changed after generation cannot be rebound at submission
+ok 25 - N01: a price changed after generation cannot be rebound at submission
+  ---
+  duration_ms: 431.626202
+  type: 'test'
+  ...
+# Subtest: N02: another repository changes price at the export boundary; no intent is written
+ok 26 - N02: another repository changes price at the export boundary; no intent is written
+  ---
+  duration_ms: 326.876957
+  type: 'test'
+  ...
+# Subtest: N03: reports and tasks require access to every contributing store
+ok 27 - N03: reports and tasks require access to every contributing store
+  ---
+  duration_ms: 291.847483
+  type: 'test'
+  ...
+# Subtest: N04: ordinary metrics and queryMetrics both reject mixed currencies
+ok 28 - N04: ordinary metrics and queryMetrics both reject mixed currencies
+  ---
+  duration_ms: 259.652069
+  type: 'test'
+  ...
+# Subtest: N05: an entirely missing store prevents a verified aggregate
+ok 29 - N05: an entirely missing store prevents a verified aggregate
+  ---
+  duration_ms: 243.284852
+  type: 'test'
+  ...
+# Subtest: N06: different request keys cannot reserve the same business delivery repeatedly
+ok 30 - N06: different request keys cannot reserve the same business delivery repeatedly
+  ---
+  duration_ms: 262.257277
+  type: 'test'
+  ...
+# Subtest: N07: new explicit retry reevaluates unsent members and keeps prior attempt history
+ok 31 - N07: new explicit retry reevaluates unsent members and keeps prior attempt history
+  ---
+  duration_ms: 240.560559
+  type: 'test'
+  ...
+# Subtest: N08: renewed approval replaces expired approval without changing or re-reviewing content
+ok 32 - N08: renewed approval replaces expired approval without changing or re-reviewing content
+  ---
+  duration_ms: 282.347217
+  type: 'test'
+  ...
+# Subtest: N01/N02: approval also rechecks generation facts inside the write lock
+ok 33 - N01/N02: approval also rechecks generation facts inside the write lock
+  ---
+  duration_ms: 278.900846
+  type: 'test'
+  ...
+# Subtest: N01: legacy content without generation provenance cannot acquire a fresh approval
+ok 34 - N01: legacy content without generation provenance cannot acquire a fresh approval
+  ---
+  duration_ms: 283.479577
+  type: 'test'
+  ...
+# Subtest: N02: exported payload is the transaction snapshot even if content changes before the HTTP response
+ok 35 - N02: exported payload is the transaction snapshot even if content changes before the HTTP response
+  ---
+  duration_ms: 245.458925
+  type: 'test'
+  ...
+# Subtest: N03: authorized single-store reports survive; incomplete or mislabeled scope is hidden
+ok 36 - N03: authorized single-store reports survive; incomplete or mislabeled scope is hidden
+  ---
+  duration_ms: 281.564025
+  type: 'test'
+  ...
+# Subtest: N04: mixed timezones are rejected even when every store uses BDT
+ok 37 - N04: mixed timezones are rejected even when every store uses BDT
+  ---
+  duration_ms: 222.233743
+  type: 'test'
+  ...
+# Subtest: N05: explicit empty order import confirms zero; an expected missing source still blocks verification
+ok 38 - N05: explicit empty order import confirms zero; an expected missing source still blocks verification
+  ---
+  duration_ms: 237.719073
+  type: 'test'
+  ...
+# Subtest: N06: concurrent repositories reserve one budget unit, shared with G06 dispatch
+ok 39 - N06: concurrent repositories reserve one budget unit, shared with G06 dispatch
+  ---
+  duration_ms: 228.141746
+  type: 'test'
+  ...
+# Subtest: N06: unknown delivery keeps its reservation and cannot be retried with another request key
+ok 40 - N06: unknown delivery keeps its reservation and cannot be retried with another request key
+  ---
+  duration_ms: 221.390067
+  type: 'test'
+  ...
+# Subtest: N06/N07: blocked intents reserve nothing; an explicit retry can recover after verification
+ok 41 - N06/N07: blocked intents reserve nothing; an explicit retry can recover after verification
+  ---
+  duration_ms: 211.445482
+  type: 'test'
+  ...
+# Subtest: N06: pending provider intents apply frequency limits to other campaigns
+ok 42 - N06: pending provider intents apply frequency limits to other campaigns
+  ---
+  duration_ms: 253.521333
+  type: 'test'
+  ...
+# Subtest: N01: editing copy cannot refresh generation facts or retain the previous language review
+ok 43 - N01: editing copy cannot refresh generation facts or retain the previous language review
+  ---
+  duration_ms: 292.65091
+  type: 'test'
+  ...
+# Subtest: N06: changing approval cancels unsent reservations and preserves consumed cost
+ok 44 - N06: changing approval cancels unsent reservations and preserves consumed cost
+  ---
+  duration_ms: 242.215705
+  type: 'test'
+  ...
+# Subtest: N06: stopping an accepted delivery preserves an unknown reservation
+ok 45 - N06: stopping an accepted delivery preserves an unknown reservation
+  ---
+  duration_ms: 227.731354
+  type: 'test'
+  ...
+# Subtest: N07: explicit retry after quiet hours uses current policy, while replay keeps the earlier result
+ok 46 - N07: explicit retry after quiet hours uses current policy, while replay keeps the earlier result
+  ---
+  duration_ms: 265.021668
+  type: 'test'
+  ...
+# Subtest: R01: tenant owner cannot change the platform-wide kill switch
+ok 47 - R01: tenant owner cannot change the platform-wide kill switch
+  ---
+  duration_ms: 285.447753
+  type: 'test'
+  ...
+# Subtest: R02: reviewer cannot smuggle an unauthorized campaign edit with approval status
+ok 48 - R02: reviewer cannot smuggle an unauthorized campaign edit with approval status
+  ---
+  duration_ms: 313.735414
+  type: 'test'
+  ...
+# Subtest: R07/R08: dispatch preview and intent creation share contact and holdout policy
+ok 49 - R07/R08: dispatch preview and intent creation share contact and holdout policy
+  ---
+  duration_ms: 254.424469
+  type: 'test'
+  ...
+# Subtest: A01: a fresh production database shows onboarding and no demo business data
+ok 50 - A01: a fresh production database shows onboarding and no demo business data
+  ---
+  duration_ms: 71.208811
+  type: 'test'
+  ...
+# Subtest: A57: admin and consumer shells expose required language choices and mobile viewport
+not ok 51 - A57: admin and consumer shells expose required language choices and mobile viewport
+  ---
+  duration_ms: 202.178871
+  type: 'test'
+  location: '/mnt/data/adda-growth-os-unified/dist/tests/e2e.test.js:61:25'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /4da38778134ae0fc6f4fb0046521903b\.jpg/. Input:
+    
+    '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADDA Growth OS · 工作台</title><style>\n' +
+      ':root{--canvas:#f3f6f3;--surface:#fff;--soft:#eaf2ed;--brand:#155d53;--brand-hover:#104c44;--ink:#173b35;--muted:#657a71;--line:#dce5df;--lotus:#d65e84;--lotus-soft:#fbeef2;--success:#267655;--warning:#886327;--danger:#ab354b;--night:#10292b;--night-panel:#163235;--night-line:#305153;--night-text:#e6f1ec;--night-muted:#a4bbb6;--radius:14px;--control-radius:9px;--shadow:0 12px 34px #153c3410;--font:Inter,"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}\n' +
+      '*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.65 var(--font);-webkit-font-smoothing:antialiased}[hidden]{display:none!important}\n' +
+      'a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}input,select,textarea{width:100%;max-width:100%;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--control-radius);padding:11px 12px;min-height:44px}textarea{min-height:96px;resize:vertical}input[type=checkbox]{width:18px;height:18px;min-height:18px;accent-color:var(--brand)}input[type=file]{overflow:hidden}label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:600;color:var(--muted)}\n' +
+      'button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--lotus);outline-offset:3px}\n' +
+      '.btn,.ab-button,.primary-action,.step button,.offer button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--brand);border-radius:var(--control-radius);min-height:42px;padding:10px 17px;background:var(--brand);color:white;font-weight:600;line-height:1.5;font-size:13px;text-decoration:none}\n' +
+      '.btn:hover,.ab-button:hover,.primary-action:hover{background:var(--brand-hover);color:white}.btn.secondary,.ab-button.secondary,button.secondary{color:var(--brand);background:var(--surface);border:1px solid var(--line)}.btn.secondary:hover{background:var(--soft)}.btn.small{min-height:36px;padding:7px 12px;font-size:12px}\n' +
+      'h1,h2,h3,h4,p{margin-top:0}h1{font-size:clamp(28px,3vw,40px);letter-spacing:-1.4px;line-height:1.25;font-weight:650;margin-bottom:14px}h2{font-size:19px;letter-spacing:-.4px;line-height:1.4;margin-bottom:17px}h3{font-size:15px;margin-bottom:13px}hr{border:0;border-top:1px solid var(--line);margin:26px 0}.muted,.fine,.lead{color:var(--muted)}.fine{font-size:12px;line-height:1.85}.lead{max-width:760px;font-size:14px;margin-bottom:27px}.eyebrow,.ab-kicker{font:600 10px/1.5 ui-monospace,monospace;letter-spacing:2px;color:var(--muted);margin-bottom:12px}\n' +
+      '.card,.ab-card,.stat,.ab-stat,.form-card,.step{border:1px solid var(--line);background:var(--surface);padding:25px;border-radius:var(--radius);min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.fields .full{grid-column:1/-1}.actions,.row-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.row{border-bottom:1px solid var(--line);padding:17px 0;overflow-wrap:anywhere}.row:last-child{border-bottom:0}.row-title{font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}.row-meta{font-size:12px;color:var(--muted);line-height:1.8;margin-top:7px}.badge,.chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--soft);color:var(--brand);border-radius:40px;padding:4px 9px;white-space:normal;font-size:10px;font-weight:650}.badge.warn{background:#fbf3e2;color:var(--warning);border-color:#ecdec0}.empty{padding:23px 12px;border:1px dashed var(--line);border-radius:10px;font-size:13px;color:var(--muted);line-height:1.8;background:var(--canvas)}.output{font-size:13px;line-height:1.85;overflow-wrap:anywhere;max-height:600px;overflow:auto}.notice,.status{font-size:12px;line-height:1.7;border-radius:10px;padding:12px 16px;background:var(--soft);border:1px solid var(--line);margin:0 0 23px;color:var(--brand)}.notice.error,.status.error{background:var(--lotus-soft);color:var(--danger);border-color:#edc8d3}.notice.success{background:var(--soft);color:var(--success)}.notice:empty,.status:empty{display:none}.skip-link{position:fixed;left:15px;top:-100px;z-index:100;background:white;padding:10px}.skip-link:focus{top:10px}.error-text,.ab-error{color:var(--danger);overflow-wrap:anywhere}\n' +
+      '@media(max-width:800px){.grid,.grid.three{grid-template-columns:1fr}.card,.ab-card,.stat,.form-card,.step{padding:20px}.fields{gap:14px}.row-title{align-items:flex-start;flex-wrap:wrap}h1{font-size:29px}}@media(max-width:420px){.fields{grid-template-columns:1fr}.fields .full{grid-column:auto}}\n' +
+      '@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}\n' +
+      '\n' +
+      '.app-header{height:86px;padding:0 30px;display:flex;justify-content:space-between;align-items:center;gap:20px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.brand{display:flex;gap:13px;align-items:center;color:var(--ink);flex-shrink:0}.brand:hover{text-decoration:none}.brand-symbol{width:43px;height:43px;object-fit:contain}.brand-name{display:block;font:600 27px/1.2 Georgia,serif;letter-spacing:1px}.brand-name i{font:500 9px var(--font);letter-spacing:1.6px;vertical-align:middle;padding-left:9px;color:var(--muted)}.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:.4px;margin-top:6px}.header-actions{display:flex;gap:14px;align-items:center}.language-switch{display:flex;gap:5px}.language-switch button[aria-pressed=true]{background:var(--soft);color:var(--brand)}#user-label{font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.store-switch{display:flex;flex-direction:row;align-items:center;gap:9px;font-size:11px}.store-switch select{width:155px;min-height:36px;padding:7px;font-size:11px}#nav-toggle{display:none}\n' +
+      '.wrap{max-width:1680px;margin:auto;padding:24px 30px 50px}.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:32px;align-items:start}.nav{position:sticky;top:110px;max-height:calc(100vh - 140px);overflow:auto;display:flex;flex-direction:column;gap:5px;background:transparent}.nav-caption{font:9px ui-monospace,monospace;letter-spacing:2px;color:var(--muted);padding:22px 14px 10px}.nav button{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid transparent;border-radius:10px;background:transparent;padding:13px 14px;color:var(--muted);font-size:13px;min-height:47px}.nav button:hover{background:var(--surface)}.nav button[aria-current=page]{background:var(--brand);color:white;box-shadow:0 5px 16px #13594b14}.nav-index{font:10px ui-monospace,monospace;opacity:.65}.nav-arrow{margin-left:auto;opacity:.65}.surface-switch{display:flex;gap:5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px}.surface-switch a{flex:1;text-align:center;font-size:11px;padding:7px 0;border-radius:7px;color:var(--muted)}.surface-switch a[aria-current=page]{background:var(--soft);color:var(--brand);font-weight:650}.page{min-width:0;padding:8px 0}.page>h1{margin-top:5px}.page>.grid{margin-bottom:22px}.page:focus{outline:0}.check{flex-direction:row;align-items:center}.two-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.record-code{font:12px/1.8 ui-monospace,monospace;overflow-wrap:anywhere}.brand-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}.brand-gallery img{display:block;width:100%;height:150px;object-fit:contain;background:white;border:1px solid var(--line);border-radius:10px}.brand-gallery small{display:block;font-size:11px;color:var(--muted);margin-top:7px}.login{display:grid;grid-template-columns:1.1fr 1fr;max-width:1000px;margin:5vh auto;gap:0;min-height:500px;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}.login-brand{position:relative;background:var(--night);display:flex;align-items:center;justify-content:center;overflow:hidden}.login-brand img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}.login-brand p{position:absolute;bottom:17px;left:24px;right:24px;color:white;font-size:12px;text-align:center;letter-spacing:1px}.login>.card{padding:55px 42px;border:0;border-radius:0;display:flex;flex-direction:column;justify-content:center}.login .fields{display:block}.login label{margin-bottom:18px}.login .btn{width:100%}.login .eyebrow{color:var(--lotus)}.staff-note{background:var(--soft);border-left:3px solid var(--brand);padding:15px 18px;margin:20px 0;font-size:12px}.review-mode-note{border:1px solid #ecd0dc;background:var(--lotus-soft);padding:14px 18px;border-radius:10px;font-size:12px;margin-bottom:24px}.content-toolbar{display:flex;gap:10px;margin-bottom:14px}.editor-variant{border-top:1px solid var(--line);padding-top:20px;margin-top:20px}.editor-variant h3{color:var(--brand)}\n' +
+      '@media(max-width:1200px){.app-header{padding:0 20px}.header-actions{gap:8px}.layout{grid-template-columns:180px minmax(0,1fr);gap:22px}#user-label{display:none}.wrap{padding:22px 20px 40px}.brand-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}\n' +
+      '@media(max-width:850px){.app-header{height:auto;min-height:78px;align-items:center;padding:13px 16px;flex-wrap:wrap;gap:12px}.brand-symbol{width:34px;height:34px}.brand-name{font-size:23px}.brand-name i{display:none}.header-actions{flex-wrap:wrap;margin-left:auto}.store-switch{order:6;width:100%;justify-content:flex-end}.store-switch select{width:160px}.header-actions .chip{font-size:9px}.header-a'... 102429 more characters
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ADDA Growth OS · 工作台</title><style>
+    :root{--canvas:#f3f6f3;--surface:#fff;--soft:#eaf2ed;--brand:#155d53;--brand-hover:#104c44;--ink:#173b35;--muted:#657a71;--line:#dce5df;--lotus:#d65e84;--lotus-soft:#fbeef2;--success:#267655;--warning:#886327;--danger:#ab354b;--night:#10292b;--night-panel:#163235;--night-line:#305153;--night-text:#e6f1ec;--night-muted:#a4bbb6;--radius:14px;--control-radius:9px;--shadow:0 12px 34px #153c3410;--font:Inter,"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.65 var(--font);-webkit-font-smoothing:antialiased}[hidden]{display:none!important}
+    a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.48}input,select,textarea{width:100%;max-width:100%;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--control-radius);padding:11px 12px;min-height:44px}textarea{min-height:96px;resize:vertical}input[type=checkbox]{width:18px;height:18px;min-height:18px;accent-color:var(--brand)}input[type=file]{overflow:hidden}label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:600;color:var(--muted)}
+    button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--lotus);outline-offset:3px}
+    .btn,.ab-button,.primary-action,.step button,.offer button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--brand);border-radius:var(--control-radius);min-height:42px;padding:10px 17px;background:var(--brand);color:white;font-weight:600;line-height:1.5;font-size:13px;text-decoration:none}
+    .btn:hover,.ab-button:hover,.primary-action:hover{background:var(--brand-hover);color:white}.btn.secondary,.ab-button.secondary,button.secondary{color:var(--brand);background:var(--surface);border:1px solid var(--line)}.btn.secondary:hover{background:var(--soft)}.btn.small{min-height:36px;padding:7px 12px;font-size:12px}
+    h1,h2,h3,h4,p{margin-top:0}h1{font-size:clamp(28px,3vw,40px);letter-spacing:-1.4px;line-height:1.25;font-weight:650;margin-bottom:14px}h2{font-size:19px;letter-spacing:-.4px;line-height:1.4;margin-bottom:17px}h3{font-size:15px;margin-bottom:13px}hr{border:0;border-top:1px solid var(--line);margin:26px 0}.muted,.fine,.lead{color:var(--muted)}.fine{font-size:12px;line-height:1.85}.lead{max-width:760px;font-size:14px;margin-bottom:27px}.eyebrow,.ab-kicker{font:600 10px/1.5 ui-monospace,monospace;letter-spacing:2px;color:var(--muted);margin-bottom:12px}
+    .card,.ab-card,.stat,.ab-stat,.form-card,.step{border:1px solid var(--line);background:var(--surface);padding:25px;border-radius:var(--radius);min-width:0}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.fields .full{grid-column:1/-1}.actions,.row-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.row{border-bottom:1px solid var(--line);padding:17px 0;overflow-wrap:anywhere}.row:last-child{border-bottom:0}.row-title{font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}.row-meta{font-size:12px;color:var(--muted);line-height:1.8;margin-top:7px}.badge,.chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--soft);color:var(--brand);border-radius:40px;padding:4px 9px;white-space:normal;font-size:10px;font-weight:650}.badge.warn{background:#fbf3e2;color:var(--warning);border-color:#ecdec0}.empty{padding:23px 12px;border:1px dashed var(--line);border-radius:10px;font-size:13px;color:var(--muted);line-height:1.8;background:var(--canvas)}.output{font-size:13px;line-height:1.85;overflow-wrap:anywhere;max-height:600px;overflow:auto}.notice,.status{font-size:12px;line-height:1.7;border-radius:10px;padding:12px 16px;background:var(--soft);border:1px solid var(--line);margin:0 0 23px;color:var(--brand)}.notice.error,.status.error{background:var(--lotus-soft);color:var(--danger);border-color:#edc8d3}.notice.success{background:var(--soft);color:var(--success)}.notice:empty,.status:empty{display:none}.skip-link{position:fixed;left:15px;top:-100px;z-index:100;background:white;padding:10px}.skip-link:focus{top:10px}.error-text,.ab-error{color:var(--danger);overflow-wrap:anywhere}
+    @media(max-width:800px){.grid,.grid.three{grid-template-columns:1fr}.card,.ab-card,.stat,.form-card,.step{padding:20px}.fields{gap:14px}.row-title{align-items:flex-start;flex-wrap:wrap}h1{font-size:29px}}@media(max-width:420px){.fields{grid-template-columns:1fr}.fields .full{grid-column:auto}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+    
+    .app-header{height:86px;padding:0 30px;display:flex;justify-content:space-between;align-items:center;gap:20px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}.brand{display:flex;gap:13px;align-items:center;color:var(--ink);flex-shrink:0}.brand:hover{text-decoration:none}.brand-symbol{width:43px;height:43px;object-fit:contain}.brand-name{display:block;font:600 27px/1.2 Georgia,serif;letter-spacing:1px}.brand-name i{font:500 9px var(--font);letter-spacing:1.6px;vertical-align:middle;padding-left:9px;color:var(--muted)}.brand small{display:block;font-size:10px;color:var(--muted);letter-spacing:.4px;margin-top:6px}.header-actions{display:flex;gap:14px;align-items:center}.language-switch{display:flex;gap:5px}.language-switch button[aria-pressed=true]{background:var(--soft);color:var(--brand)}#user-label{font-size:11px;color:var(--muted);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.store-switch{display:flex;flex-direction:row;align-items:center;gap:9px;font-size:11px}.store-switch select{width:155px;min-height:36px;padding:7px;font-size:11px}#nav-toggle{display:none}
+    .wrap{max-width:1680px;margin:auto;padding:24px 30px 50px}.layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:32px;align-items:start}.nav{position:sticky;top:110px;max-height:calc(100vh - 140px);overflow:auto;display:flex;flex-direction:column;gap:5px;background:transparent}.nav-caption{font:9px ui-monospace,monospace;letter-spacing:2px;color:var(--muted);padding:22px 14px 10px}.nav button{display:flex;align-items:center;gap:12px;text-align:left;border:1px solid transparent;border-radius:10px;background:transparent;padding:13px 14px;color:var(--muted);font-size:13px;min-height:47px}.nav button:hover{background:var(--surface)}.nav button[aria-current=page]{background:var(--brand);color:white;box-shadow:0 5px 16px #13594b14}.nav-index{font:10px ui-monospace,monospace;opacity:.65}.nav-arrow{margin-left:auto;opacity:.65}.surface-switch{display:flex;gap:5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px}.surface-switch a{flex:1;text-align:center;font-size:11px;padding:7px 0;border-radius:7px;color:var(--muted)}.surface-switch a[aria-current=page]{background:var(--soft);color:var(--brand);font-weight:650}.page{min-width:0;padding:8px 0}.page>h1{margin-top:5px}.page>.grid{margin-bottom:22px}.page:focus{outline:0}.check{flex-direction:row;align-items:center}.two-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.record-code{font:12px/1.8 ui-monospace,monospace;overflow-wrap:anywhere}.brand-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:20px 0}.brand-gallery img{display:block;width:100%;height:150px;object-fit:contain;background:white;border:1px solid var(--line);border-radius:10px}.brand-gallery small{display:block;font-size:11px;color:var(--muted);margin-top:7px}.login{display:grid;grid-template-columns:1.1fr 1fr;max-width:1000px;margin:5vh auto;gap:0;min-height:500px;border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}.login-brand{position:relative;background:var(--night);display:flex;align-items:center;justify-content:center;overflow:hidden}.login-brand img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}.login-brand p{position:absolute;bottom:17px;left:24px;right:24px;color:white;font-size:12px;text-align:center;letter-spacing:1px}.login>.card{padding:55px 42px;border:0;border-radius:0;display:flex;flex-direction:column;justify-content:center}.login .fields{display:block}.login label{margin-bottom:18px}.login .btn{width:100%}.login .eyebrow{color:var(--lotus)}.staff-note{background:var(--soft);border-left:3px solid var(--brand);padding:15px 18px;margin:20px 0;font-size:12px}.review-mode-note{border:1px solid #ecd0dc;background:var(--lotus-soft);padding:14px 18px;border-radius:10px;font-size:12px;margin-bottom:24px}.content-toolbar{display:flex;gap:10px;margin-bottom:14px}.editor-variant{border-top:1px solid var(--line);padding-top:20px;margin-top:20px}.editor-variant h3{color:var(--brand)}
+    @media(max-width:1200px){.app-header{padding:0 20px}.header-actions{gap:8px}.layout{grid-template-columns:180px minmax(0,1fr);gap:22px}#user-label{display:none}.wrap{padding:22px 20px 40px}.brand-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:850px){.app-header{height:auto;min-height:78px;align-items:center;padding:13px 16px;flex-wrap:wrap;gap:12px}.brand-symbol{width:34px;height:34px}.brand-name{font-size:23px}.brand-name i{display:none}.header-actions{flex-wrap:wrap;margin-left:auto}.store-switch{order:6;width:100%;justify-content:flex-end}.store-switch select{width:160px}.header-actions .chip{font-size:9px}.header-actions .language-switch .btn{min-height:32px;padding:5px 8px}.layout{display:block}.wrap{padding:18px 16px 36px}.nav{display:none;position:static;max-height:none;background:var(--surface);padding:12px;border:1px solid var(--line);border-radius:14px;margin-bottom:22px;grid-template-columns:repeat(2,minmax(0,1fr))}.nav-caption{display:none}.surface-switch{grid-column:1/-1}.nav button{font-size:12px;padding:9px}.nav-index{display:none}body[data-menu=open] .nav{display:grid}#nav-toggle{display:inline-flex}.two-columns{grid-template-columns:1fr}.login{grid-template-columns:1fr;margin:12px auto}.login-brand{height:220px}.login-brand img{object-position:center 48%}.login>.card{padding:30px 24px}.login-brand p{display:none}}
+    @media(max-width:460px){.app-header{align-items:flex-start}.header-actions{max-width:200px;gap:6px}.store-switch{font-size:10px}.store-switch select{width:143px}.brand small{font-size:9px}.header-actions #mode{display:none}.brand-gallery img{height:120px}.btn{padding:9px 12px;font-size:12px}}
+    
+    #ab-home{min-width:0}.ab-home-top,.ab-run-header{display:flex;justify-content:space-between;align-items:center;gap:24px;margin:4px 0 25px}.ab-home-top h1,.ab-run-header h1{margin:10px 0 13px}.ab-home-top p,.ab-run-header p{color:var(--muted);font-size:13px;line-height:1.8;margin:0}.ab-kicker{font-size:10px!important;letter-spacing:2px!important;margin-bottom:10px!important}.ab-context{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}.ab-context span:first-child{color:var(--brand);font-weight:700}.ab-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:24px 0}.ab-stat{padding:22px 21px}.ab-stat>span{font-size:12px;color:var(--muted)}.ab-stat strong{display:block;font-size:clamp(26px,2.5vw,38px);font-weight:550;letter-spacing:-1.5px;line-height:1.2;margin:17px 0 13px;overflow-wrap:anywhere}.ab-stat small{display:block;font-size:10px;color:var(--muted);line-height:1.7}.ab-home-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px;margin:22px 0}.ab-card-head{display:flex;align-items:center;justify-content:space-between;gap:14px}.ab-tag{font-size:10px;border:1px solid var(--line);padding:5px 11px;border-radius:30px;color:var(--muted);white-space:nowrap}.ab-task{display:flex;align-items:center;gap:14px;padding:17px 0;border-bottom:1px solid var(--line)}.ab-task>div{flex:1;min-width:0}.ab-task strong{font-weight:600;font-size:13px;display:block;overflow-wrap:anywhere}.ab-task small{display:block;font-size:11px;color:var(--muted);margin-top:6px}.ab-task-icon{width:30px;height:30px;display:grid;place-items:center;background:var(--soft);color:var(--brand);border-radius:8px}.ab-task .ab-button,.ab-home-actions .ab-button{background:var(--surface);color:var(--brand);border-color:var(--line);font-size:12px}.ab-home-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.ab-next{background:var(--soft)}.ab-next p{font-size:13px;line-height:1.95;color:var(--muted)}.ab-flow-mini{display:flex;gap:8px;flex-wrap:wrap;margin:28px 0}.ab-flow-mini span{padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font:11px/1.6 ui-monospace,monospace}.ab-connector{display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:12px 0;font-size:12px}.ab-card>small{display:block;color:var(--muted);font-size:11px;margin-top:16px}.ab-empty{font-size:12px;line-height:1.9;color:var(--muted);padding:16px 0}.ab-run-actions,.ab-run-controls{display:flex;gap:8px;flex-wrap:wrap}.ab-run-message{font-size:12px;color:var(--muted);line-height:1.8;margin:12px 0 20px;overflow-wrap:anywhere}.ab-error{font-size:12px;line-height:1.85}.ab-console{display:grid;grid-template-columns:190px minmax(0,1fr) 235px;min-height:580px;background:var(--night);color:var(--night-text);border:1px solid var(--night-line);border-radius:var(--radius);overflow:hidden}.ab-console-label{font:10px/1.7 ui-monospace,monospace;letter-spacing:1.5px;color:var(--night-muted);display:flex;justify-content:space-between;gap:12px;margin-bottom:20px}.ab-queue{padding:23px 14px;background:var(--night-panel);border-right:1px solid var(--night-line);min-width:0}.ab-run-item{display:block;text-align:left;width:100%;padding:13px 11px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--night-text);margin-bottom:8px;overflow-wrap:anywhere}.ab-run-item:hover{background:#234143}.ab-run-item.is-selected{background:#244649;border-color:#638782}.ab-run-item span{font:9px ui-monospace,monospace;letter-spacing:1px;color:#e8abc0}.ab-run-item strong{font-size:12px;line-height:1.8;display:block;font-weight:500;margin:9px 0}.ab-run-item small{font-size:10px;color:var(--night-muted)}.ab-console .ab-empty{color:var(--night-muted)}.ab-canvas{padding:25px;min-width:0;background-image:radial-gradient(#345353 1px,transparent 1px);background-size:22px 22px}.ab-run-title h2{color:var(--night-text);font-size:21px;line-height:1.55;margin:26px 0 10px;overflow-wrap:anywhere}.ab-run-title p{font:10px/1.9 ui-monospace,monospace;color:var(--night-muted);overflow-wrap:anywhere}.ab-nodes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:36px 0 30px}.ab-node{text-align:left;background:var(--night-panel);border:1px solid var(--night-line);border-radius:11px;padding:17px 12px;min-width:0;color:var(--night-text);position:relative}.ab-node.is-selected{border-color:#e6a8bb;box-shadow:0 0 0 2px #e6a8bb22}.ab-node strong{display:block;font-size:12px;line-height:1.7;margin:19px 0 11px;overflow-wrap:anywhere}.ab-node small{display:block;font:9px/1.9 ui-monospace,monospace;overflow-wrap:anywhere;color:var(--night-muted)}.ab-node-index{font:10px ui-monospace,monospace;padding:5px 8px;background:#315350;color:#badbd0;border-radius:6px}.ab-state-completed{color:#a8dfc3!important}.ab-state-failed{color:#f4aabb!important}.ab-console .ab-button{background:#284447;color:var(--night-text);border-color:#456967;font-size:11px;min-height:38px;padding:8px 12px}.ab-console .ab-error{color:#f5a9bc}.ab-conclusion{padding:17px;background:#183638ed;border:1px solid var(--night-line);border-radius:10px;font-size:11px;line-height:1.85;margin:25px 0}.ab-conclusion strong,.ab-conclusion span{display:block;color:#d4e5dc}.ab-conclusion p{color:var(--night-muted);margin:8px 0 0;font-size:11px}.ab-event-log{font:10px/2 ui-monospace,monospace}.ab-event-log>div{display:flex;gap:15px;color:var(--night-muted)}.ab-event-log time{opacity:.75;flex-shrink:0}.ab-inspector{padding:24px 18px;min-width:0;overflow-wrap:anywhere;background:var(--night-panel);border-left:1px solid var(--night-line)}.ab-inspector h3{font-size:16px;color:var(--night-text);margin-top:25px}.ab-inspector dl{font-size:11px}.ab-inspector dt{color:var(--night-muted);margin-top:17px}.ab-inspector dd{margin:5px 0;color:var(--night-text);font:10px/1.9 ui-monospace,monospace}.ab-inspector p{font-size:11px;line-height:1.9;color:var(--night-muted)}.ab-observations{border-top:1px solid var(--night-line);padding-top:15px;margin-top:23px}.ab-observations small{display:block;color:#acbfba;font:9px/1.9 ui-monospace,monospace}.ab-observations h4{font-size:12px;color:#e8abc0}.ab-canvas-empty{padding:90px 10px;text-align:center;line-height:2}.ab-canvas-empty strong{font-size:19px;font-weight:500}.ab-canvas-empty p{font-size:12px;color:var(--night-muted)}.ab-dialog{width:min(550px,calc(100vw - 32px));max-height:90vh;overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}.ab-dialog::backdrop{background:#092d2caa;backdrop-filter:blur(3px)}.ab-dialog h2{font-size:22px;margin:0}.ab-dialog label{margin:17px 0}.ab-dialog p{font-size:12px;line-height:1.8;color:var(--muted)}.ab-dialog [data-close]{border:0;background:transparent;font-size:26px;color:var(--muted);min-width:38px;min-height:38px}
+    @media(min-width:1550px){.ab-console{grid-template-columns:210px minmax(0,1fr) 260px}}
+    @media(max-width:1250px){.ab-console{grid-template-columns:175px minmax(0,1fr)}.ab-inspector{grid-column:1/-1;border-left:0;border-top:1px solid var(--night-line)}.ab-inspector dl{display:grid;grid-template-columns:140px 1fr;gap:9px}.ab-inspector dt,.ab-inspector dd{margin:0}.ab-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ab-home-grid{grid-template-columns:1fr}}
+    @media(max-width:800px){.ab-home-top,.ab-run-header{flex-direction:column;align-items:flex-start;gap:16px}.ab-context{font-size:10px}.ab-stats{gap:12px}.ab-stat{padding:18px}.ab-stat strong{font-size:29px}.ab-console{grid-template-columns:1fr}.ab-queue{border-right:0;border-bottom:1px solid var(--night-line);display:flex;flex-wrap:wrap;gap:8px}.ab-queue .ab-console-label{width:100%;margin-bottom:4px}.ab-run-item{width:calc(50% - 4px);margin:0}.ab-canvas{padding:22px 18px}.ab-nodes{grid-template-columns:1fr;margin:23px 0}.ab-node{display:grid;grid-template-columns:32px minmax(0,1fr);gap:5px 12px;align-items:center;padding:14px}.ab-node-index{grid-row:1/4}.ab-node strong{margin:0}.ab-node small{grid-column:2}.ab-inspector{grid-column:auto}.ab-task-icon{display:none}.ab-task .ab-button{padding:8px}.ab-run-controls{gap:7px}.ab-home-top .ab-button{font-size:12px}}
+    </style></head><body data-surface="admin"><a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="app-header"><a class="brand" href="/admin" aria-label="ADDA 工作台"><img class="brand-symbol" src="/assets/brand/suiwu-lotus-mark.png" alt="SUIWU 随物 Logo"><span><span class="brand-name">ADDA <i>GROWTH OS</i></span><small>SUIWU 随物旗下品牌</small></span></a><div class="header-actions"><button id="nav-toggle" class="btn secondary small" type="button" aria-expanded="false" aria-controls="workspace-nav">菜单</button><label class="store-switch">门店<select id="workspace-store" aria-label="当前门店" disabled><option>登录后选择</option></select></label><span id="mode" class="chip">连接中</span><span id="user-label"></span><span class="language-switch"><button class="btn secondary small" id="lang-zh" type="button" aria-pressed="true">中文</button><button class="btn secondary small" id="lang-en" type="button" aria-pressed="false">English</button></span><button class="btn secondary small" id="logout" hidden>退出登录</button></div></header>
+    <div class="wrap"><div id="notice" class="notice" role="status">正在连接服务…</div><div id="production-empty" class="notice" hidden>空生产库：请先配置品牌资料、门店、菜单和所有者邀请。</div>
+    <section id="login" class="login"><div class="login-brand" aria-label="SUIWU 母品牌"><img src="/assets/brand/f78fd9085f6bde2ab8101aac1de72da9.jpg" alt="SUIWU 随物 · Lifestyle Medicine Management"><p>ADDA · SUIWU 随物旗下品牌</p></div><div class="card"><p class="eyebrow">Welcome back</p><h1>登录工作台</h1><p class="muted">使用门店账号继续。演示数据与真实业务分开。</p><form id="login-form"><div class="fields"><label class="full">邮箱 / Email<input id="email" type="email" autocomplete="username" required></label><label class="full">密码 / Password<input id="password" type="password" autocomplete="current-password" required></label></div><div class="actions"><button class="btn">登录</button></div></form><p id="login-result" role="status"></p></div></section>
+    <div id="workspace" class="layout" hidden><nav id="workspace-nav" class="nav" aria-label="工作台模块"><div class="surface-switch"><a href="/admin">运营</a><a href="/review">审核</a><a href="/staff">收银</a></div><span class="nav-caption">YOUR WORKSPACE</span><button data-page="overview" aria-current="page"><span class="nav-index" aria-hidden="true">01</span><span class="nav-label">总览</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="imports"><span class="nav-index" aria-hidden="true">02</span><span class="nav-label">POS 与指标</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="content"><span class="nav-index" aria-hidden="true">03</span><span class="nav-label">内容审批</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="voice"><span class="nav-index" aria-hidden="true">04</span><span class="nav-label">顾客反馈</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="brand"><span class="nav-index" aria-hidden="true">05</span><span class="nav-label">品牌与菜单</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="campaigns"><span class="nav-index" aria-hidden="true">06</span><span class="nav-label">活动与优惠</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="crm"><span class="nav-index" aria-hidden="true">07</span><span class="nav-label">会员触达</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="campus"><span class="nav-index" aria-hidden="true">08</span><span class="nav-label">校园活动</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="control"><span class="nav-index" aria-hidden="true">09</span><span class="nav-label">日报与连接器</span><span class="nav-arrow" aria-hidden="true">↗</span></button><button data-page="cashier"><span class="nav-index" aria-hidden="true">11</span><span class="nav-label">收银与现场核验</span><span class="nav-arrow" aria-hidden="true">↗</span></button></nav><main id="main-content" tabindex="-1">
+    <section class="page" id="page-overview" aria-label="增长驾驶舱"></section>
+    <section class="page" id="page-brand" hidden>
+    <p class="eyebrow">01 · Source of truth</p>
+    <h1>品牌与菜单</h1>
+    <p class="muted lead">品牌事实、价格和素材授权先录入，再明确审批。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>品牌事实</h2>
+    <p class="fine">以 JSON 录入已确认资料，例如 {"brand_name":"ADDA TEA"}。提交后仍需审批。</p>
+    <form id="brand-form">
+    <div class="fields"><label>来源说明<input name="source_label" value="门店确认" required></label><label>适用门店<select name="store_id" data-store><option value="">整个租户</option></select></label><label class="full">事实 JSON<textarea name="content" required></textarea></label></div>
+    <div class="actions"><button class="btn">保存待审版本</button></div>
+    </form>
+    <hr>
+    <h3>待补项与版本</h3>
+    <div id="brand-list"></div></div>
+    <div class="card">
+    <h2>菜单产品</h2>
+    <form id="product-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>SKU<input name="external_sku" required></label><label>名称<input name="name" required></label><label>初始价格（最小单位）<input name="price_minor" type="number" min="0" step="1"></label></div>
+    <div class="actions"><button class="btn">添加产品</button></div>
+    </form>
+    <hr>
+    <div id="product-list"></div>
+    <h3>添加价格版本</h3>
+    <form id="price-form">
+    <div class="fields"><label>产品<select id="price-product" name="product_id" required></select></label><label>价格（最小单位）<input name="amount_minor" type="number" min="0" step="1" required></label><label>状态<select name="status"><option value="draft">待审</option><option value="approved">批准</option></select></label><label>来源<input name="source_citation" value="门店确认" required></label></div>
+    <div class="actions"><button class="btn secondary">保存价格</button></div>
+    </form></div></div>
+    <div class="card" style="margin-top:14px">
+    <h2>素材授权元数据</h2>
+    <p class="fine">这里只记录文件路径和授权状态，不上传素材文件。</p>
+    <form id="asset-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>素材路径<input name="storage_key" required></label><label>校验值<input name="checksum" required></label><label>授权状态<select name="rights_status"><option value="unknown">待核验</option><option value="approved">批准</option></select></label><label class="full">授权用途（逗号分隔）<input name="allowed_uses" placeholder="organic_social"></label></div>
+    <div class="actions"><button class="btn secondary">登记素材</button></div>
+    </form>
+    <div id="asset-list"></div></div>
+    </section>
+    <section class="page" id="page-campaigns" hidden>
+    <p class="eyebrow">02 · Plan and invite</p>
+    <h1>活动与优惠</h1>
+    <p class="muted lead">活动先保存草稿并关联已核实的产品与素材；来源链接只携带随机令牌。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>新建活动</h2>
+    <form id="campaign-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>活动名称<input name="name" required maxlength="160"></label><label class="full">活动目标<input name="objective" placeholder="例如：合格订单"></label><label>预算（最小单位）<input name="budget_minor" type="number" min="0" step="1"></label></div>
+    <div class="actions"><button class="btn">创建草稿</button></div>
+    </form>
+    <hr>
+    <h3>关联产品与素材</h3>
+    <form id="campaign-resources-form">
+    <div class="fields"><label class="full">活动<select name="campaign_id" data-campaign required></select></label><label>产品（可多选）<select id="campaign-products" multiple size="3"></select></label><label>素材（可多选）<select id="campaign-assets" multiple size="3"></select></label></div>
+    <div class="actions"><button class="btn secondary">保存关联</button></div>
+    </form>
+    <hr>
+    <h3>来源链接</h3>
+    <form id="source-form">
+    <div class="fields"><label>活动<select name="campaign_id" data-campaign required></select></label><label>来源名称<input name="label" required></label><label>渠道<select name="channel"><option value="manual">人工/线下</option><option value="qr">二维码</option><option value="social">社交平台</option></select></label></div>
+    <div class="actions"><button class="btn secondary">生成链接</button></div>
+    </form>
+    <div id="generated-link" class="output" role="status"></div>
+    <p class="fine">原始链接只在创建时展示，请立即保存。</p></div>
+    <div class="card">
+    <h2>活动列表</h2>
+    <div id="campaign-list"></div></div></div>
+    <div class="grid" style="margin-top:14px">
+    <div class="card">
+    <h2>创建优惠</h2>
+    <form id="offer-form">
+    <div class="fields"><label>活动<select name="campaign_id" data-campaign required></select></label><label>名称<input name="name" required></label><label class="full">条款<textarea name="terms" required></textarea></label><label>有效天数<input name="days" type="number" value="7" min="1" max="365" required></label><label>最大发放量<input name="max_redemptions" type="number" min="1" step="1"></label></div>
+    <div class="actions"><button class="btn secondary">创建优惠</button></div>
+    </form></div>
+    <div class="card">
+    <h2>优惠列表</h2>
+    <div id="offer-list"></div></div></div>
+    </section>
+    <section class="page" id="page-content" hidden>
+    <p class="eyebrow">03 · Review before use</p>
+    <h1>内容审批</h1>
+    <p class="muted lead">逐语种审阅、孟语复核和审批后才能导出；导出不代表发布。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>生成内容草稿</h2>
+    <form id="content-form">
+    <div class="fields"><label>活动<select name="campaign_id" data-campaign required></select></label><label>渠道<select name="channel"><option value="manual">人工发布</option><option value="instagram">Instagram</option><option value="facebook">Facebook</option></select></label><label>内容支柱<input name="content_pillar" value="Campus Adda"></label><label>目标指标<input name="target_metric" value="verified_orders"></label></div>
+    <div class="actions"><button class="btn">生成草稿</button></div>
+    </form>
+    <p class="fine">演示环境使用确定性样例提供者。</p></div>
+    <div class="card">
+    <h2>内容详情</h2>
+    <div id="content-detail" class="output" role="region" aria-label="内容详情"></div></div></div>
+    <div class="card" style="margin-top:14px">
+    <h2>版本队列</h2>
+    <div id="content-list"></div></div>
+    </section>
+    <section class="page" id="page-imports" hidden>
+    <p class="eyebrow">04 · Evidence first</p>
+    <h1>POS 与指标</h1>
+    <p class="muted lead">CSV 先预览错误与来源范围，再人工确认提交。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>导入 CSV</h2>
+    <form id="import-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>类型<select name="kind"><option value="orders">订单</option><option value="refunds">退款</option><option value="members">会员</option></select></label><label>来源标识<input name="source" value="manual_csv" required></label><label>确认完整至<input name="complete_through" type="datetime-local"></label><label class="full">CSV 文件<input id="csv-file" type="file" accept=".csv,text/csv"></label><label class="full">或粘贴 CSV<textarea name="content"></textarea></label></div>
+    <div class="actions"><button class="btn">预览导入</button><button id="commit-import" class="btn secondary" type="button" disabled>确认提交</button></div>
+    </form>
+    <div id="import-preview" class="output" role="status"></div></div>
+    <div class="card">
+    <h2>指标质量</h2>
+    <div id="metric-summary"></div>
+    <hr>
+    <h3>导入记录</h3>
+    <div id="import-list"></div></div></div>
+    </section>
+    <section class="page" id="page-crm" hidden>
+    <p class="eyebrow">05 · Consent and guardrails</p>
+    <h1>会员触达</h1>
+    <p class="muted lead">按规则预览受众、冻结名单，再审批模板和预算。无连接器时发送会被阻断。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>预览分群</h2>
+    <form id="segment-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>规则<select name="rule"><option value="registered_unpurchased">已注册未首购</option><option value="first_purchase_no_second">首购未复购</option><option value="inactive_14d">14 天未活跃</option><option value="marketing_opt_in">同意营销</option></select></label></div>
+    <div class="actions"><button class="btn secondary">查看人数</button></div>
+    </form>
+    <div id="segment-preview" class="output"></div>
+    <hr>
+    <h2>创建触达任务</h2>
+    <form id="outreach-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>规则<select name="rule"><option value="registered_unpurchased">已注册未首购</option><option value="first_purchase_no_second">首购未复购</option><option value="inactive_14d">14 天未活跃</option><option value="marketing_opt_in">同意营销</option></select></label><label>任务名称<input name="name" required></label><label>渠道<select name="channel"><option value="manual">人工</option><option value="email">Email</option><option value="sms">SMS</option><option value="whatsapp">WhatsApp</option></select></label><label>模板 ID<input name="template_id" required></label><label>预算（最小单位）<input name="budget_minor" type="number" min="0" value="0" required></label><label class="full">模板文案<textarea name="template_text" required></textarea></label><label>保留组 %<input name="holdout_percent" type="number" min="0" max="100" value="10"></label><label class="check"><input name="template_approved" type="checkbox">我已核实模板</label></div>
+    <div class="actions"><button class="btn">冻结受众并创建</button></div>
+    </form></div>
+    <div class="card">
+    <h2>触达队列</h2>
+    <div id="outreach-list"></div></div></div>
+    </section>
+    <section class="page" id="page-campus" hidden>
+    <p class="eyebrow">06 · On campus</p>
+    <h1>校园活动</h1>
+    <p class="muted lead">确认日期和容量，开放报名后才可登记签到。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>活动模板</h2>
+    <form id="event-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>模板<select id="event-template" name="template_id" required></select></label><label>名称<input name="name" required></label><label>容量<input name="capacity" type="number" min="1" required></label><label>开始<input name="starts_at" type="datetime-local"></label><label>结束<input name="ends_at" type="datetime-local"></label></div>
+    <div class="actions"><button class="btn">创建草稿</button></div>
+    </form>
+    <hr>
+    <h3>补齐草稿日程</h3>
+    <form id="event-schedule-form">
+    <div class="fields"><label>活动草稿<select id="schedule-event" name="event_id" required></select></label><label>容量<input name="capacity" type="number" min="1" required></label><label>开始<input name="starts_at" type="datetime-local" required></label><label>结束<input name="ends_at" type="datetime-local" required></label></div>
+    <div class="actions"><button class="btn secondary">保存日程</button></div>
+    </form>
+    <hr>
+    <h3>报名</h3>
+    <form id="registration-form">
+    <div class="fields"><label>校园活动项目<select name="event_id" data-event required></select></label><label>会员 ID<input name="member_id" required></label></div>
+    <div class="actions"><button class="btn secondary">登记报名</button></div>
+    </form>
+    <h3 style="margin-top:17px">签到</h3>
+    <form id="checkin-form">
+    <div class="fields"><label>校园活动项目<select name="event_id" data-event required></select></label><label>会员 ID<input name="member_id" required></label></div>
+    <div class="actions"><button class="btn secondary">确认签到</button></div>
+    </form></div>
+    <div class="card">
+    <h2>校园活动列表</h2>
+    <div id="event-list"></div>
+    <hr>
+    <h3>伙伴资料</h3>
+    <form id="partner-form">
+    <div class="fields"><label>名称<input name="name" required></label><label>类型<select name="kind"><option value="organization">机构</option><option value="club">社团</option><option value="koc">KOC</option></select></label><label class="full">公开来源 URL<input name="source_url" type="url" required></label><label class="check full"><input type="checkbox" name="contact_permission">已有联系许可</label></div>
+    <div class="actions"><button class="btn secondary">登记伙伴</button></div>
+    </form>
+    <div id="partner-list"></div></div></div>
+    </section>
+    <section class="page" id="page-voice" hidden>
+    <p class="eyebrow">07 · Close the loop</p>
+    <h1>顾客反馈</h1>
+    <p class="muted lead">记录、处理、审批回复并留存人工执行证据。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>登记反馈</h2>
+    <form id="feedback-form">
+    <div class="fields"><label>门店<select name="store_id" data-store required></select></label><label>来源<input name="source" value="staff_recorded" required></label><label class="full">顾客原话<textarea name="text" required></textarea></label></div>
+    <div class="actions"><button class="btn">保存反馈</button></div>
+    </form>
+    <hr>
+    <h3>反馈列表</h3>
+    <div id="feedback-list"></div></div>
+    <div class="card">
+    <h2>工单与回复</h2>
+    <div id="case-list"></div>
+    <hr>
+    <form id="reply-form">
+    <div class="fields"><label>工单<select id="reply-case" name="case_id" required></select></label><label>方式<select name="channel"><option value="manual">人工</option><option value="email">Email</option><option value="sms">SMS</option></select></label><label class="full">回复文案<textarea name="body" required></textarea></label></div>
+    <div class="actions"><button class="btn secondary">保存回复草稿</button></div>
+    </form>
+    <div id="reply-list"></div>
+    <hr>
+    <h3>人工任务</h3>
+    <div id="voice-task-list"></div>
+    <form id="voice-task-form">
+    <div class="fields"><label>我的任务<select id="voice-task-select" name="task_id" required></select></label><label class="full">完成证据<input name="evidence" required minlength="3"></label></div>
+    <div class="actions"><button class="btn secondary">记录人工处理</button></div>
+    </form>
+    <hr>
+    <h3>结案</h3>
+    <form id="case-resolve-form">
+    <div class="fields"><label>工单<select id="resolve-case" name="case_id" required></select></label><label class="full">结案证据<input name="evidence" required minlength="3"></label></div>
+    <div class="actions"><button class="btn secondary">结案并留存证据</button></div>
+    </form></div></div>
+    </section>
+    <section class="page" id="page-control" hidden>
+    <p class="eyebrow">08 · Review and operate</p>
+    <h1>日报与连接器</h1>
+    <p class="muted lead">日报标出数据质量；人工导出与真实外部发送分别显示。</p>
+    <div class="grid">
+    <div class="card">
+    <h2>日报</h2><button id="generate-report" class="btn">生成今天的日报</button>
+    <div id="daily-list"></div>
+    <div id="daily-detail" class="output" role="region" aria-label="日报详情"></div>
+    <hr>
+    <h3>任务</h3>
+    <div id="task-list"></div>
+    <form id="task-form">
+    <div class="fields"><label>我的任务<select id="task-select" name="task_id" required></select></label><label>完成证据<input name="evidence" required></label></div>
+    <div class="actions"><button class="btn secondary">记录完成</button></div>
+    </form></div>
+    <div class="card">
+    <h2>连接器状态</h2>
+    <div id="connector-list"></div></div></div>
+    </section>
+    <section class="page" id="page-cashier" hidden>
+    <p class="eyebrow">ADDA / STORE DESK</p><h1>收银与现场核验</h1><p class="lead">一次处理一笔。券保留与现场签到不计成交，只有权威 POS 订单匹配后才计入指标。</p>
+    <div class="grid">
+    <article class="card"><h2>01 · 核验并保留券</h2><form id="cashier-reserve-form"><div class="fields"><label class="full">门店<select name="store_id" data-store required></select></label><label class="full">优惠券令牌<input name="coupon_token" autocomplete="off" required maxlength="128"></label><label class="full">POS 订单号<input name="pos_order_ref" autocomplete="off" required maxlength="160"></label></div><div class="actions"><button class="btn" type="submit">核验并保留</button></div></form><div class="staff-note">此操作不会创建付款记录，也不会自动在 POS 中修改价格。</div><div id="cashier-reserve-result" class="output" role="status"></div></article>
+    <article class="card"><h2>02 · 匹配权威订单</h2><form id="cashier-match-form"><div class="fields"><label class="full">门店<select name="store_id" data-store required></select></label><label class="full">券记录 ID<input name="coupon_id" required autocomplete="off"></label><label class="full">POS 订单号<input name="pos_order_ref" required autocomplete="off"></label><label class="full">订单来源<input name="order_source" placeholder="与导入来源一致" required></label></div><div class="actions"><button class="btn secondary" type="submit">匹配已导入订单</button></div></form><div id="cashier-match-result" class="output" role="status"></div></article>
+    </div><article class="card"><h2>现场活动签到</h2><form id="cashier-checkin-form"><div class="fields"><label>活动<select name="event_id" id="cashier-event" required></select></label><label>会员 ID<input name="member_id" autocomplete="off" required></label></div><div class="actions"><button class="btn secondary" type="submit">核验已报名会员</button></div></form><div id="cashier-checkin-result" class="output" role="status"></div><p class="fine">只允许已开放活动和已报名会员；服务端阻止重复签到。</p></article>
+    </section>
+    </main></div></div><script>function __name(target,value){Object.defineProperty(target,'name',{value,configurable:true});return target}(function adminApp(mountAB) {
+        const $ = (id) => document.getElementById(id);
+        const v = (form, name) => String(new FormData(form).get(name) || '').trim();
+        const x = (input) => String(input ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] || c);
+        let adminLanguage = 'zh';
+        let currentStore = '';
+        let scopeInitialized = false;
+        let refreshEpoch = 0;
+        let acting = false;
+        let activePage = location.hash.slice(1) || 'overview';
+        const surface = document.body.dataset.surface || 'admin';
+        const tx = (zh, en) => adminLanguage === 'en' ? en : zh;
+        const adminEnglish = {
+            '菜单': 'Menu', '运营': 'Manage', '审核': 'Review', '收银': 'Store', '收银与现场核验': 'Store operations', '全部授权门店': 'All authorized stores', '登录后选择': 'Sign in first', '优惠券令牌': 'Coupon token', 'POS 订单号': 'POS order reference', '核验并保留': 'Verify and reserve', '券记录 ID': 'Coupon record ID', '订单来源': 'Order source', '匹配已导入订单': 'Match imported order', '现场活动签到': 'Event check-in', '核验已报名会员': 'Verify registered member', '01 · 核验并保留券': '01 · Verify and reserve', '02 · 匹配权威订单': '02 · Match authoritative order', '保存改稿': 'Save new draft', '编辑内容': 'Edit content', '历史版本': 'Revision history', '退回': 'Reject', '母品牌与子品牌': 'Parent and endorsed brand', '门店增长工作台': 'Store growth workspace', '退出登录': 'Sign out', '中文': '中文', '连接中': 'Connecting', '正在连接服务…': 'Connecting to the service…', '空生产库：请先配置品牌资料、门店、菜单和所有者邀请。': 'Empty production database: configure the brand, store, menu, and owner invitation first.',
+            '登录工作台': 'Sign in to workspace', '使用门店账号继续。演示数据与真实业务分开。': 'Use your store account. Demo data is separate from live business data.', '邮箱 / Email': 'Email', '密码 / Password': 'Password', '登录': 'Sign in',
+            '总览': 'Overview', 'POS 与指标': 'POS and metrics', '内容审批': 'Content review', '顾客反馈': 'Customer feedback', '品牌与菜单': 'Brand and menu', '活动与优惠': 'Campaigns and offers', '会员触达': 'Member outreach', '校园活动': 'Campus events', '日报与连接器': 'Daily reports and connectors',
+            '今天先处理什么': 'What needs attention today', '待办和指标来自当前门店。没有可靠订单数据时保留“缺失”。': 'Tasks and metrics use the current store. Unreliable order data remains missing.', '品牌资料待补': 'Brand facts to complete', '渠道状态': 'Connector status', '订单数据': 'Order data', '内容待办': 'Content to review', '反馈工单': 'Feedback cases', '暂无待补品牌资料。': 'No missing brand facts.', '演示环境已就绪。外部渠道未配置时仅支持受控的人工流程。': 'Demo is ready. External channels are unavailable; controlled manual workflows are available.', '环境已就绪，请按资料和审批状态继续。': 'The environment is ready. Check source facts and approval status before proceeding.', '服务未就绪，请检查本地进程。': 'The service is unavailable. Check the local process.',
+            '品牌事实、价格和素材授权先录入，再明确审批。': 'Enter brand facts, prices, and asset rights, then approve them.', '品牌事实': 'Brand facts', '以 JSON 录入已确认资料，例如 {"brand_name":"ADDA TEA"}。提交后仍需审批。': 'Enter confirmed facts as JSON, for example {"brand_name":"ADDA TEA"}. Approval is still required.', '来源说明': 'Source note', '适用门店': 'Store scope', '整个租户': 'All stores', '事实 JSON': 'Facts JSON', '保存待审版本': 'Save for review', '待补项与版本': 'Missing facts and revisions', '菜单产品': 'Menu products', '门店': 'Store', '名称': 'Name', '初始价格（最小单位）': 'Initial price (minor units)', '添加产品': 'Add product', '添加价格版本': 'Add price revision', '产品': 'Product', '价格（最小单位）': 'Price (minor units)', '状态': 'Status', '待审': 'Pending review', '批准': 'Approved', '来源': 'Source', '保存价格': 'Save price', '素材授权元数据': 'Asset rights metadata', '这里只记录文件路径和授权状态，不上传素材文件。': 'Record file paths and rights status here; no asset file is uploaded.', '素材路径': 'Asset path', '校验值': 'Checksum', '授权状态': 'Rights status', '待核验': 'Needs verification', '授权用途（逗号分隔）': 'Allowed uses (comma separated)', '登记素材': 'Register asset',
+            '活动先保存草稿并关联已核实的产品与素材；来源链接只携带随机令牌。': 'Save a campaign draft and link verified products and assets. Source links contain random tokens only.', '新建活动': 'New campaign', '活动名称': 'Campaign name', '活动目标': 'Campaign objective', '预算（最小单位）': 'Budget (minor units)', '创建草稿': 'Create draft', '关联产品与素材': 'Link products and assets', '活动': 'Campaign', '产品（可多选）': 'Products (multiple)', '素材（可多选）': 'Assets (multiple)', '保存关联': 'Save links', '来源链接': 'Source link', '来源名称': 'Source name', '渠道': 'Channel', '人工/线下': 'Manual / offline', '二维码': 'QR code', '社交平台': 'Social media', '生成链接': 'Create link', '原始链接只在创建时展示，请立即保存。': 'The source link appears only when created. Save it now.', '活动列表': 'Campaign list', '创建优惠': 'Create offer', '条款': 'Terms', '有效天数': 'Valid days', '最大发放量': 'Maximum issues', '优惠列表': 'Offer list',
+            '逐语种审阅、孟语复核和审批后才能导出；导出不代表发布。': 'Review each language, complete Bengali review, and approve before export. Export is not publication.', '生成内容草稿': 'Generate content draft', '人工发布': 'Manual publication', '内容支柱': 'Content pillar', '目标指标': 'Target metric', '生成草稿': 'Generate draft', '演示环境使用确定性样例提供者。': 'Demo mode uses a deterministic sample provider.', '内容详情': 'Content detail', '版本队列': 'Revision queue',
+            'CSV 先预览错误与来源范围，再人工确认提交。': 'Preview CSV errors and source scope, then confirm the import.', '导入 CSV': 'Import CSV', '类型': 'Type', '订单': 'Orders', '退款': 'Refunds', '会员': 'Members', '来源标识': 'Source identifier', '确认完整至': 'Complete through', 'CSV 文件': 'CSV file', '或粘贴 CSV': 'Or paste CSV', '预览导入': 'Preview import', '确认提交': 'Confirm import', '指标质量': 'Metric quality', '导入记录': 'Import history',
+            '按规则预览受众、冻结名单，再审批模板和预算。无连接器时发送会被阻断。': 'Preview an audience, freeze the list, then approve the template and budget. Sending is blocked without a connector.', '预览分群': 'Preview segment', '规则': 'Rule', '已注册未首购': 'Registered, no purchase', '首购未复购': 'One purchase, no repeat', '14 天未活跃': 'Inactive for 14 days', '同意营销': 'Marketing opt-in', '查看人数': 'View count', '创建触达任务': 'Create outreach task', '任务名称': 'Task name', '人工': 'Manual', '模板 ID': 'Template ID', '模板文案': 'Template copy', '保留组 %': 'Holdout %', '我已核实模板': 'I verified this template', '冻结受众并创建': 'Freeze audience and create', '触达队列': 'Outreach queue',
+            '确认日期和容量，开放报名后才可登记签到。': 'Confirm dates and capacity. Registration and check-in require an open event.', '活动模板': 'Event template', '模板': 'Template', '容量': 'Capacity', '开始': 'Start', '结束': 'End', '补齐草稿日程': 'Complete draft schedule', '活动草稿': 'Event draft', '保存日程': 'Save schedule', '校园活动项目': 'Campus event', '校园活动列表': 'Campus event list', '报名': 'Registration', '会员 ID': 'Member ID', '登记报名': 'Register member', '签到': 'Check-in', '确认签到': 'Confirm check-in', '伙伴资料': 'Partner records', '公开来源 URL': 'Public source URL', '已有联系许可': 'Contact permission recorded', '登记伙伴': 'Register partner', '机构': 'Organization', '社团': 'Club',
+            '记录、处理、审批回复并留存人工执行证据。': 'Record feedback, approve replies, and retain evidence of manual action.', '登记反馈': 'Record feedback', '顾客原话': 'Customer statement', '保存反馈': 'Save feedback', '反馈列表': 'Feedback list', '工单与回复': 'Cases and replies', '工单': 'Case', '方式': 'Method', '回复文案': 'Reply copy', '保存回复草稿': 'Save reply draft', '人工任务': 'Manual tasks', '我的任务': 'My tasks', '完成证据': 'Completion evidence', '记录人工处理': 'Record manual action', '结案': 'Close case', '结案证据': 'Closure evidence', '结案并留存证据': 'Close with evidence',
+            '日报标出数据质量；人工导出与真实外部发送分别显示。': 'Daily reports show data quality. Manual exports and external delivery are distinct.', '日报': 'Daily reports', '生成今天的日报': 'Generate today’s report', '任务': 'Tasks', '记录完成': 'Record completion', '连接器状态': 'Connector status',
+            '请选择': 'Select', '进入处理 →': 'Open →', '批准版本': 'Approve revision', '复制': 'Copy', '查看': 'View', '孟语复核': 'Bengali review', '提交': 'Submit', '导出': 'Export', '人工导出预览': 'Preview manual export', '尝试发送': 'Attempt dispatch', '开放': 'Open', '关闭': 'Close', '补齐日程': 'Complete schedule', '处理': 'Handle', '转人工执行': 'Create manual task', '查看分析': 'View analysis', '标记已解决': 'Mark resolved', '暂无活动。': 'No campaigns yet.', '暂无优惠。': 'No offers yet.', '暂无内容草稿。': 'No content drafts yet.', '暂无导入。': 'No imports yet.', '暂无触达任务。': 'No outreach tasks yet.', '暂无校园活动。': 'No campus events yet.', '暂无伙伴资料。': 'No partner records yet.', '暂无反馈。': 'No feedback yet.', '暂无工单。': 'No cases yet.', '暂无人工任务。': 'No manual tasks yet.', '尚未生成日报。': 'No daily reports yet.', '暂无行动任务。': 'No action tasks yet.', '暂无连接器状态。': 'No connector status available.'
+        };
+        const adminPhrases = [['日程：', 'Schedule: '], ['报名 ', 'Registered '], ['签到 ', 'Checked in '], ['负责人：', 'Owner: '], ['截止：', 'Due: '], ['目标：', 'Objective: '], ['缺失：', 'Missing: '], ['到期：', 'Expires: '], ['已发放 ', 'Issued '], ['授权用途：', 'Allowed uses: '], ['价格版本 ', 'Price revision '], ['创建：', 'Created: '], ['有效 ', 'Valid '], ['错误 ', 'Errors '], ['预算 ', 'Budget '], ['版本 ', 'Revision '], ['质量：', 'Quality: '], ['完整至：', 'Complete through: '], ['净营收：', 'Net revenue: '], ['合格订单：', 'Qualified orders: ']];
+        const originalText = new WeakMap();
+        function translateAdmin() {
+            document.documentElement.lang = adminLanguage === 'en' ? 'en' : 'zh-CN';
+            $('lang-zh').setAttribute('aria-pressed', String(adminLanguage === 'zh'));
+            $('lang-en').setAttribute('aria-pressed', String(adminLanguage === 'en'));
+            document.querySelector('.nav')?.setAttribute('aria-label', adminLanguage === 'en' ? 'Workspace modules' : '工作台模块');
+            $('content-detail').setAttribute('aria-label', adminLanguage === 'en' ? 'Content detail' : '内容详情');
+            $('daily-detail').setAttribute('aria-label', adminLanguage === 'en' ? 'Daily report detail' : '日报详情');
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+            let node;
+            while ((node = walker.nextNode())) {
+                if (node.parentElement?.closest('script,style,[data-user-content]'))
+                    continue;
+                const textNode = node;
+                const previous = originalText.get(textNode);
+                const current = textNode.textContent || '';
+                const raw = previous && current === previous.translated ? previous.original : current;
+                const key = raw.trim();
+                const english = adminEnglish[key];
+                if (adminLanguage === 'en') {
+                    let translated = english ? raw.replace(key, english) : raw;
+                    if (!english)
+                        for (const [chinese, phrase] of adminPhrases)
+                            translated = translated.split(chinese).join(phrase);
+                    if (translated !== raw) {
+                        textNode.textContent = translated;
+                        originalText.set(textNode, { original: raw, translated });
+                    }
+                }
+                else if (previous && current === previous.translated) {
+                    textNode.textContent = previous.original;
+                    originalText.delete(textNode);
+                }
+            }
+        }
+        let me = null;
+        let health = null;
+        let pendingImport = '';
+        let latestLink = '';
+        let currentFeedbackId = '';
+        const db = {};
+        const loadErrors = {};
+        const can = (permission) => Boolean(me?.actor?.permissions?.includes(permission));
+        const notice = (message, kind = '') => { $('notice').textContent = message; $('notice').className = 'notice' + (kind ? ' ' + kind : ''); translateAdmin(); };
+        const empty = (message) => '<div class="empty">' + x(message) + '</div>';
+        const button = (action, id, label, allowed = true) => allowed ? '<button type="button" class="btn small secondary" data-action="' + x(action) + '" data-id="' + x(id) + '">' + x(label) + '</button>' : '';
+        const row = (title, meta, status = '', actions = '') => '<div class="row"><div class="row-title"><span data-user-content>' + x(title) + '</span>' + (status ? '<span class="badge' + (/draft|pending|needs|blocked|missing/.test(status) ? ' warn' : '') + '">' + x(status) + '</span>' : '') + '</div><div class="row-meta">' + meta + '</div>' + (actions ? '<div class="row-actions">' + actions + '</div>' : '') + '</div>';
+        const renderList = (id, html, noData) => { $(id).innerHTML = html || empty(noData); };
+        const date = (input) => input ? new Date(String(input)).toLocaleString(adminLanguage === 'en' ? 'en-GB' : 'zh-CN', { timeZone: me?.stores?.find((s) => s.id === currentStore)?.timezone || 'Asia/Dhaka' }) : tx('未确认', 'Not confirmed');
+        const money = (input) => typeof input === 'number' ? (input / 100).toLocaleString() + ' ' + (me?.stores?.find((s) => s.id === currentStore)?.currency || 'BDT') : '缺失';
+        async function api(path, method = 'GET', body) {
+            const target = new URL(path, location.origin);
+            if (currentStore && !['/api/me', '/api/healthz', '/api/auth/logout'].includes(target.pathname))
+                target.searchParams.set('store_id', currentStore);
+            const response = await fetch(target, { method, credentials: 'same-origin', headers: method === 'GET' ? {} : { 'content-type': 'application/json', 'x-csrf-token': me?.csrf_token || '' }, body: method === 'GET' ? undefined : JSON.stringify(body || {}) });
+            let data = {};
+            try {
+                data = await response.json();
+            }
+            catch { }
+            if (!response.ok) {
+                const messages = { event_date_required: '请先补齐活动开始与结束时间。', event_date_invalid: '活动结束时间必须晚于开始时间。', event_not_open: '活动尚未开放。', registration_not_found: '请先登记该会员报名。', event_capacity_full: '活动人数已满。', manual_reply_evidence_required: '请先记录人工回复的执行证据。' };
+                throw Object.assign(new Error(messages[data.error_code] || data.error_code || data.message || '请求失败：' + response.status), { status: response.status });
+            }
+            return data;
+        }
+        const pagePermissions = { overview: 'report:read', orchestration: 'report:read', brand: 'brand:read', campaigns: 'campaign:read', content: 'campaign:read', imports: 'report:read', crm: 'outreach:read', campus: 'campaign:read', voice: 'report:read', control: 'report:read', cashier: 'campaign:read' };
+        function permitted(name) {
+            if (!me)
+                return true;
+            if (me.role === 'CASHIER')
+                return name === 'cashier';
+            if (surface === 'staff')
+                return name === 'cashier' && (can('campaign:create') || me.role === 'CASHIER');
+            if (surface === 'review' && !['content', 'brand', 'voice'].includes(name))
+                return false;
+            return name in pagePermissions && can(pagePermissions[name]) && (name !== 'cashier' || can('campaign:create'));
+        }
+        function page(name, focus = true) {
+            if (!document.getElementById('page-' + name) || !permitted(name))
+                name = me?.role === 'CASHIER' || surface === 'staff' ? 'cashier' : surface === 'review' ? 'content' : 'overview';
+            activePage = name;
+            document.querySelectorAll('.nav button[data-page]').forEach(b => b.setAttribute('aria-current', b.dataset.page === name ? 'page' : 'false'));
+            document.querySelectorAll('.page').forEach(section => { section.hidden = section.id !== 'page-' + name; });
+            document.body.dataset.menu = 'closed';
+            $('nav-toggle').setAttribute('aria-expanded', 'false');
+            if (location.hash !== '#' + name)
+                history.pushState(null, '', '#' + name);
+            if (focus) {
+                const heading = document.querySelector('#page-' + name + ' h1');
+                heading?.setAttribute('tabindex', '-1');
+                heading?.focus({ preventScroll: true });
+                window.scrollTo({ top: 0, behavior: 'auto' });
+            }
+        }
+        function permissions() {
+            document.querySelectorAll('.nav button[data-page]').forEach(b => b.hidden = !permitted(b.dataset.page));
+            document.querySelectorAll('.surface-switch a').forEach(a => { a.setAttribute('aria-current', a.pathname === ('/' + (me?.role === 'CASHIER' ? 'staff' : surface)) ? 'page' : 'false'); });
+            const forms = { 'brand-form': 'brand:write', 'product-form': 'product:write', 'price-form': 'product:write', 'asset-form': 'asset:write', 'campaign-form': 'campaign:create', 'campaign-resources-form': 'campaign:create', 'source-form': 'campaign:create', 'offer-form': 'campaign:create', 'content-form': 'campaign:create', 'import-form': 'import:write', 'segment-form': 'outreach:read', 'outreach-form': 'outreach:create', 'event-form': 'campaign:create', 'event-schedule-form': 'campaign:create', 'registration-form': 'campaign:create', 'checkin-form': 'campaign:create', 'partner-form': 'campaign:create', 'feedback-form': 'campaign:create', 'reply-form': 'campaign:create', 'voice-task-form': 'campaign:create', 'case-resolve-form': 'campaign:create', 'task-form': 'report:read' };
+            for (const [id, permission] of Object.entries(forms))
+                $(id).hidden = !can(permission);
+            $('content-form').closest('.card').hidden = !can('campaign:create') || surface === 'review';
+            const reviewGrid = $('content-form').closest('.grid');
+            if (reviewGrid)
+                reviewGrid.style.gridTemplateColumns = surface === 'review' ? '1fr' : '';
+            page(activePage, false);
+        }
+        function selectOptions(selector, options) {
+            document.querySelectorAll(selector).forEach(select => { const prev = select.value; select.innerHTML = '<option value="">请选择</option>' + options.map(o => '<option value="' + x(o.id) + '">' + x(o.label) + '</option>').join(''); if (options.some(o => o.id === prev))
+                select.value = prev;
+            else if (options.length === 1)
+                select.value = options[0].id; });
+        }
+        const ab = mountAB({ api, page, can, snapshot: () => ({ me, health, db, errors: loadErrors, scope: currentStore }) });
+        for (const id of ['lang-zh', 'lang-en'])
+            $(id).addEventListener('click', () => { setTimeout(() => ab.update(), 0); });
+        async function refresh() {
+            const epoch = ++refreshEpoch;
+            let nextMe = null;
+            try {
+                health = await api('/api/healthz');
+                if (epoch !== refreshEpoch)
+                    return;
+                $('mode').textContent = health.mode.toUpperCase();
+                $('production-empty').hidden = !(health.mode === 'production' && !health.has_business_data);
+            }
+            catch {
+                if (epoch !== refreshEpoch)
+                    return;
+                health = null;
+                notice(tx('服务连接失败，请重试。', 'Service unavailable. Retry.'), 'error');
+            }
+            try {
+                nextMe = await api('/api/me');
+            }
+            catch (error) {
+                if (error.status !== 401 && me) {
+                    notice(tx('账号状态读取失败，未展示新的数据。', 'Account state unavailable. No fresh data displayed.'), 'error');
+                    return;
+                }
+            }
+            if (epoch !== refreshEpoch)
+                return;
+            me = nextMe;
+            $('login').hidden = Boolean(me);
+            $('workspace').hidden = !me;
+            $('logout').hidden = !me;
+            $('user-label').textContent = me ? me.user.display_name + ' · ' + me.role : '';
+            if (!me) {
+                for (const key of Object.keys(db))
+                    delete db[key];
+                scopeInitialized = false;
+                $('workspace-store').disabled = true;
+                ab.update();
+                translateAdmin();
+                return;
+            }
+            if (!scopeInitialized) {
+                const requested = new URL(location.href).searchParams.get('store');
+                currentStore = requested === 'all' ? '' : me.store_ids.includes(requested) ? requested : me.store_ids[0] || '';
+                scopeInitialized = true;
+            }
+            if (currentStore && !me.store_ids.includes(currentStore))
+                currentStore = me.store_ids[0] || '';
+            const selector = $('workspace-store');
+            selector.innerHTML = '<option value="">' + tx('全部授权门店', 'All authorized stores') + '</option>' + (me.stores || []).map((store) => '<option value="' + x(store.id) + '">' + x(store.name) + '</option>').join('');
+            selector.value = currentStore;
+            selector.disabled = false;
+            const sources = [['brand', '/api/brand/overview', 'brand:read'], ['campaigns', '/api/campaigns', 'campaign:read'], ['offers', '/api/offers', 'campaign:read'], ['content', '/api/content', 'campaign:read'], ['imports', '/api/imports', 'brand:read'], ['metrics', '/api/metrics', 'report:read'], ['outreach', '/api/outreach', 'outreach:read'], ['events', '/api/events', 'campaign:read'], ['templates', '/api/events/templates', 'campaign:read'], ['partners', '/api/partners', 'campaign:read'], ['feedback', '/api/feedback', 'report:read'], ['cases', '/api/support-cases', 'report:read'], ['daily', '/api/reports/daily', 'report:read']];
+            await Promise.all(sources.map(async ([key, path, permission]) => {
+                if (!can(permission)) {
+                    db[key] = {};
+                    loadErrors[key] = tx('无权读取', 'Not authorized');
+                    return;
+                }
+                try {
+                    const data = await api(path);
+                    if (epoch !== refreshEpoch)
+                        return;
+                    db[key] = data;
+                    delete loadErrors[key];
+                }
+                catch (error) {
+                    if (epoch !== refreshEpoch)
+                        return;
+                    db[key] = {};
+                    loadErrors[key] = tx('读取失败：', 'Read failed: ') + (error instanceof Error ? error.message : String(error));
+                }
+            }));
+            if (epoch !== refreshEpoch)
+                return;
+            render();
+            ab.update();
+            permissions();
+            if ($('notice').textContent?.includes('正在连接'))
+                notice(tx('已连接。当前演示/测试资料与真实业务分开。', 'Connected. Demo/test records are separate from live business.'));
+        }
+        function render() {
+            const metric = db.metrics?.summary;
+            const connectors = health?.connectors || {};
+            selectOptions('[data-store]', me.store_ids.filter((id) => !currentStore || id === currentStore).map((id) => ({ id, label: (me.stores || []).find((s) => s.id === id)?.name || id })));
+            selectOptions('#cashier-event', (db.events?.items || []).filter((e) => e.status === 'open').map((e) => ({ id: e.id, label: e.name })));
+            selectOptions('[data-campaign]', (db.campaigns?.items || []).map((c) => ({ id: c.id, label: c.name + ' · ' + c.status })));
+            const resourceOptions = (id, items) => { const select = $(id); const selected = new Set(Array.from(select.selectedOptions).map(option => option.value)); select.innerHTML = items.map(item => '<option value="' + x(item.id) + '"' + (selected.has(item.id) ? ' selected' : '') + '>' + x(item.label) + '</option>').join(''); };
+            resourceOptions('campaign-products', (db.brand?.products || []).map((p) => ({ id: p.id, label: p.names?.en || p.external_sku })));
+            resourceOptions('campaign-assets', (db.brand?.assets || []).map((a) => ({ id: a.id, label: a.storage_key + ' · ' + a.rights_status })));
+            selectOptions('#price-product', (db.brand?.products || []).map((p) => ({ id: p.id, label: p.names?.en || p.external_sku })));
+            selectOptions('#event-template', (db.templates?.items || []).map((t) => ({ id: t.id, label: t.name })));
+            selectOptions('[data-event]', (db.events?.items || []).filter((a) => a.status === 'open').map((a) => ({ id: a.id, label: a.name + ' · ' + a.status })));
+            selectOptions('#schedule-event', (db.events?.items || []).filter((a) => a.status === 'draft').map((a) => ({ id: a.id, label: a.name })));
+            selectOptions('#voice-task-select', (db.cases?.tasks || []).filter((t) => t.owner_user_id === me.user.id && t.status === 'open').map((t) => ({ id: t.id, label: t.kind + ' · ' + t.id.slice(0, 8) })));
+            selectOptions('#resolve-case', (db.cases?.items || []).filter((c) => !['resolved', 'closed'].includes(c.status)).map((c) => ({ id: c.id, label: c.id.slice(0, 8) + ' · ' + c.status })));
+            selectOptions('#reply-case', (db.cases?.items || []).filter((c) => !['resolved', 'closed'].includes(c.status)).map((c) => ({ id: c.id, label: c.id.slice(0, 8) + ' · ' + c.status })));
+            selectOptions('#task-select', (db.daily?.tasks || []).filter((t) => t.owner_user_id === me.user.id && t.status !== 'done').map((t) => ({ id: t.id, label: t.title })));
+            renderList('brand-list', (db.brand?.needs_input || []).map((n) => row(n, '待补')).join('') + (db.brand?.revisions || []).map((r) => row('品牌版本 ' + r.version, '创建：' + x(date(r.created_at)), r.status, button('approve-brand', r.id, '批准版本', can('brand:approve') && r.status !== 'approved'))).join(''), '暂无品牌版本。');
+            renderList('product-list', (db.brand?.products || []).map((p) => row(p.names?.en || p.external_sku, 'SKU ' + x(p.external_sku) + ' · 价格版本 ' + x(p.current_price_version_id || '未设置'), p.status)).join(''), '暂无产品。');
+            renderList('asset-list', (db.brand?.assets || []).map((a) => row(a.storage_key, '授权用途：' + x((a.allowed_uses || []).join(', ') || '未登记'), a.rights_status)).join(''), '暂无素材。');
+            renderList('campaign-list', (db.campaigns?.items || []).map((c) => row(c.name, '目标：' + x(c.objective || '未填写') + ' · 缺失：' + x((c.needs_input || []).join(', ') || '无'), c.status, button('approve-campaign', c.id, '批准', can('campaign:approve') && c.status !== 'approved'))).join(''), '暂无活动。');
+            renderList('offer-list', (db.offers?.items || []).map((o) => row(o.name, '到期：' + x(date(o.valid_to)) + ' · 已发放 ' + x(o.issued_count), o.status)).join(''), '暂无优惠。');
+            if (latestLink)
+                $('generated-link').innerHTML = '<a href="' + x(latestLink) + '" target="_blank" rel="noopener noreferrer">' + x(location.origin + latestLink) + '</a> ' + button('copy-link', '', '复制');
+            renderList('content-list', (db.content?.items || []).map((c) => row('内容版本 ' + c.revision + ' · ' + c.id.slice(0, 8), '缺失：' + x((c.needs_input || []).join(', ') || '无'), c.status, button('content-view', c.id, '查看') + button('content-edit', c.id, '编辑内容', can('campaign:create')) + button('content-history', c.id, '历史版本') + button('content-review', c.id, '孟语复核', (can('brand:approve') || me.role === 'LOCAL_REVIEWER') && c.status === 'needs_local_review') + button('content-submit', c.id, '提交', can('campaign:create') && c.status === 'draft' && !(c.needs_input || []).length) + button('content-approve', c.current_approval_id || '', '批准', can('brand:approve') && Boolean(c.current_approval_id) && c.status === 'pending_approval') + button('content-reject', c.current_approval_id || '', '退回', can('brand:approve') && Boolean(c.current_approval_id) && c.status === 'pending_approval') + button('content-export', c.id, '导出', can('campaign:create') && c.status === 'approved'))).join(''), '暂无内容草稿。');
+            $('metric-summary').innerHTML = metric ? '<span class="chip">质量：' + x(metric.quality) + '</span><p>净营收：<strong>' + x(money(metric.net_revenue_minor)) + '</strong><br>合格订单：<strong>' + x(metric.qualified_order_count ?? '—') + '</strong><br>完整至：' + x(metric.complete_through || '未确认') + '</p>' : empty('指标缺失：' + (db.metrics?.missing_reason || 'orders_not_imported'));
+            renderList('import-list', (db.imports?.items || []).slice().reverse().map((b) => row(b.file_name, x(b.kind) + ' · ' + x(b.source) + ' · 有效 ' + x(b.valid_row_count) + '/' + x(b.row_count) + ' · 错误 ' + x(b.error_count), b.status, button('commit-batch', b.id, '提交', can('import:write') && b.status === 'preview' && b.error_count === 0))).join(''), '暂无导入。');
+            renderList('outreach-list', (db.outreach?.items || []).slice().reverse().map((o) => row(o.template_id, x(o.channel) + ' · 预算 ' + x(money(o.budget_minor)), o.status, button('outreach-submit', o.id, '提交/批准', (can('outreach:create') || can('outreach:approve')) && o.status === 'pending_approval') + button('outreach-export', o.id, '人工导出预览', can('member:export') && o.status === 'approved') + button('outreach-dispatch', o.id, '尝试发送', can('outreach:dispatch') && o.status === 'approved'))).join(''), '暂无触达任务。');
+            renderList('event-list', (db.events?.items || []).map((a) => row(a.name, '日程：' + x(date(a.startsAt)) + '—' + x(date(a.endsAt)) + ' · 报名 ' + x(a.registrationCount ?? 0) + '/' + x(a.capacity) + ' · 签到 ' + x(a.checkinCount ?? 0), a.status, button('event-edit', a.id, '补齐日程', can('campaign:create') && a.status === 'draft') + button('event-open', a.id, '开放', can('campaign:create') && a.status === 'draft') + button('event-close', a.id, '关闭', can('campaign:create') && a.status === 'open'))).join(''), '暂无校园活动。');
+            renderList('partner-list', (db.partners?.items || []).map((p) => row(p.name, x(p.sourceUrl || ''), p.stage)).join(''), '暂无伙伴资料。');
+            renderList('feedback-list', (db.feedback?.items || []).slice().reverse().slice(0, 8).map((f) => row(f.evidence_excerpt || f.id, x(f.source) + ' · ' + x(date(f.received_at)), f.risk, button('feedback-view', f.id, '查看'))).join(''), '暂无反馈。');
+            renderList('case-list', (db.cases?.items || []).map((c) => row('工单 ' + c.id.slice(0, 8), '截止：' + x(date(c.sla_due_at)), c.status, button('case-select', c.id, '处理', can('campaign:create') && !['resolved', 'closed'].includes(c.status)))).join(''), '暂无工单。');
+            renderList('voice-task-list', (db.cases?.tasks || []).map((t) => row(t.kind, '负责人：' + x(t.owner_user_id?.slice(0, 8) || '未指派') + ' · 截止：' + x(date(t.due_at)), t.status)).join(''), '暂无人工任务。');
+            renderList('daily-list', (db.daily?.items || []).slice().reverse().slice(0, 5).map((r) => row('日报 v' + r.version, '截至 ' + x(date(r.as_of)), r.status, button('report-view', r.id, '查看分析'))).join(''), '尚未生成日报。');
+            renderList('task-list', (db.daily?.tasks || []).map((t) => row(t.title, '负责人：' + x(t.owner_user_id.slice(0, 8)), t.status)).join(''), '暂无行动任务。');
+            renderList('connector-list', Object.entries(connectors).map(([name, s]) => row(name, x(s.reason || ''), s.mode || 'unconfigured')).join(''), '暂无连接器状态。');
+            translateAdmin();
+        }
+        async function showFeedbackDetail(id) {
+            const r = await api('/api/feedback/' + encodeURIComponent(id));
+            $('reply-list').innerHTML = '<h3>反馈详情</h3><p>' + x(r.original_text || r.item.evidence_excerpt) + '</p>' + (r.replies || []).map((reply) => row(reply.body || '无权查看回复原文', x(reply.channel), reply.status, button('reply-submit', reply.id, '提交', can('campaign:create') && reply.status === 'draft') + button('reply-approve', reply.id, '批准', can('brand:approve') && reply.status === 'pending_approval') + button('reply-execute', reply.id, '转人工执行', can('campaign:create') && reply.status === 'approved'))).join('');
+        }
+        async function act(fn, message) {
+            if (acting)
+                return;
+            acting = true;
+            $('workspace').setAttribute('aria-busy', 'true');
+            try {
+                await fn();
+                notice(message, 'success');
+            }
+            catch (error) {
+                notice(error instanceof Error ? error.message : String(error), 'error');
+            }
+            finally {
+                acting = false;
+                $('workspace').setAttribute('aria-busy', 'false');
+            }
+            await refresh();
+            if (currentFeedbackId && !$('page-voice').hidden)
+                try {
+                    await showFeedbackDetail(currentFeedbackId);
+                }
+                catch { }
+        }
+        function bind(id, fn, message) { const form = $(id); form.addEventListener('submit', ev => { ev.preventDefault(); void act(() => fn(form), message); }); }
+        const iso = (s) => s ? new Date(s).toISOString() : null;
+        const download = (name, payload) => { const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
+        function modal(title, contents) {
+            const trigger = document.activeElement;
+            const d = document.createElement('dialog');
+            d.className = 'ab-dialog';
+            d.innerHTML = '<div class="ab-card-head"><h2>' + x(title) + '</h2><button type="button" data-close aria-label="Close">×</button></div>' + contents;
+            const close = () => { d.close(); d.remove(); trigger?.isConnected && trigger.focus(); };
+            d.querySelector('[data-close]').addEventListener('click', close);
+            d.addEventListener('cancel', e => { e.preventDefault(); close(); });
+            document.body.append(d);
+            d.showModal();
+            return d;
+        }
+        async function editContent(id) {
+            const r = await api('/api/content/' + encodeURIComponent(id));
+            const data = r.package;
+            const d = modal(tx('编辑内容', 'Edit content'), '<p>' + tx('保存会重置孟语复核并使旧审批失效。批准内容的历史快照保留。', 'Saving resets Bengali review and invalidates prior approval. Approved history remains immutable.') + '</p><form><label>中文操作说明<textarea name="notes">' + x(data.operator_notes_zh) + '</textarea></label>' + data.variants.map((v, i) => '<div class="editor-variant"><h3>' + x(v.locale) + '</h3><label>Title<input name="title-' + i + '" value="' + x(v.title) + '" required></label><label>Caption<textarea name="caption-' + i + '" required>' + x(v.caption) + '</textarea></label></div>').join('') + '<p class="error-text" role="status"></p><button class="btn" type="submit">' + tx('保存改稿', 'Save new draft') + '</button></form>');
+            d.querySelector('form').addEventListener('submit', e => { e.preventDefault(); const f = e.currentTarget; const submit = f.querySelector('button[type=submit]'); if (submit.disabled)
+                return; submit.disabled = true; data.operator_notes_zh = v(f, 'notes'); data.variants.forEach((item, i) => { item.title = v(f, 'title-' + i); item.caption = v(f, 'caption-' + i); }); void api('/api/content/' + encodeURIComponent(id), 'PATCH', { package_data: data, expected_hash: r.item.content_hash }).then(async () => { d.querySelector('[data-close]').click(); notice(tx('已保存新稿，必须重新复核与审批。', 'Draft saved. Review and approval are required again.'), 'success'); await refresh(); }).catch(error => { f.querySelector('[role=status]').textContent = error.message; submit.disabled = false; }); });
+        }
+        document.addEventListener('click', ev => {
+            const b = ev.target.closest('button[data-page],button[data-action]');
+            if (!b)
+                return;
+            if (b.dataset.page) {
+                page(b.dataset.page);
+                return;
+            }
+            const id = b.dataset.id || '';
+            const action = b.dataset.action || '';
+            if (action === 'content-edit') {
+                void editContent(id).catch(error => notice(error.message, 'error'));
+                return;
+            }
+            if (action === 'content-history') {
+                void act(async () => { const r = await api('/api/content/' + encodeURIComponent(id) + '/history'); $('content-detail').innerHTML = '<h3>' + tx('历史版本', 'Revision history') + '</h3>' + (r.items || []).map((h) => '<details class="row"><summary>' + x(h.reason) + ' · ' + x(date(h.capturedAt)) + '</summary><code class="record-code">' + x(h.contentHash) + '</code><p data-user-content>' + x(h.revision.packageData.operator_notes_zh) + '</p>' + h.revision.packageData.variants.map((v) => '<p data-user-content><strong>' + x(v.locale) + '</strong> ' + x(v.caption) + '</p>').join('') + '</details>').join(''); }, '历史快照已读取。');
+                return;
+            }
+            if (action === 'content-reject') {
+                const d = modal(tx('退回审批', 'Reject approval'), '<form><label>' + tx('退回原因', 'Reason') + '<textarea name="reason" required maxlength="2000"></textarea></label><p role="status" class="error-text"></p><button class="btn" type="submit">' + tx('确认退回', 'Reject') + '</button></form>');
+                d.querySelector('form').addEventListener('submit', e => { e.preventDefault(); void api('/api/approvals/' + encodeURIComponent(id) + '/reject', 'POST', { reason: v(e.currentTarget, 'reason') }).then(async () => { d.querySelector('[data-close]').click(); await refresh(); }).catch(error => { d.querySelector('[role=status]').textContent = error.message; }); });
+                return;
+            }
+            if (action === 'go-brand') {
+                page('brand');
+                return;
+            }
+            if (action === 'case-select') {
+                $('reply-case').value = id;
+                $('resolve-case').value = id;
+                page('voice');
+                return;
+            }
+            if (action === 'event-edit') {
+                const event = (db.events?.items || []).find((a) => a.id === id);
+                if (event) {
+                    $('schedule-event').value = id;
+                    document.querySelector('#event-schedule-form [name=capacity]').value = String(event.capacity);
+                    for (const key of ['starts_at', 'ends_at']) {
+                        const value = event[key === 'starts_at' ? 'startsAt' : 'endsAt'];
+                        document.querySelector('#event-schedule-form [name=' + key + ']').value = value ? new Date(value).toLocaleString('sv-SE', { hour12: false }).replace(' ', 'T').slice(0, 16) : '';
+                    }
+                    $('schedule-event').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return;
+            }
+            if (action === 'report-view') {
+                const r = (db.daily?.items || []).find((item) => item.id === id);
+                if (r) {
+                    const section = (title, items) => '<h3>' + x(title) + '</h3>' + (items.length ? items.map(item => '<p>' + x(item.text || item.hypothesis || String(item)) + '</p>').join('') : empty('暂无'));
+                    $('daily-detail').innerHTML = '<strong>日报 v' + x(r.version) + ' · ' + x(r.status) + '</strong><p>数据完整至：' + x(r.complete_through || '未确认') + '</p>' + section('观察', r.observations || []) + section('假设', r.hypotheses || []) + section('建议', r.advice || []);
+                }
+                return;
+            }
+            if (action === 'copy-link') {
+                void navigator.clipboard.writeText(location.origin + latestLink).then(() => notice('链接已复制。', 'success')).catch(() => notice('复制失败，请手动复制。', 'error'));
+                return;
+            }
+            if (action === 'content-view') {
+                void act(async () => { const r = await api('/api/content/' + encodeURIComponent(id)); $('content-detail').innerHTML = '<strong>来源</strong><p>' + x((r.package.sources || []).map((s) => s.excerpt).join(' · ')) + '</p>' + (r.package.variants || []).map((v) => row(v.locale + ' · ' + v.review_status, '<strong>' + x(v.title) + '</strong><p>' + x(v.caption) + '</p>')).join(''); }, '内容详情已展开。');
+                return;
+            }
+            if (action === 'feedback-view') {
+                currentFeedbackId = id;
+                void showFeedbackDetail(id).then(() => notice('反馈详情已展开。', 'success')).catch(error => notice(error instanceof Error ? error.message : String(error), 'error'));
+                return;
+            }
+            const handlers = {
+                'approve-brand': () => api('/api/brand/revisions/' + encodeURIComponent(id) + '/approve', 'POST'),
+                'approve-campaign': () => api('/api/campaigns/' + encodeURIComponent(id), 'PATCH', { status: 'approved' }),
+                'content-review': () => api('/api/content/' + encodeURIComponent(id) + '/review-bn', 'POST', { decision: 'reviewed' }),
+                'content-submit': () => api('/api/content/submit', 'POST', { revision_id: id }),
+                'content-approve': () => api('/api/approvals/' + encodeURIComponent(id) + '/approve', 'POST'),
+                'content-export': async () => { const r = await api('/api/content/export', 'POST', { revision_id: id }); download('adda-content-' + id.slice(0, 8) + '.json', r.package); },
+                'commit-batch': () => api('/api/imports/' + encodeURIComponent(id) + '/commit', 'POST'),
+                'outreach-submit': () => api('/api/outreach/' + encodeURIComponent(id) + '/submit', 'POST'),
+                'outreach-export': async () => { const r = await api('/api/outreach/' + encodeURIComponent(id) + '/export', 'POST'); $('segment-preview').textContent = '可人工处理 ' + r.items.length + ' 人；受政策阻断 ' + r.blocked_count + ' 人。无明文联系人。'; },
+                'outreach-dispatch': async () => { const result = await api('/api/outreach/' + encodeURIComponent(id) + '/dispatch', 'POST'); if (result.delivery_mode === 'external_blocked' || result.campaign?.status === 'blocked')
+                    throw new Error('未发送：连接器未配置或发送政策阻断。'); return result; },
+                'event-open': () => api('/api/events/' + encodeURIComponent(id) + '/status', 'POST', { status: 'open' }),
+                'event-close': () => api('/api/events/' + encodeURIComponent(id) + '/status', 'POST', { status: 'closed' }),
+                'reply-submit': () => api('/api/reply-revisions/' + encodeURIComponent(id) + '/submit', 'POST'),
+                'reply-approve': () => api('/api/reply-revisions/' + encodeURIComponent(id) + '/approve', 'POST'),
+                'reply-execute': () => api('/api/reply-revisions/' + encodeURIComponent(id) + '/execute', 'POST')
+            };
+            if (handlers[action])
+                void act(handlers[action], '操作已完成。');
+        });
+        $('login-form').addEventListener('submit', ev => { ev.preventDefault(); void (async () => { try {
+            const response = await fetch('/api/auth/login', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: $('email').value, password: $('password').value }) });
+            const result = await response.json();
+            if (!response.ok)
+                throw new Error(result.message || result.error_code);
+            $('password').value = '';
+            $('login-result').textContent = '';
+            notice('已登录：' + result.user.display_name, 'success');
+            await refresh();
+        }
+        catch (error) {
+            $('login-result').textContent = error instanceof Error ? error.message : '登录失败';
+        } })(); });
+        $('lang-zh').addEventListener('click', () => { adminLanguage = 'zh'; translateAdmin(); });
+        $('lang-en').addEventListener('click', () => { adminLanguage = 'en'; translateAdmin(); });
+        $('logout').addEventListener('click', () => { void act(async () => { await api('/api/auth/logout', 'POST'); refreshEpoch++; me = null; scopeInitialized = false; latestLink = ''; currentFeedbackId = ''; clearDetails(); }, '已退出登录。'); });
+        bind('brand-form', async (f) => { await api('/api/brand/documents', 'POST', { source_type: 'form', source_label: v(f, 'source_label'), store_id: v(f, 'store_id') || null, content: v(f, 'content') }); f.reset(); }, '品牌事实已保存，等待审批。');
+        bind('product-form', async (f) => { const price = v(f, 'price_minor'); await api('/api/products', 'POST', { store_id: v(f, 'store_id'), external_sku: v(f, 'external_sku'), names: { en: v(f, 'name') }, price_minor: price ? Number(price) : null }); f.reset(); }, '产品已添加；价格仍需审批。');
+        bind('price-form', async (f) => { await api('/api/products/' + encodeURIComponent(v(f, 'product_id')) + '/prices', 'POST', { amount_minor: Number(v(f, 'amount_minor')), status: v(f, 'status'), source_citation: v(f, 'source_citation') }); }, '价格版本已保存。');
+        bind('asset-form', async (f) => { await api('/api/media-assets', 'POST', { store_id: v(f, 'store_id'), storage_key: v(f, 'storage_key'), checksum: v(f, 'checksum'), rights_status: v(f, 'rights_status'), allowed_uses: v(f, 'allowed_uses').split(',').map(s => s.trim()).filter(Boolean) }); f.reset(); }, '素材元数据已登记。');
+        bind('campaign-form', async (f) => { const budget = v(f, 'budget_minor'); await api('/api/campaigns', 'POST', { store_id: v(f, 'store_id'), name: v(f, 'name'), objective: v(f, 'objective') || null, budget_minor: budget ? Number(budget) : null }); f.reset(); }, '活动草稿已创建。');
+        bind('campaign-resources-form', async (f) => { const chosen = (id) => Array.from($(id).selectedOptions).map(option => option.value); await api('/api/campaigns/' + encodeURIComponent(v(f, 'campaign_id')), 'PATCH', { product_ids: chosen('campaign-products'), asset_ids: chosen('campaign-assets') }); }, '活动关联已保存；已有内容需要重新生成并审批。');
+        bind('source-form', async (f) => { const r = await api('/api/campaigns/' + encodeURIComponent(v(f, 'campaign_id')) + '/source-links', 'POST', { label: v(f, 'label'), channel: v(f, 'channel') }); latestLink = r.url; }, '来源链接已生成，请立即复制。');
+        bind('offer-form', async (f) => { const max = v(f, 'max_redemptions'); await api('/api/offers', 'POST', { campaign_id: v(f, 'campaign_id'), name: v(f, 'name'), terms: v(f, 'terms'), valid_to: new Date(Date.now() + Number(v(f, 'days')) * 86400000).toISOString(), max_redemptions: max ? Number(max) : undefined }); }, '优惠已创建。');
+        bind('content-form', async (f) => { await api('/api/content/generate', 'POST', { campaign_id: v(f, 'campaign_id'), channel: v(f, 'channel'), content_pillar: v(f, 'content_pillar'), target_metric: v(f, 'target_metric') }); }, '内容草稿已生成，请逐语种审阅。');
+        bind('import-form', async (f) => { const file = $('csv-file').files?.[0]; const content = file ? await file.text() : v(f, 'content'); if (!content)
+            throw new Error('请选择 CSV 文件或粘贴内容。'); const r = await api('/api/imports/preview', 'POST', { store_id: v(f, 'store_id'), kind: v(f, 'kind'), source: v(f, 'source'), file_name: file?.name || 'pasted.csv', content, complete_through: iso(v(f, 'complete_through')) }); pendingImport = r.import.id; $('import-preview').innerHTML = '<strong>有效 ' + x(r.preview.valid_row_count) + '/' + x(r.preview.row_count) + ' 行；错误 ' + x(r.preview.error_count) + '</strong>' + (r.preview.errors || []).slice(0, 20).map((er) => '<p class="fine">第 ' + x(er.row_number) + ' 行：' + x(er.message) + '</p>').join(''); $('commit-import').disabled = r.preview.error_count > 0; }, '预览完成，请核对后提交。');
+        $('commit-import').addEventListener('click', () => { void act(async () => { if (!pendingImport)
+            throw new Error('请先预览 CSV。'); await api('/api/imports/' + encodeURIComponent(pendingImport) + '/commit', 'POST'); pendingImport = ''; $('commit-import').disabled = true; }, 'CSV 已提交，指标已刷新。'); });
+        bind('segment-form', async (f) => { const r = await api('/api/segments/preview', 'POST', { store_id: v(f, 'store_id'), rule: v(f, 'rule') }); $('segment-preview').textContent = '符合规则 ' + r.count + ' 人；样本已脱敏。'; }, '受众预览已更新。');
+        bind('outreach-form', async (f) => { await api('/api/outreach/preview', 'POST', { store_id: v(f, 'store_id'), rule: v(f, 'rule'), name: v(f, 'name'), channel: v(f, 'channel'), template_id: v(f, 'template_id'), template_text: v(f, 'template_text'), template_approved: new FormData(f).get('template_approved') === 'on', budget_minor: Number(v(f, 'budget_minor')), cost_per_attempt_minor: 0, holdout_percent: Number(v(f, 'holdout_percent')) }); }, '触达草稿已创建。');
+        bind('event-form', async (f) => { await api('/api/events', 'POST', { store_id: v(f, 'store_id'), template_id: v(f, 'template_id'), name: v(f, 'name'), capacity: Number(v(f, 'capacity')), starts_at: iso(v(f, 'starts_at')), ends_at: iso(v(f, 'ends_at')) }); f.reset(); }, '活动草稿已创建。');
+        bind('event-schedule-form', async (f) => { await api('/api/events/' + encodeURIComponent(v(f, 'event_id')), 'PATCH', { capacity: Number(v(f, 'capacity')), starts_at: iso(v(f, 'starts_at')), ends_at: iso(v(f, 'ends_at')) }); f.reset(); }, '活动日程已保存，可以开放报名。');
+        bind('registration-form', async (f) => { await api('/api/events/' + encodeURIComponent(v(f, 'event_id')) + '/registrations', 'POST', { member_id: v(f, 'member_id') }); }, '报名已登记。');
+        bind('checkin-form', async (f) => { await api('/api/events/' + encodeURIComponent(v(f, 'event_id')) + '/checkins', 'POST', { member_id: v(f, 'member_id'), method: 'staff_confirmed' }); }, '签到已登记。');
+        bind('partner-form', async (f) => { await api('/api/partners', 'POST', { name: v(f, 'name'), kind: v(f, 'kind'), source_url: v(f, 'source_url'), contact_permission: new FormData(f).get('contact_permission') === 'on' }); f.reset(); }, '伙伴资料已登记。');
+        bind('feedback-form', async (f) => { await api('/api/feedback', 'POST', { store_id: v(f, 'store_id'), source: v(f, 'source'), text: v(f, 'text') }); f.reset(); }, '反馈已保存。');
+        bind('reply-form', async (f) => { const caseId = v(f, 'case_id'); await api('/api/support-cases/' + encodeURIComponent(caseId) + '/replies', 'POST', { channel: v(f, 'channel'), body: v(f, 'body') }); currentFeedbackId = (db.cases?.items || []).find((c) => c.id === caseId)?.feedback_id || ''; }, '回复草稿已保存。');
+        bind('voice-task-form', async (f) => { await api('/api/voice-tasks/' + encodeURIComponent(v(f, 'task_id')) + '/complete', 'POST', { evidence: v(f, 'evidence') }); f.reset(); }, '人工处理证据已记录；仅代表操作员确认。');
+        bind('case-resolve-form', async (f) => { await api('/api/support-cases/' + encodeURIComponent(v(f, 'case_id')), 'PATCH', { status: 'closed', evidence: v(f, 'evidence') }); f.reset(); }, '工单已结案，证据已留存。');
+        $('generate-report').addEventListener('click', () => { void act(async () => { await api('/api/reports/daily', 'POST'); }, '日报已生成。'); });
+        bind('task-form', async (f) => { await api('/api/control-tasks/' + encodeURIComponent(v(f, 'task_id')) + '/complete', 'POST', { evidence: v(f, 'evidence') }); }, '任务完成证据已记录。');
+        function clearDetails() { for (const id of ['content-detail', 'daily-detail', 'reply-list', 'generated-link', 'import-preview', 'segment-preview', 'cashier-reserve-result', 'cashier-match-result', 'cashier-checkin-result'])
+            $(id).replaceChildren(); pendingImport = ''; $('commit-import').disabled = true; }
+        $('workspace-store').addEventListener('change', () => { refreshEpoch++; currentStore = $('workspace-store').value; latestLink = ''; currentFeedbackId = ''; clearDetails(); const u = new URL(location.href); u.searchParams.set('store', currentStore || 'all'); history.replaceState(null, '', u); void refresh(); });
+        $('nav-toggle').addEventListener('click', () => { const open = document.body.dataset.menu !== 'open'; document.body.dataset.menu = open ? 'open' : 'closed'; $('nav-toggle').setAttribute('aria-expanded', String(open)); });
+        window.addEventListener('popstate', () => page(location.hash.slice(1) || 'overview', false));
+        bind('cashier-reserve-form', async (f) => { const r = await api('/api/redemptions/reserve', 'POST', { store_id: v(f, 'store_id'), coupon_token: v(f, 'coupon_token'), pos_order_ref: v(f, 'pos_order_ref') }); $('cashier-reserve-result').textContent = tx('已保留，待 POS 核验。券 ID：', 'Reserved, pending POS verification. Coupon ID: ') + r.coupon.id; const next = $('cashier-match-form'); next.elements.namedItem('coupon_id').value = r.coupon.id; next.elements.namedItem('pos_order_ref').value = v(f, 'pos_order_ref'); f.elements.namedItem('coupon_token').value = ''; }, '券状态已保存；尚未计入成交。');
+        bind('cashier-match-form', async (f) => { const r = await api('/api/redemptions/' + encodeURIComponent(v(f, 'coupon_id')) + '/match-pos', 'POST', { store_id: v(f, 'store_id'), pos_order_ref: v(f, 'pos_order_ref'), order_source: v(f, 'order_source') }); $('cashier-match-result').textContent = tx('POS 核验结果：', 'POS match result: ') + r.coupon.status; }, '订单核验完成。');
+        bind('cashier-checkin-form', async (f) => { const r = await api('/api/events/' + encodeURIComponent(v(f, 'event_id')) + '/checkins', 'POST', { member_id: v(f, 'member_id'), method: 'staff_confirmed' }); $('cashier-checkin-result').textContent = tx('签到已记录：', 'Check-in recorded: ') + r.checkin.id; }, '现场核验已完成；不代表成交。');
+        page(surface === 'staff' ? 'cashier' : surface === 'review' ? 'content' : activePage, false);
+        void refresh();
+    })(function installABWorkspace(bridge) {
+        const x = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] || c);
+        const $ = (id) => document.getElementById(id);
+        const en = () => document.documentElement.lang === 'en';
+        const t = (zh, english) => en() ? english : zh;
+        const money = (n) => typeof n === 'number' && Number.isFinite(n) ? (n / 100).toLocaleString(en() ? 'en' : 'zh-CN', { maximumFractionDigits: 2 }) + ' BDT' : '—';
+        const statusName = (s) => ({ queued: t('排队中', 'Queued'), running: t('运行中', 'Running'), completed: t('分析完成', 'Analysis finished'), failed: t('失败', 'Failed'), cancelled: t('已取消', 'Cancelled'), needs_input: t('资料待补', 'Needs input') })[s] || s;
+        const names = { brand_guardian: 'Brand Guardian', growth_analyst: 'Growth Analyst', crm_planner: 'CRM Planner', content_producer: 'Content Producer', campus_coordinator: 'Campus Coordinator', event_planner: 'Event Planner', customer_voice: 'Customer Voice' };
+        const stat = (label, value, foot) => '<article class="ab-stat"><span>' + x(label) + '</span><strong>' + x(value) + '</strong><small>' + x(foot) + '</small></article>';
+        document.body.dataset.workspace = 'ab';
+        const home = document.createElement('div');
+        home.id = 'ab-home';
+        $('page-overview').prepend(home);
+        const nav = document.createElement('button');
+        nav.type = 'button';
+        nav.dataset.page = 'orchestration';
+        nav.className = 'ab-nav';
+        nav.innerHTML = '<span class="nav-index" aria-hidden="true">10</span><span class="nav-label">Agent 编排</span><span aria-hidden="true">↗</span>';
+        document.querySelector('.nav').querySelector('[data-page=overview]').after(nav);
+        const panel = document.createElement('section');
+        panel.id = 'page-orchestration';
+        panel.className = 'page ab-orchestration';
+        panel.hidden = true;
+        document.querySelector('#workspace main').append(panel);
+        let runs = [];
+        let selected = '';
+        let nodeIndex = 0;
+        let busy = false;
+        let loaded = false;
+        let loadError = '';
+        let message = '';
+        let owner = '';
+        let generation = 0;
+        const btn = (action, label, id = '', disabled = false) => '<button type="button" class="ab-button" data-ab-action="' + action + '" data-ab-id="' + x(id) + '"' + (disabled ? ' disabled' : '') + '>' + x(label) + '</button>';
+        function openRuns() { bridge.page('orchestration'); if (!loaded && !busy)
+            void reload();
+        else
+            renderRuns(); }
+        nav.addEventListener('click', openRuns);
+        function renderHome() {
+            const { db, errors, health, me, scope } = bridge.snapshot();
+            const store = (me?.stores || []).find((s) => s.id === scope);
+            const fail = (key) => Boolean(errors[key]) || !bridge.can(key === 'content' ? 'campaign:read' : 'report:read');
+            const content = db.content?.items || [];
+            const pending = content.filter((c) => ['draft', 'pending_approval', 'needs_local_review'].includes(c.status));
+            const cases = (db.cases?.items || []).filter((c) => !['resolved', 'closed'].includes(c.status));
+            const tasks = db.daily?.tasks || [];
+            const m = db.metrics?.summary;
+            const metricsReason = fail('metrics') ? t('未能读取，不能视作零', 'Unavailable, not zero') : t('来自指标接口；缺失保留空值', 'From metrics API; missing stays null');
+            home.innerHTML = '<div class="ab-home-top"><div><p class="ab-kicker">ADDA / GROWTH WORKSPACE</p><h1>' + t('增长驾驶舱', 'Growth workspace') + '</h1><p>' + t('先看证据，再决定下一步。当前展示所选门店的数据。', 'Evidence first, then the next action. Data covers your authorized scope.') + '</p></div><div>' + btn('open-runs', t('进入 Agent 编排 ↗', 'Open orchestration ↗')) + '</div></div>' +
+                '<div class="ab-context"><span>● ' + x(health?.mode || 'unknown') + '</span><span>' + t('指标不等于因果 · 分析不等于发布', 'Metrics are not causality · Analysis is not publication') + '</span><span>' + x(store ? store.name + ' · ' + store.timezone + ' · ' + store.currency : t('授权门店汇总', 'Authorized stores')) + '</span></div>' +
+                '<div class="ab-stats">' + stat(t('合格订单', 'Qualified orders'), fail('metrics') ? '—' : m?.qualified_order_count ?? '—', metricsReason) + stat(t('净营收', 'Net revenue'), fail('metrics') ? '—' : money(m?.net_revenue_minor), metricsReason) + stat(t('内容待审', 'Content to review'), fail('content') ? '—' : pending.length, fail('content') ? t('未读取', 'Not loaded') : t('草稿 / 审批 / 本地复核', 'Draft / approval / local review')) + stat(t('反馈待办', 'Open feedback cases'), fail('cases') ? '—' : cases.length, fail('cases') ? t('未读取', 'Not loaded') : t('未关闭工单', 'Cases not closed')) + '</div>' +
+                '<div class="ab-home-grid"><article class="ab-card"><div class="ab-card-head"><div><p class="ab-kicker">REQUIRES YOUR DECISION</p><h2>' + t('今天先处理什么', 'What needs attention') + '</h2></div><span class="ab-tag">' + t('人工决策', 'Human decision') + '</span></div>' +
+                (fail('content') ? '<p class="ab-error">' + t('内容队列读取失败或无权限，不展示虚假的零待办。', 'Content queue is unavailable or forbidden; it is not an empty queue.') + '</p>' : pending.slice(0, 4).map((c) => '<div class="ab-task"><span class="ab-task-icon">↗</span><div><strong>' + x(c.title || c.content_pillar || c.id) + '</strong><small>' + x(c.status) + ' · ' + t('使用原内容审批链路', 'Uses the existing approval workflow') + '</small></div>' + btn('content', t('审阅', 'Review')) + '</div>').join('') || '<p class="ab-empty">' + t('当前没有待审内容。创建活动后，在内容审批中生成草稿。', 'No content awaiting review. Create a campaign before generating drafts.') + '</p>') +
+                '<div class="ab-home-actions">' + btn('campaigns', t('新建活动', 'New campaign')) + btn('imports', t('核对 POS 与指标', 'Review POS and metrics')) + '</div></article>' +
+                '<aside class="ab-card ab-next"><p class="ab-kicker">CONTROLLED EXECUTION</p><h2>' + t('每一步，都可追溯', 'Every step is traceable') + '</h2><p>' + t('只读技能 → 持久化检查点 → 人工审阅。外发、触达和孟语复核继续使用原业务审批。', 'Read-only skills → persisted checkpoints → human review. Dispatch and Bengali review keep their existing approval controls.') + '</p><div class="ab-flow-mini"><span>01 · Scope</span><span>02 · Evidence</span><span>03 · Review</span></div>' + btn('open-runs', t('打开运行队列 →', 'Open run queue →')) + '</aside></div>' +
+                '<div class="ab-home-grid"><article class="ab-card"><h2>' + t('行动任务', 'Action tasks') + '</h2>' + (fail('daily') ? '<p class="ab-error">' + t('任务数据未读取', 'Task data unavailable') + '</p>' : tasks.filter((a) => a.status !== 'done').slice(0, 3).map((a) => '<div class="ab-task"><div><strong>' + x(a.title) + '</strong><small>' + x(a.status) + '</small></div>' + btn('control', t('查看证据', 'View evidence')) + '</div>').join('') || '<p class="ab-empty">' + t('暂无行动任务。', 'No action tasks.') + '</p>') + '</article><article class="ab-card"><h2>' + t('来源与连接器', 'Sources and connectors') + '</h2>' + Object.entries(health?.connectors || {}).map(([key, value]) => '<div class="ab-connector"><strong>' + x(key) + '</strong><span>' + x(value.mode) + '</span></div>').join('') + '<small>' + t('未配置渠道不会显示为已接通。', 'Unconfigured channels never appear connected.') + '</small></article></div>';
+        }
+        function renderRuns() {
+            const chosen = runs.find(r => r.id === selected) || runs[0];
+            if (chosen && !selected)
+                selected = chosen.id;
+            const nodes = chosen?.nodes || [];
+            if (nodeIndex >= nodes.length)
+                nodeIndex = 0;
+            const node = nodes[nodeIndex];
+            const authorized = bridge.can('report:read');
+            const focused = panel.contains(document.activeElement) ? document.activeElement?.dataset.abAction : undefined;
+            panel.innerHTML = '<div class="ab-run-header"><div><p class="ab-kicker">ADDA / RELAY</p><h1>' + t('Agent 编排', 'Agent orchestration') + '</h1><p>' + t('服务端检查点 · 确定性离线技能 · 外部写入禁用', 'Server checkpoints · Deterministic offline skills · External writes disabled') + '</p></div><div class="ab-run-actions">' + btn('reload', t('刷新', 'Refresh'), '', busy || !authorized) + btn('new', t('+ 新建任务', '+ New run'), '', busy || !authorized) + '</div></div>' +
+                '<div class="ab-run-message" role="status">' + x(loadError || message || (loaded ? t('展示当前用户最近 100 条授权任务。', 'Showing your latest 100 authorized runs.') : t('尚未读取任务。', 'Runs have not been loaded.'))) + '</div>' +
+                '<div class="ab-console"><aside class="ab-queue"><div class="ab-console-label">RUN QUEUE <span>' + (loaded && !loadError ? runs.length : '—') + '</span></div>' + (runs.map(r => '<button class="ab-run-item' + (r.id === selected ? ' is-selected' : '') + '" data-ab-action="select" data-ab-id="' + x(r.id) + '"><span>' + x(r.plan.toUpperCase()) + ' · v' + x(r.version) + '</span><strong>' + x(r.prompt.slice(0, 75)) + '</strong><small>' + x(statusName(r.status)) + ' · ' + x(r.storeId) + '</small></button>').join('') || '<p class="ab-empty">' + (loadError ? t('读取失败，不能判定队列为空。', 'Read failed; queue emptiness is unknown.') : t('创建一个有明确门店范围的检查任务。', 'Create a check with an explicit store scope.')) + '</p>') + '</aside><div class="ab-canvas"><div class="ab-console-label">' + t('执行图 / 顺序检查点', 'EXECUTION / SEQUENTIAL CHECKPOINTS') + '<span>READ ONLY</span></div>' +
+                (chosen ? '<div class="ab-run-title"><h2>' + x(chosen.prompt) + '</h2><p>' + x(chosen.id) + ' · v' + x(chosen.version) + '</p></div><div class="ab-nodes">' + nodes.map((n, i) => '<button class="ab-node' + (i === nodeIndex ? ' is-selected' : '') + '" data-ab-node="' + i + '"><span class="ab-node-index">' + String(i + 1).padStart(2, '0') + '</span><strong>' + x(names[n.skill] || n.skill) + '</strong><small class="ab-state-' + x(n.status) + '">' + x(statusName(n.status)) + '</small><small>' + t('尝试 ', 'Attempt ') + x(n.attempts) + ' · ' + x(n.result?.status || n.error || 'not_started') + '</small></button>').join('') + '</div>' +
+                    '<div class="ab-run-controls">' + btn('advance', t('推进下一步', 'Advance one step'), chosen.id, busy || chosen.execution === 'background' || !['queued', 'running'].includes(chosen.status) || !!loadError) + btn('retry', t('仅重试失败节点', 'Retry failed node'), chosen.id, busy || chosen.status !== 'failed' || !chosen.nodes.some((n) => n.status === 'failed' && n.error === 'analysis_failed' && n.attempts <= chosen.maxRetries) || !!loadError) + btn('cancel', t('取消任务', 'Cancel run'), chosen.id, busy || ['completed', 'cancelled'].includes(chosen.status) || !!loadError) + btn('export', t('导出记录', 'Export record'), chosen.id, !!loadError) + '</div>' +
+                    '<div class="ab-conclusion"><strong>' + t('执行状态', 'Execution') + ': ' + x(statusName(chosen.status)) + '</strong><span>' + t('业务结论', 'Business conclusion') + ': ' + x(chosen.conclusion) + '</span><p>' + t('分析完成不表示增长有效，也不表示任何内容已获准发布。', 'Finished analysis proves neither growth impact nor publication approval.') + '</p></div><div class="ab-event-log"><div class="ab-console-label">EVENT LOG</div>' + chosen.events.slice(-6).map((e) => '<div><time>' + x(new Date(e.at).toLocaleTimeString(en() ? 'en' : 'zh-CN', { timeZone: 'Asia/Dhaka' })) + '</time><span>' + x(e.type) + (e.node !== null ? ' · #' + (e.node + 1) : '') + '</span></div>').join('') + '</div>' : '<div class="ab-canvas-empty"><strong>' + t('一个任务，一条可核对的执行链。', 'One run. An auditable execution chain.') + '</strong><p>' + t('任务保存在后端，不依赖此标签页或本地缓存。', 'Runs live on the server, not in this tab or local cache.') + '</p></div>') +
+                '</div><aside class="ab-inspector"><div class="ab-console-label">INSPECTOR</div><h3>' + x(node ? names[node.skill] : t('节点详情', 'Node details')) + '</h3>' +
+                (chosen ? '<dl><dt>' + t('模型成本', 'Model cost') + '</dt><dd>' + money(chosen.actualCostMinor) + '</dd><dt>' + t('预算上限', 'Budget cap') + '</dt><dd>' + money(chosen.budgetMinor) + '</dd><dt>' + t('外部写入', 'External writes') + '</dt><dd>DISABLED</dd><dt>' + t('固定数据时点', 'Pinned as-of') + '</dt><dd>' + x(chosen.asOf) + '</dd></dl>' : '') +
+                (node?.error ? '<p class="ab-error">' + x(node.error) + '</p>' : '') + (node?.result ? '<div class="ab-observations">' + node.result.observations.map((o) => '<p>' + x(o.text) + '<small>' + x(o.sourceRefs.join(', ')) + '</small></p>').join('') + '<h4>' + t('仍需补充', 'Still required') + '</h4><p>' + x((node.result.needsInput || []).join(' · ') || '—') + '</p></div>' : '<p>' + t('选择节点查看实际输出与缺失原因。', 'Select a node to inspect outputs and missing inputs.') + '</p>') + btn('content', t('前往内容审批 →', 'Open content review →')) + '</aside></div>';
+            if (focused)
+                panel.querySelector('[data-ab-action="' + focused + '"]')?.focus({ preventScroll: true });
+        }
+        async function reload() {
+            if (!bridge.can('report:read')) {
+                runs = [];
+                loaded = false;
+                loadError = t('没有读取编排的权限。', 'No permission to read runs.');
+                renderRuns();
+                return;
+            }
+            const epoch = generation;
+            busy = true;
+            if (!loaded)
+                renderRuns();
+            try {
+                const result = await bridge.api('/api/control/runs');
+                if (epoch !== generation)
+                    return;
+                if (!Array.isArray(result.items))
+                    throw new Error('invalid_run_response');
+                runs = result.items;
+                if (!runs.some(r => r.id === selected))
+                    selected = runs[0]?.id || '';
+                loaded = true;
+                loadError = '';
+            }
+            catch (error) {
+                if (epoch === generation) {
+                    loadError = t('任务读取失败：', 'Run read failed: ') + String(error instanceof Error ? error.message : error);
+                    runs = [];
+                    loaded = false;
+                }
+            }
+            finally {
+                if (epoch === generation) {
+                    busy = false;
+                    renderRuns();
+                }
+            }
+        }
+        function newRun() {
+            const epoch = generation;
+            const dialog = document.createElement('dialog');
+            dialog.className = 'ab-dialog';
+            const stores = (bridge.snapshot().me?.store_ids || []).filter((id) => !bridge.snapshot().scope || id === bridge.snapshot().scope);
+            dialog.innerHTML = '<form><div class="ab-card-head"><h2>' + t('新建只读检查', 'New read-only check') + '</h2><button type="button" data-close aria-label="Close">×</button></div><p>' + t('不会生成发布授权，也不会调用外部渠道。', 'No publication authorization or external channel call is created.') + '</p><label>' + t('任务目标', 'Objective') + '<textarea name="prompt" required maxlength="4000" rows="3"></textarea></label><label>' + t('门店范围', 'Store scope') + '<select name="store" required>' + stores.map(s => '<option>' + x(s) + '</option>').join('') + '</select></label><label>' + t('检查流程', 'Check plan') + '<select name="plan"><option value="growth">Growth / 品牌 → 指标 → CRM</option><option value="content">Content / 品牌 → 内容</option><option value="campus">Campus / 伙伴 → 活动</option><option value="voice">Voice / 反馈 → 指标</option></select></label><label>' + t('执行方式', 'Execution mode') + '<select name="execution"><option value="background">后台执行 / Background worker</option><option value="manual">逐步调试 / Step-by-step</option></select></label><p>' + t('离线模型成本 0 BDT；上限 180 秒；失败最多重试一次。', 'Offline model cost 0 BDT; 180-second deadline; one retry per failed node.') + '</p><p class="ab-error" role="status"></p><button class="ab-button" type="submit">' + t('创建任务', 'Create run') + '</button></form>';
+            document.body.append(dialog);
+            const trigger = document.activeElement;
+            const close = () => { dialog.close(); dialog.remove(); trigger?.focus(); };
+            dialog.querySelector('[data-close]').addEventListener('click', close);
+            dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
+            // Reuse the same key after an uncertain POST result: it is not a new run.
+            const requestKey = Array.from(crypto.getRandomValues(new Uint8Array(16)), n => n.toString(16).padStart(2, '0')).join('');
+            let request = null;
+            dialog.querySelector('form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (busy)
+                    return;
+                const form = dialog.querySelector('form');
+                const data = new FormData(form);
+                request ??= { execution: data.get('execution') || 'background', prompt: data.get('prompt'), plan: data.get('plan'), store_id: data.get('store'), request_key: requestKey, budget_minor: 0, max_retries: 1, deadline_seconds: 180 };
+                busy = true;
+                const submit = form.querySelector('button[type=submit]');
+                submit.disabled = true;
+                form.querySelectorAll('input,textarea,select').forEach(field => { field.disabled = true; });
+                try {
+                    const result = await bridge.api('/api/control/runs', 'POST', request);
+                    if (epoch !== generation)
+                        return;
+                    selected = result.item.id;
+                    message = t('任务已保存。后台模式由 worker 执行，离开页面也不会丢失。', 'Run saved. Background mode is processed by the worker, independently of this tab.');
+                    close();
+                    busy = false;
+                    await reload();
+                    panel.querySelector('[data-ab-action=new]')?.focus();
+                }
+                catch (error) {
+                    if (epoch !== generation)
+                        return;
+                    form.querySelector('[role=status]').textContent = String(error instanceof Error ? error.message : error) + t('。重试会复用本次任务键；修改目标请关闭后新建。', '. Retry reuses this request key; close and reopen to change the objective.');
+                }
+                finally {
+                    if (epoch === generation) {
+                        busy = false;
+                        submit.disabled = false;
+                    }
+                }
+            });
+            dialog.showModal();
+            dialog.querySelector('textarea')?.focus();
+        }
+        async function action(name, id) {
+            if (name === 'open-runs') {
+                openRuns();
+                return;
+            }
+            if (['content', 'campaigns', 'imports', 'control'].includes(name)) {
+                bridge.page(name);
+                return;
+            }
+            if (name === 'select') {
+                selected = id;
+                nodeIndex = 0;
+                renderRuns();
+                return;
+            }
+            if (name === 'reload') {
+                await reload();
+                return;
+            }
+            if (name === 'new') {
+                if (!busy && bridge.can('report:read'))
+                    newRun();
+                return;
+            }
+            let run = runs.find(r => r.id === id);
+            if (!run || loadError)
+                return;
+            if (name === 'export') {
+                try {
+                    run = (await bridge.api('/api/control/runs/' + encodeURIComponent(id))).item;
+                }
+                catch {
+                    message = t('导出前权限复核失败，请刷新。', 'Export authorization failed. Refresh before retrying.');
+                    renderRuns();
+                    return;
+                }
+                const url = URL.createObjectURL(new Blob([JSON.stringify({ source: 'authenticated_server_checkpoint', run }, null, 2)], { type: 'application/json' }));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'adda-run-' + run.id + '.json';
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                return;
+            }
+            if (busy || !['advance', 'retry', 'cancel'].includes(name))
+                return;
+            const epoch = generation;
+            busy = true;
+            renderRuns();
+            try {
+                const result = await bridge.api('/api/control/runs/' + encodeURIComponent(id) + '/' + name, 'POST', { expected_version: run.version });
+                if (epoch !== generation)
+                    return;
+                runs = runs.map(r => r.id === id ? result.item : r);
+                message = result.item.status === 'failed' ? t('节点失败，未宣称执行成功；请查看错误。', 'Node failed; inspect the error. This is not a successful execution.') : t('服务端检查点已保存。', 'Server checkpoint saved.');
+            }
+            catch (error) {
+                // An uncertain response never causes a blind replay of the command.
+                if (epoch !== generation)
+                    return;
+                message = String(error instanceof Error ? error.message : error) + t('；已重新读取服务端状态，没有自动重放。', '; reloading server state without replay.');
+                await reload();
+            }
+            finally {
+                if (epoch === generation) {
+                    busy = false;
+                    renderRuns();
+                }
+            }
+        }
+        for (const target of [home, panel])
+            target.addEventListener('click', event => {
+                const element = event.target.closest('[data-ab-action],[data-ab-node]');
+                if (!element)
+                    return;
+                if ('abNode' in element.dataset) {
+                    nodeIndex = Number(element.dataset.abNode);
+                    renderRuns();
+                    return;
+                }
+                void action(element.dataset.abAction, element.dataset.abId || '');
+            });
+        setInterval(() => { if (!panel.hidden && owner && !busy && !document.hidden && !document.querySelector('dialog[open]'))
+            void reload(); }, 2000);
+        return { update() {
+                const snapshot = bridge.snapshot();
+                const nextOwner = snapshot.me ? JSON.stringify([snapshot.me.user.id, snapshot.me.actor?.tenant_id || snapshot.me.tenant_id || '', snapshot.me.role, snapshot.me.store_ids, snapshot.scope]) : '';
+                if (nextOwner !== owner) {
+                    document.querySelectorAll('.ab-dialog').forEach(d => { d.close(); d.remove(); });
+                    generation++;
+                    owner = nextOwner;
+                    runs = [];
+                    selected = '';
+                    loaded = false;
+                    busy = false;
+                    loadError = '';
+                    message = '';
+                }
+                if (!snapshot.me) {
+                    home.replaceChildren();
+                    panel.replaceChildren();
+                    return;
+                }
+                nav.hidden = !bridge.can('report:read') || document.body.dataset.surface !== 'admin';
+                renderHome();
+                renderRuns();
+                for (const [key, id] of Object.entries({ content: 'content-list', cases: 'case-list', daily: 'daily-list', imports: 'import-list', outreach: 'outreach-list', campaigns: 'campaign-list' })) {
+                    const target = document.getElementById(id);
+                    if (target && snapshot.errors[key])
+                        target.innerHTML = '<p class="ab-error" role="status">' + x(snapshot.errors[key]) + '</p>';
+                }
+            } };
+    });</script></body></html>
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/adda-growth-os-unified/dist/tests/e2e.test.js:70:22)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: health and readiness are explicit and connectors remain unconfigured
+ok 52 - health and readiness are explicit and connectors remain unconfigured
+  ---
+  duration_ms: 168.728438
+  type: 'test'
+  ...
+# Subtest: A06: empty Brand Brain exposes needs_input and does not invent prices or launch date
+ok 53 - A06: empty Brand Brain exposes needs_input and does not invent prices or launch date
+  ---
+  duration_ms: 255.59333
+  type: 'test'
+  ...
+# Subtest: A07: only an approved, current revision is returned by default
+ok 54 - A07: only an approved, current revision is returned by default
+  ---
+  duration_ms: 38.995221
+  type: 'test'
+  ...
+# Subtest: A08: changing a price version marks an old brand reference stale
+ok 55 - A08: changing a price version marks an old brand reference stale
+  ---
+  duration_ms: 39.988501
+  type: 'test'
+  ...
+# Subtest: A13: publish check blocks missing/expired rights and unapproved prices
+ok 56 - A13: publish check blocks missing/expired rights and unapproved prices
+  ---
+  duration_ms: 15.690313
+  type: 'test'
+  ...
+# Subtest: expired brand revisions cannot be approved
+ok 57 - expired brand revisions cannot be approved
+  ---
+  duration_ms: 8.505013
+  type: 'test'
+  ...
+# Subtest: A15: importing the same CSV twice is idempotent
+ok 58 - A15: importing the same CSV twice is idempotent
+  ---
+  duration_ms: 316.89998
+  type: 'test'
+  ...
+# Subtest: A16: a changed order is a correction, not a second active sale
+ok 59 - A16: a changed order is a correction, not a second active sale
+  ---
+  duration_ms: 43.877292
+  type: 'test'
+  ...
+# Subtest: A17: malformed rows and over-refunds are isolated with stable row errors
+ok 60 - A17: malformed rows and over-refunds are isolated with stable row errors
+  ---
+  duration_ms: 25.703995
+  type: 'test'
+  ...
+# Subtest: A18/A19/A21/A22/A23: code-calculated golden metrics match expected values
+ok 61 - A18/A19/A21/A22/A23: code-calculated golden metrics match expected values
+  ---
+  duration_ms: 75.679144
+  type: 'test'
+  ...
+# Subtest: A20: business-day comparisons use the store timezone, not server timezone
+ok 62 - A20: business-day comparisons use the store timezone, not server timezone
+  ---
+  duration_ms: 0.61293
+  type: 'test'
+  ...
+# Subtest: A64: missing source watermark is explicitly provisional
+ok 63 - A64: missing source watermark is explicitly provisional
+  ---
+  duration_ms: 241.485204
+  type: 'test'
+  ...
+# Subtest: A24/A25/A27: opaque source link records touch without treating it as an order
+ok 64 - A24/A25/A27: opaque source link records touch without treating it as an order
+  ---
+  duration_ms: 350.676633
+  type: 'test'
+  ...
+# Subtest: A28/A29: registration works without marketing opt-in; verification is explicit
+ok 65 - A28/A29: registration works without marketing opt-in; verification is explicit
+  ---
+  duration_ms: 21.216326
+  type: 'test'
+  ...
+# Subtest: A30/A31: coupon reservation is not revenue and 20 concurrent requests yield one success
+ok 66 - A30/A31: coupon reservation is not revenue and 20 concurrent requests yield one success
+  ---
+  duration_ms: 98.525809
+  type: 'test'
+  ...
+# Subtest: A30: reservation cannot match until authoritative POS import exists
+ok 67 - A30: reservation cannot match until authoritative POS import exists
+  ---
+  duration_ms: 26.773696
+  type: 'test'
+  ...
+# Subtest: A32: expired and wrong-store coupons are rejected with stable errors
+ok 68 - A32: expired and wrong-store coupons are rejected with stable errors
+  ---
+  duration_ms: 20.984633
+  type: 'test'
+  ...
+# Subtest: production verification does not fake a verified contact
+ok 69 - production verification does not fake a verified contact
+  ---
+  duration_ms: 8.626825
+  type: 'test'
+  ...
+# Subtest: A09: deterministic provider produces editable zh-CN/en/bn package with shots, subtitles and sources
+ok 70 - A09: deterministic provider produces editable zh-CN/en/bn package with shots, subtitles and sources
+  ---
+  duration_ms: 371.937757
+  type: 'test'
+  ...
+# Subtest: A10: bn review is required before submit/approval
+ok 71 - A10: bn review is required before submit/approval
+  ---
+  duration_ms: 14.418162
+  type: 'test'
+  ...
+# Subtest: A11/A47: approval binds content hash and valid approved citations
+ok 72 - A11/A47: approval binds content hash and valid approved citations
+  ---
+  duration_ms: 21.496862
+  type: 'test'
+  ...
+# Subtest: A12: manual export is not published; operator evidence is separate
+ok 73 - A12: manual export is not published; operator evidence is separate
+  ---
+  duration_ms: 59.410798
+  type: 'test'
+  ...
+# Subtest: A13/A14/A46: missing rights/unsafe instructions fail closed with manual edit path
+ok 74 - A13/A14/A46: missing rights/unsafe instructions fail closed with manual edit path
+  ---
+  duration_ms: 25.152432
+  type: 'test'
+  ...
+# Subtest: A33: partner/KOC requires a source and starts as identified
+ok 75 - A33: partner/KOC requires a source and starts as identified
+  ---
+  duration_ms: 355.232635
+  type: 'test'
+  ...
+# Subtest: A34: event capacity, registration and check-in counts are separate and idempotent
+ok 76 - A34: event capacity, registration and check-in counts are separate and idempotent
+  ---
+  duration_ms: 65.772823
+  type: 'test'
+  ...
+# Subtest: A35/A36: referral qualification excludes self/duplicates/prior buyers and rewards stay manual
+ok 77 - A35/A36: referral qualification excludes self/duplicates/prior buyers and rewards stay manual
+  ---
+  duration_ms: 36.217779
+  type: 'test'
+  ...
+# Subtest: A35: existing buyer and full refund make referral not payable
+ok 78 - A35: existing buyer and full refund make referral not payable
+  ---
+  duration_ms: 57.799118
+  type: 'test'
+  ...
+# Subtest: A28/A37: segment rules use real behavior and preview never returns contacts
+ok 79 - A28/A37: segment rules use real behavior and preview never returns contacts
+  ---
+  duration_ms: 293.415879
+  type: 'test'
+  ...
+# Subtest: A38/A40: frozen audience keeps stable holdout, excludes post-freeze opt-out and new members
+ok 80 - A38/A40: frozen audience keeps stable holdout, excludes post-freeze opt-out and new members
+  ---
+  duration_ms: 90.647617
+  type: 'test'
+  ...
+# Subtest: A39: template, budget, quiet hours and frequency cap are server-side policies
+ok 81 - A39: template, budget, quiet hours and frequency cap are server-side policies
+  ---
+  duration_ms: 138.436962
+  type: 'test'
+  ...
+# Subtest: A40/A48: production dispatch does not fake delivery
+ok 82 - A40/A48: production dispatch does not fake delivery
+  ---
+  duration_ms: 24.665631
+  type: 'test'
+  ...
+# Subtest: G07 feedback risk escalation, dedupe, correction, reply approval and manual task
+ok 83 - G07 feedback risk escalation, dedupe, correction, reply approval and manual task
+  ---
+  duration_ms: 398.435097
+  type: 'test'
+  ...
+# Subtest: G08 router blocks prompt injection and daily report is versioned with at most three tasks
+ok 84 - G08 router blocks prompt injection and daily report is versioned with at most three tasks
+  ---
+  duration_ms: 284.697577
+  type: 'test'
+  ...
+# Subtest: G09 webhook signature, idempotency, monotonic status and kill switch are enforced
+ok 85 - G09 webhook signature, idempotency, monotonic status and kill switch are enforced
+  ---
+  duration_ms: 400.477108
+  type: 'test'
+  ...
+# Subtest: G07 ordinary case cannot close before manual reply task evidence
+ok 86 - G07 ordinary case cannot close before manual reply task evidence
+  ---
+  duration_ms: 249.893923
+  type: 'test'
+  ...
+# Subtest: G09 adapter blocks live writes by default and maps provider references
+ok 87 - G09 adapter blocks live writes by default and maps provider references
+  ---
+  duration_ms: 0.882655
+  type: 'test'
+  ...
+# Subtest: A02: authenticated campaign creation persists to disk
+ok 88 - A02: authenticated campaign creation persists to disk
+  ---
+  duration_ms: 372.984739
+  type: 'test'
+  ...
+# Subtest: A02: campaign survives a web server restart
+ok 89 - A02: campaign survives a web server restart
+  ---
+  duration_ms: 132.55692
+  type: 'test'
+  ...
+# Subtest: A03: another tenant cannot read or enumerate the first tenant campaign
+ok 90 - A03: another tenant cannot read or enumerate the first tenant campaign
+  ---
+  duration_ms: 98.817932
+  type: 'test'
+  ...
+# Subtest: A04: same-tenant ungranted store is hidden
+ok 91 - A04: same-tenant ungranted store is hidden
+  ---
+  duration_ms: 10.200388
+  type: 'test'
+  ...
+# Subtest: A05: CASHIER is blocked from sensitive operations
+ok 92 - A05: CASHIER is blocked from sensitive operations
+  ---
+  duration_ms: 8.357471
+  type: 'test'
+  ...
+# Subtest: writes require the session CSRF token
+ok 93 - writes require the session CSRF token
+  ---
+  duration_ms: 43.176315
+  type: 'test'
+  ...
+# Subtest: production login and logout cookies include Secure
+ok 94 - production login and logout cookies include Secure
+  ---
+  duration_ms: 175.655486
+  type: 'test'
+  ...
+# Subtest: running jobs are protected by owner leases and only expired leases recover
+ok 95 - running jobs are protected by owner leases and only expired leases recover
+  ---
+  duration_ms: 27.051694
+  type: 'test'
+  ...
+# Subtest: legacy running jobs without lease metadata are recovered once
+ok 96 - legacy running jobs without lease metadata are recovered once
+  ---
+  duration_ms: 10.909443
+  type: 'test'
+  ...
+# Subtest: R10: same external member id in different stores remains two canonical members
+ok 97 - R10: same external member id in different stores remains two canonical members
+  ---
+  duration_ms: 294.702043
+  type: 'test'
+  ...
+# Subtest: R10: an order carrying an internal member id resolves to that member only
+ok 98 - R10: an order carrying an internal member id resolves to that member only
+  ---
+  duration_ms: 0.438058
+  type: 'test'
+  ...
+# Subtest: R10: ambiguous external ids are left unlinked instead of merged
+ok 99 - R10: ambiguous external ids are left unlinked instead of merged
+  ---
+  duration_ms: 0.360942
+  type: 'test'
+  ...
+# Subtest: R11: a watermark older than as_of is provisional in the shared quality model
+ok 100 - R11: a watermark older than as_of is provisional in the shared quality model
+  ---
+  duration_ms: 1.367513
+  type: 'test'
+  ...
+# Subtest: R11: /api/metrics does not label stale complete_through as verified
+ok 101 - R11: /api/metrics does not label stale complete_through as verified
+  ---
+  duration_ms: 63.748012
+  type: 'test'
+  ...
+# Subtest: production is the safe default and rejects a missing session secret
+ok 102 - production is the safe default and rejects a missing session secret
+  ---
+  duration_ms: 0.962596
+  type: 'test'
+  ...
+# Subtest: CASHIER cannot export, edit budget, approve or manage channels
+ok 103 - CASHIER cannot export, edit budget, approve or manage channels
+  ---
+  duration_ms: 0.192369
+  type: 'test'
+  ...
+# Subtest: real domain metric code reproduces the golden fixture
+ok 104 - real domain metric code reproduces the golden fixture
+  ---
+  duration_ms: 26.822179
+  type: 'test'
+  ...
+# Subtest: demo seed is idempotent and production refuses it
+ok 105 - demo seed is idempotent and production refuses it
+  ---
+  duration_ms: 194.666396
+  type: 'test'
+  ...
+# Subtest: invalid empty CSV cannot certify zero revenue
+ok 106 - invalid empty CSV cannot certify zero revenue
+  ---
+  duration_ms: 327.014503
+  type: 'test'
+  ...
+# Subtest: same CSV bytes in two POS sources create separate import batches
+ok 107 - same CSV bytes in two POS sources create separate import batches
+  ---
+  duration_ms: 258.851531
+  type: 'test'
+  ...
+# Subtest: campaign with missing objective cannot be approved or issue offers
+ok 108 - campaign with missing objective cannot be approved or issue offers
+  ---
+  duration_ms: 247.67112
+  type: 'test'
+  ...
+# Subtest: changing an approved campaign returns it to approval
+ok 109 - changing an approved campaign returns it to approval
+  ---
+  duration_ms: 210.721577
+  type: 'test'
+  ...
+# Subtest: store manager cannot self-approve prices, assets, or outreach copy
+ok 110 - store manager cannot self-approve prices, assets, or outreach copy
+  ---
+  duration_ms: 247.444525
+  type: 'test'
+  ...
+# Subtest: public marketing opt-in without a channel grants no WhatsApp permission
+ok 111 - public marketing opt-in without a channel grants no WhatsApp permission
+  ---
+  duration_ms: 222.847156
+  type: 'test'
+  ...
+# Subtest: check-in requires an open event and a registration
+ok 112 - check-in requires an open event and a registration
+  ---
+  duration_ms: 208.090456
+  type: 'test'
+  ...
+# Subtest: a prior purchase imported after referral creation stays ineligible
+ok 113 - a prior purchase imported after referral creation stays ineligible
+  ---
+  duration_ms: 209.082225
+  type: 'test'
+  ...
+# Subtest: outreach with only holdout members is not marked completed
+ok 114 - outreach with only holdout members is not marked completed
+  ---
+  duration_ms: 0.354833
+  type: 'test'
+  ...
+# Subtest: migration repairs a previously completed all-holdout outreach
+ok 115 - migration repairs a previously completed all-holdout outreach
+  ---
+  duration_ms: 198.970289
+  type: 'test'
+  ...
+# Subtest: large CSV preview follows the advertised import size and validates quiet hours
+ok 116 - large CSV preview follows the advertised import size and validates quiet hours
+  ---
+  duration_ms: 240.448119
+  type: 'test'
+  ...
+# Subtest: R05: real WhatsApp nested status envelopes normalize as a stable batch
+ok 117 - R05: real WhatsApp nested status envelopes normalize as a stable batch
+  ---
+  duration_ms: 2.561277
+  type: 'test'
+  ...
+# Subtest: R05: unknown provider status remains unknown_delivery and does not look successful
+ok 118 - R05: unknown provider status remains unknown_delivery and does not look successful
+  ---
+  duration_ms: 0.317376
+  type: 'test'
+  ...
+# Subtest: R06: verify-token challenge is independent from operator authentication
+ok 119 - R06: verify-token challenge is independent from operator authentication
+  ---
+  duration_ms: 249.663281
+  type: 'test'
+  ...
+# Subtest: R05: POST accepts signed nested payloads and records each status without external send
+ok 120 - R05: POST accepts signed nested payloads and records each status without external send
+  ---
+  duration_ms: 225.307081
+  type: 'test'
+  ...
+1..120
+# tests 120
+# suites 0
+# pass 119
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9114.739912

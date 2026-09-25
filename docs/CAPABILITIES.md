@@ -1,13 +1,16 @@
-# 能力与验证记录
+# 当前能力与验证范围 — 2026-09-25
 
-由 npm run capabilities 生成。能力范围维护在 docs/capabilities.json；测试数量来自实际运行记录，不由文档手填。离线通过只说明所列用例通过。
+本次基于上传的完整源码实施。`npm run validate:unified` 中全部 7 个命令退出码为 0，源码在验证期间未改变。实际应用与证据测试 **145/145** 通过、0 失败、0 跳过。当前命令日志、源文件校验值与工具链见 [validation.json](../artifacts/unified-2026-09-25/validation.json)。
 
-最近验证：2026-09-22T20:45:05.680Z；Node v22.22.0。122 项通过，0 项失败，0 项跳过。
+DOM + 真实 HTTP 桥检查 **89** 项通过；它不是原生浏览器 E2E。[详细检查](../artifacts/unified-2026-09-25/browser-checks.json)。预编译副本不含 node_modules 的启动/重启实测 **10** 项通过：[运行记录](../artifacts/unified-2026-09-25/runtime-smoke.json)。
 
-[命令、退出码、日志和源码哈希](../artifacts/audit-b01-b05/validation.json)。生成时比较完整文件集合、哈希、锁文件、工具链和验证命令；新增、删除、修改源码均需重新验证。
+工具链：Node v22.16.0、TypeScript 5.8.3、@types/node 24.0.4。npm ci 失败于 DNS；不是锁版本干净安装。浏览器原生导航被策略阻断，记录在 [native attempt](../artifacts/unified-2026-09-25/browser-native-attempt.json)。这些限制没有转换成通过项。
 
-| 能力 | 状态 | 实现或测试证据 | 尚未覆盖 |
+| 能力 | 当前状态 | 实现/测试 | 边界 |
 |---|---|---|---|
+| 持久化只读 Agent 编排 | 完整应用 HTTP / 文件并发回归通过 | [packages/domain/src/control-runs.ts](../packages/domain/src/control-runs.ts)、[packages/adapters/src/control-worker.ts](../packages/adapters/src/control-worker.ts)、[tests/unified-backend.test.ts](../tests/unified-backend.test.ts) | 固定四个流程、七种确定性只读技能；真实模型调用和外部动作不在此执行器内。 |
+| SUIWU / ADDA 多端统一 | 统一源码、真实 API、DOM 检查通过 | [packages/ui/src/theme.ts](../packages/ui/src/theme.ts)、[apps/web/src/ui/admin-page.ts](../apps/web/src/ui/admin-page.ts)、[apps/web/src/ui/consumer-page.ts](../apps/web/src/ui/consumer-page.ts)、[tests/browser_unified.py](../tests/browser_unified.py) | 运营、审核、收银与顾客 H5；89 项 DOM/HTTP 桥检查不是浏览器原生 Cookie、导航和存储验收。 |
+| 批准历史与重复领券 | 真实 HTTP / 仓储并发回归通过 | [tests/unified-backend.test.ts](../tests/unified-backend.test.ts)、[packages/db/src/repository.ts](../packages/db/src/repository.ts) | 历史批准内容 append-only；同会员同优惠一次领取，重复请求重用令牌；真实供应商副作用仍关闭。 |
 | 报表与任务门店权限 | 离线回归通过 | [tests/audit-n01-n08.test.ts](../tests/audit-n01-n08.test.ts)、[packages/domain/src/report-policy.ts](../packages/domain/src/report-policy.ts) | 已存报表须证明完整范围；不能证明则隐藏。未做生产安全验收。 |
 | 生成事实、审批、导出 | 离线回归通过 | [tests/audit-n01-n08.test.ts](../tests/audit-n01-n08.test.ts)、[packages/domain/src/content-policy.ts](../packages/domain/src/content-policy.ts)、[tests/audit-b01-b05.test.ts](../tests/audit-b01-b05.test.ts) | 人工导出；不证明真人文案质量或真实发布。 |
 | 指标范围与完整性 | 离线回归通过 | [tests/metrics-remediation.test.ts](../tests/metrics-remediation.test.ts)、[packages/domain/src/metric-service.ts](../packages/domain/src/metric-service.ts)、[tests/audit-b01-b05.test.ts](../tests/audit-b01-b05.test.ts) | 来源以门店 orderSources 配置和已知导入/订单为准；无法发现从未登记的外部系统。 |
@@ -18,9 +21,9 @@
 | 任务租约与生产 Cookie | 离线回归通过 | [tests/jobs-cookie-remediation.test.ts](../tests/jobs-cookie-remediation.test.ts) | 不等于实际业务 worker 或生产认证系统已交付。 |
 | WhatsApp 协议 | 本地协议测试通过 | [tests/whatsapp-remediation.test.ts](../tests/whatsapp-remediation.test.ts)、[tests/g07-g10.test.ts](../tests/g07-g10.test.ts) | 无真实 WABA 联调；发送适配器未接入业务 worker。 |
 | 生产数据库 | 内部未实现 | [packages/adapters/src/config.ts](../packages/adapters/src/config.ts) | 当前仅有 JSON 文件仓储，缺 PostgreSQL 适配器和生产迁移。 |
-| 发送与对账 worker | 内部未实现 | [apps/worker/src/index.ts](../apps/worker/src/index.ts) | 只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。 |
+| 发送与对账 worker | 内部未实现 | [apps/worker/src/index.ts](../apps/worker/src/index.ts) | 现已支持持久化只读 control run 与 maintenance；真实渠道发送、最终发送前授权和人工回执对账 worker 仍未接通。 |
 | 真实模型技能 | 内部未实现 | [packages/domain/src/content-provider.ts](../packages/domain/src/content-provider.ts) | 使用确定性生成；缺 provider 接入、成本记录及真人评测。 |
-| 生产初始化与客户界面 | 部分实现 | [apps/web/src/ui.ts](../apps/web/src/ui.ts)、[tests/e2e.test.ts](../tests/e2e.test.ts) | 缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。 |
+| 生产初始化与客户界面 | 部分实现 | [apps/web/src/ui.ts](../apps/web/src/ui.ts)、[tests/e2e.test.ts](../tests/e2e.test.ts) | 运营、语言审核、收银和顾客端已共用主题并连接实际 API；受控生产 OWNER 初始化/邀请未实现；原生浏览器导航验收待执行。 |
 | 真实渠道与客户验收 | 内部开发及外部条件均待完成 | [docs/BLOCKERS.md](../docs/BLOCKERS.md) | 需完成上述内部能力，再取得凭证、批准测试对象、业务数据、语言评审及 UAT。 |
 
-本记录的验证命令使用已有依赖，未做干净安装；命令本身不包含浏览器点击、生产数据库、真实模型、渠道或客户验收。独立浏览器与 CodeBuddy CLI 实测见项目复审报告。AI-contract 仅检查合成契约；安全扫描是有限静态检查。
+旧证据及旧规格保留，不代表本轮生产验收。历史生成页面见 CAPABILITIES_HISTORY_PRE_UNIFIED.md；原 `validate:release` / `capabilities` 脚本仍为历史格式的全门槛校验，须完成其实际运行后才能生成相应记录。本次本地记录使用 `validate:unified`。真实模型、外部渠道、生产数据库和客户 UAT 均没有因此变为完成。

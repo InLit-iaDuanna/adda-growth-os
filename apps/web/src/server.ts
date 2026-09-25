@@ -27,6 +27,8 @@ import { calculateMetrics } from '../../../packages/domain/src/metric-service';
 import type { RouterRequest } from '../../../packages/domain/src/control';
 import { runDeterministicRouter } from '../../../packages/domain/src/control-runtime';
 import { queryMetrics, runControl } from '../../../packages/domain/src/control-service';
+import { parseControlRequest } from '../../../packages/domain/src/control-request';
+import { commandControlRun, listControlRuns } from '../../../packages/domain/src/control-runs';
 import { ATTRIBUTION_MODEL } from '../../../packages/domain/src/attribution-policy';
 import { DomainError, timestampInput, requireTimeRange } from '../../../packages/domain/src/validation';
 import { renderAdminPage, renderConsumerPage } from './ui';
@@ -76,6 +78,7 @@ export async function createAppServer(options: AppServerOptions = {}): Promise<A
       await route(req, res, requestId, repository, config);
     } catch (error) {
       if (error instanceof DomainError) { sendJson(res, error.status, { error_code: error.code, retryable: false, request_id: requestId }); return; }
+      if (error instanceof URIError) { sendJson(res,400,{error_code:'invalid_url_encoding',retryable:false}); return; }
       if (error instanceof SyntaxError || (error instanceof Error && ['invalid_json_body','request_body_too_large'].includes(error.message))) { sendJson(res, error instanceof SyntaxError ? 400 : error.message === 'request_body_too_large' ? 413 : 400, { error_code: 'invalid_request_body', retryable: false }); return; }
       const message = error instanceof Error ? error.message : 'internal_error';
       console.error(JSON.stringify({ request_id: requestId, error: message.startsWith('invalid_') ? message : 'internal_error' }));
@@ -144,8 +147,8 @@ async function route(
     return;
   }
 
-  if (pathname === '/' && method === 'GET') {
-    sendHtml(res, 200, renderAdminPage());
+  if (['/', '/admin', '/review', '/staff'].includes(pathname) && method === 'GET') {
+    sendHtml(res, 200, renderAdminPage(pathname === '/review' ? 'review' : pathname === '/staff' ? 'staff' : 'admin'));
     return;
   }
 
@@ -178,11 +181,25 @@ async function route(
     const existingMember = repository.snapshot().members.find((item) => item.tenantId === link.tenantId && item.storeId === link.storeId && item.contactHmac === contactHash);
     if (existingMember) { sendJson(res, 409, { error_code: 'member_already_registered', message: '该联系方式已登记，请使用已有会员链接', retryable: false, request_id: requestId }); return; }
     const memberAccessToken = randomBytes(32).toString('base64url');
-    const member = await repository.createMember({ tenantId: link.tenantId, storeId: link.storeId, externalMemberId: `public_${randomUUID()}`, displayName: typeof body.display_name === 'string' ? body.display_name.slice(0, 120) : null, registeredAt: nowIso(), language: body.language === 'bn' ? 'bn' : 'en', contact: null, contactHmac: contactHash, publicAccessTokenHash: hashToken(memberAccessToken, config.sessionSecret), isSynthetic: config.mode !== 'production' });
-    await repository.addTouchEvent({ tenantId: link.tenantId, storeId: link.storeId, sourceLinkId: link.id, eventType: 'member_register', sessionTokenHash: hashToken(`${sourceToken}:${member.id}`, config.sessionSecret) });
-    if (body.marketing_opt_in === true && ['email', 'sms', 'whatsapp'].includes(body.channel)) await repository.addConsent({ tenantId: link.tenantId, memberId: member.id, channel: body.channel, purpose: 'marketing', granted: true, noticeVersion: typeof body.notice_version === 'string' ? body.notice_version : 'unspecified', source: 'public_registration' });
+    const member = await repository.mutate(state => {
+      if (state.members.some(m=>m.tenantId===link.tenantId && m.storeId===link.storeId && m.contactHmac===contactHash)) throw new DomainError('member_already_registered',409);
+      const currentLink=state.sourceLinks.find(s=>s.id===link.id && s.status==='active');
+      if(!currentLink) throw new DomainError('not_found',404);
+      const created={id:randomUUID(),tenantId:link.tenantId,storeId:link.storeId,externalMemberId:`public_${randomUUID()}`,displayName:typeof body.display_name==='string'?body.display_name.slice(0,120):null,registeredAt:nowIso(),language:body.language==='bn'?'bn':'en',contact:null,contactHmac:contactHash,publicAccessTokenHash:hashToken(memberAccessToken,config.sessionSecret),isSynthetic:config.mode!=='production',contactVerified:false,verificationProof:null,verificationExpiresAt:null,createdAt:nowIso()};
+      state.members.push(created);
+      state.touchEvents.push({id:randomUUID(),tenantId:link.tenantId,storeId:link.storeId,sourceLinkId:link.id,eventType:'member_register',sessionTokenHash:hashToken(`${sourceToken}:${created.id}`,config.sessionSecret),occurredAt:nowIso()});
+      if(body.marketing_opt_in===true && ['email','sms','whatsapp'].includes(body.channel)) state.consentEvents.push({id:randomUUID(),tenantId:link.tenantId,memberId:created.id,channel:body.channel,purpose:'marketing',granted:true,noticeVersion:typeof body.notice_version==='string'?body.notice_version:'unspecified',source:'public_registration',occurredAt:nowIso()});
+      return created;
+    });
     sendJson(res, 201, { member: { id: member.id, language: member.language, contact_verified: member.contactVerified, marketing_opt_in: repository.consentGranted(member.tenantId, member.id, 'marketing') }, member_token: memberAccessToken, source_link_id: link.id, store: store ? { slug: store.slug } : null });
     return;
+  }
+
+  if (pathname === '/api/public/member-state' && method === 'POST') {
+    const body=await readJson(req); const state=repository.snapshot();
+    const member=state.members.find(m=>m.id===body.member_id && typeof body.member_token==='string' && m.publicAccessTokenHash===hashToken(body.member_token,config.sessionSecret));
+    if(!member || !state.tenants.some(t=>t.id===member.tenantId && t.status==='active') || !state.stores.some(s=>s.id===member.storeId && s.status==='active')) return notFound(res,requestId);
+    sendJson(res,200,{member_id:member.id,contact_verified:member.contactVerified && !!member.verificationExpiresAt && Date.parse(member.verificationExpiresAt)>Date.now(),marketing_opt_in:repository.consentGranted(member.tenantId,member.id,'marketing')}); return;
   }
 
   if (pathname === '/api/members/verify' && method === 'POST') {
@@ -224,9 +241,11 @@ async function route(
     const member = repository.snapshot().members.find((item) => item.id === memberId && item.tenantId === link.tenantId && item.storeId === link.storeId && item.publicAccessTokenHash === hashToken(memberToken, config.sessionSecret));
     if (!member) { notFound(res, requestId); return; }
     try {
-      const couponToken = randomBytes(32).toString('base64url');
+      // Server-secret HMAC makes the same approved business claim replayable
+      // after an uncertain response, without storing raw coupon bearer tokens.
+      const couponToken = createHmac('sha256',config.sessionSecret).update(JSON.stringify(['coupon-v2',link.tenantId,link.storeId,offerId,member.id])).digest('base64url');
       const coupon = await repository.issueCoupon({ tenantId: link.tenantId, storeId: link.storeId, offerId, memberId, sourceLinkId: link.id, tokenHash: hashToken(couponToken, config.sessionSecret) });
-      await repository.addTouchEvent({ tenantId: link.tenantId, storeId: link.storeId, sourceLinkId: link.id, eventType: 'coupon_issue', sessionTokenHash: hashToken(`${sourceToken}:${memberId}`, config.sessionSecret) });
+      await repository.addTouchEvent({ tenantId: link.tenantId, storeId: link.storeId, sourceLinkId: link.id, eventType: 'coupon_issue', sessionTokenHash: hashToken(`${sourceToken}:${memberId}:${offerId}`, config.sessionSecret) });
       sendJson(res, 201, { coupon: { id: coupon.id, token: couponToken, status: coupon.status, expires_at: repository.findOffer(coupon.offerId)?.validTo || null } });
     } catch (error) {
       const code = error instanceof Error ? error.message : 'offer_unavailable';
@@ -342,7 +361,8 @@ async function route(
       role: context.actor.role,
       tenant_id: context.actor.tenantId,
       store_ids: context.actor.storeIds,
-      csrf_token: context.csrfToken
+      csrf_token: context.csrfToken,
+      stores: context.actor.storeIds.map(id => repository.findStoreById(id)).filter(Boolean).map(store => ({id:store!.id,name:store!.name,timezone:store!.timezone,currency:store!.currency}))
     });
     return;
   }
@@ -351,6 +371,12 @@ async function route(
   if (!context) {
     sendJson(res, 401, { error_code: 'unauthenticated', message: '请先登录 / Sign in first', retryable: false, request_id: requestId });
     return;
+  }
+
+  const requestedScope = parsed.searchParams.get('store_id');
+  if (requestedScope) {
+    if (!context.actor.storeIds.includes(requestedScope)) return notFound(res, requestId);
+    context.actor = { ...context.actor, storeIds: [requestedScope] };
   }
 
   // ----- Customer voice and human case loop (G07) -----
@@ -454,14 +480,37 @@ async function route(
     return;
   }
 
+  const detailRunMatch=pathname.match(/^\/api\/control\/runs\/([a-zA-Z0-9-]+)$/);
+  if (detailRunMatch && method==='GET') {
+    const item=listControlRuns(repository.snapshot(),context.actor).find(run=>run.id===detailRunMatch[1]);
+    if(!item) return notFound(res,requestId);
+    sendJson(res,200,{item});return;
+  }
+
+  // Persisted, scoped, read-only agent checkpoints. No external delivery adapter.
+  const runMatch = pathname.match(/^\/api\/control\/runs\/([a-zA-Z0-9-]+)\/(advance|retry|cancel)$/);
+  if (pathname === '/api/control/runs' || runMatch) {
+    if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'control_read_forbidden');
+    if (method === 'GET' && !runMatch) {
+      sendJson(res, 200, { items: listControlRuns(repository.snapshot(), context.actor), limit: 100, model: { mode: 'deterministic_offline', external_call: false } });
+      return;
+    }
+    if (method !== 'POST') return notFound(res, requestId);
+    if (!checkCsrf(req, context)) return csrfFailure(res, requestId);
+    const body = await readJson(req);
+    const command = runMatch ? runMatch[2] as 'advance' | 'retry' | 'cancel' : 'create';
+    const item = await repository.mutate(state => commandControlRun(state, context.actor, command, runMatch ? runMatch[1] : null, body, nowIso()));
+    sendJson(res, 200, { item, model: { mode: 'deterministic_offline', external_call: false } });
+    return;
+  }
+
   // ----- Growth control router and daily report (G08) -----
   if (pathname === '/api/control/route' && method === 'POST') {
     if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'control_read_forbidden');
     if (!checkCsrf(req, context)) return csrfFailure(res, requestId);
     const body = await readJson(req);
-    const input = { skill: body.skill, prompt: typeof body.prompt === 'string' ? body.prompt : '', metricQueries: Array.isArray(body.metric_queries) ? body.metric_queries : [], allowedTools: Array.isArray(body.allowed_tools) ? body.allowed_tools : [], budgetMinor: body.budget_minor, maxSteps: body.max_steps, maxRetries: body.max_retries, deadlineSeconds: body.deadline_seconds } as RouterRequest;
-    try { const result = runControl(repository.snapshot(), context.actor, input, nowIso()); sendJson(res, 200, { result, model: { mode: 'deterministic_offline', external_call: false } }); }
-    catch (error) { const code = error instanceof DomainError ? error.code : error instanceof Error ? error.message : 'router_contract_invalid'; sendJson(res, 400, { error_code: code, errors: [code], retryable: false }); }
+    try { const input = parseControlRequest(body); const result = runControl(repository.snapshot(), context.actor, input, nowIso()); sendJson(res, 200, { result, model: { mode: 'deterministic_offline', external_call: false } }); }
+    catch (error) { if (!(error instanceof DomainError)) throw error; sendJson(res, error.status, { error_code: error.code, errors: [error.code], retryable: false }); }
     return;
   }
   if (pathname === '/api/reports/daily' && method === 'POST') {
@@ -816,6 +865,34 @@ async function route(
     return;
   }
 
+  const historyMatch = pathname.match(/^\/api\/content\/([^/]+)\/history$/);
+  if (historyMatch && method === 'GET') {
+    if (!hasPermission(context.actor,'campaign:read')) return forbidden(res,requestId,'content_read_forbidden');
+    const id=decodeURIComponent(historyMatch[1]);
+    const revision=repository.findContentRevision(id);
+    const brief=revision && repository.findContentBrief(revision.briefId);
+    if (!revision || !brief || brief.tenantId!==context.actor.tenantId || !context.actor.storeIds.includes(brief.storeId)) return notFound(res,requestId);
+    sendJson(res,200,{items:(repository.snapshot().contentHistory||[]).filter(h=>h.resourceId===id && h.tenantId===context.actor.tenantId)}); return;
+  }
+  const rejectMatch=pathname.match(/^\/api\/approvals\/([^/]+)\/reject$/);
+  if (rejectMatch && method==='POST') {
+    if (!hasBrandPermission(context.actor,'brand:approve')) return forbidden(res,requestId,'approval_forbidden');
+    if (!checkCsrf(req,context)) return csrfFailure(res,requestId);
+    const body=await readJson(req);
+    if (typeof body.reason!=='string' || !body.reason.trim() || body.reason.length>2000) return badRequest(res,requestId,'rejection_reason_required');
+    const approval=await repository.mutate(state=>{
+      const a=state.contentApprovals.find(a=>a.id===rejectMatch[1] && a.tenantId===context.actor.tenantId);
+      const r=a && state.contentRevisions.find(r=>r.id===a.resourceRevisionId);
+      const b=r && state.contentBriefs.find(b=>b.id===r.briefId);
+      if (!a || !r || !b || !context.actor.storeIds.includes(b.storeId)) throw new DomainError('not_found',404);
+      if (a.status!=='pending' || r.currentApprovalId!==a.id) throw new DomainError('approval_not_pending');
+      a.status='revoked';r.status='rejected';r.currentApprovalId=null;
+      state.auditEvents.push({id:randomUUID(),tenantId:context.actor.tenantId,storeId:b.storeId,actorUserId:context.actor.userId,action:'content.rejected',resourceType:'approval',resourceId:a.id,metadata:{reason:body.reason.trim()},createdAt:nowIso()});
+      return a;
+    });
+    sendJson(res,200,{approval:publicContentApproval(approval)});return;
+  }
+
   // ----- Content studio, local review and approval/export (G04) -----
   if (pathname === '/api/content/generate' && method === 'POST') {
     if (!hasPermission(context.actor, 'campaign:create')) return forbidden(res, requestId, 'content_generate_forbidden');
@@ -858,7 +935,12 @@ async function route(
   if (pathname === '/api/content' && method === 'GET') {
     if (!hasPermission(context.actor, 'campaign:read')) return forbidden(res, requestId, 'content_read_forbidden');
     const approvals = repository.snapshot().contentApprovals;
-    sendJson(res, 200, { items: repository.listContentRevisions(context.actor.tenantId, context.actor.storeIds).map(revision => ({ ...publicContentRevision(revision), current_approval_id: revision.currentApprovalId || approvals.find(approval => approval.resourceRevisionId === revision.id && approval.status === 'pending')?.id || null })) });
+    sendJson(res, 200, { items: repository.listContentRevisions(context.actor.tenantId, context.actor.storeIds).map(revision => {
+      const brief=repository.findContentBrief(revision.briefId);
+      const campaign=brief?repository.findCampaign(brief.campaignId):undefined;
+      return { ...publicContentRevision(revision), title:(campaign?.name || 'Content') + ' · v' + revision.revision, content_pillar:brief?.contentPillar || '', store_id:brief?.storeId || null,
+        current_approval_id:revision.currentApprovalId || approvals.find(approval=>approval.resourceRevisionId===revision.id && approval.status==='pending')?.id || null };
+    }) });
     return;
   }
 
@@ -880,11 +962,11 @@ async function route(
     const body = await readJson(req);
     const packageData = (body.package_data && typeof body.package_data === 'object' ? body.package_data : revision.packageData) as ContentPackageData;
     try {
-      const updated = await repository.updateContentRevision(revision.id, packageData, context.actor.userId);
+      const updated = await repository.updateContentRevision(revision.id, packageData, context.actor.userId, typeof body.expected_hash === 'string' ? body.expected_hash : undefined);
       sendJson(res, 200, { item: publicContentRevision(updated || revision), approval_invalidated: true });
     } catch (error) {
       const code = error instanceof Error ? error.message : 'content_edit_failed';
-      sendJson(res, 400, { error_code: code, message: '内容结构不符合合同 / Invalid content package', retryable: false, request_id: requestId });
+      sendJson(res, error instanceof DomainError ? error.status : 400, { error_code: code, message: '内容结构不符合合同 / Invalid content package', retryable: false, request_id: requestId });
     }
     return;
   }
@@ -960,6 +1042,11 @@ async function route(
   }
 
   // ----- Campus partners, events and referrals (G05) -----
+  if (pathname === '/api/partners' || pathname.startsWith('/api/partners/')) {
+    const tenantStores=repository.snapshot().stores.filter(store=>store.tenantId===context.actor.tenantId && store.status==='active');
+    if (!tenantStores.every(store=>context.actor.storeIds.includes(store.id))) return forbidden(res,requestId,'tenant_wide_partner_permission');
+  }
+
   if (pathname === '/api/partners' && method === 'POST') {
     if (!hasPermission(context.actor, 'campaign:create')) return forbidden(res, requestId, 'partner_write_forbidden');
     if (!checkCsrf(req, context)) return csrfFailure(res, requestId);
@@ -1197,6 +1284,7 @@ async function route(
   }
 
   if (pathname === '/api/brand/facts' && method === 'GET') {
+    if (!hasBrandPermission(context.actor,'brand:read')) return forbidden(res,requestId,'brand_read_forbidden');
     const includeUnapproved = parsed.searchParams.get('include_unapproved') === '1';
     if (includeUnapproved && !hasBrandPermission(context.actor, 'brand:approve')) return forbidden(res, requestId, 'brand_unapproved_read_forbidden');
     const facts = repository.listBrandFacts(context.actor.tenantId, !includeUnapproved).filter((fact) => {

@@ -1,0 +1,48 @@
+{
+  "mode": "fresh precompiled copy, actual localhost HTTP and real web+worker processes",
+  "no_dependency_install": true,
+  "passed": 10,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "runtime copy contains no node_modules",
+      "passed": true
+    },
+    {
+      "name": "launcher starts only demo; real test outbox is disabled",
+      "passed": true
+    },
+    {
+      "name": "real login works without runtime dependencies",
+      "passed": true
+    },
+    {
+      "name": "actual launcher worker completes a persisted background run",
+      "passed": true
+    },
+    {
+      "name": "graceful stop closes both web and worker",
+      "passed": true
+    },
+    {
+      "name": "fresh launcher restart retains completed run, no duplicate attempt",
+      "passed": true
+    },
+    {
+      "name": "runtime route /admin",
+      "passed": true
+    },
+    {
+      "name": "runtime route /review",
+      "passed": true
+    },
+    {
+      "name": "runtime route /staff",
+      "passed": true
+    },
+    {
+      "name": "runtime route /assets/brand/99b0b4ec1602cc2760ffed5944b53444.jpg",
+      "passed": true
+    }
+  ]
+}

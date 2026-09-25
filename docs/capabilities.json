@@ -1,5 +1,35 @@
 [
   {
+    "name": "持久化只读 Agent 编排",
+    "status": "完整应用 HTTP / 文件并发回归通过",
+    "evidence": [
+      "packages/domain/src/control-runs.ts",
+      "packages/adapters/src/control-worker.ts",
+      "tests/unified-backend.test.ts"
+    ],
+    "limit": "固定四个流程、七种确定性只读技能；真实模型调用和外部动作不在此执行器内。"
+  },
+  {
+    "name": "SUIWU / ADDA 多端统一",
+    "status": "统一源码、真实 API、DOM 检查通过",
+    "evidence": [
+      "packages/ui/src/theme.ts",
+      "apps/web/src/ui/admin-page.ts",
+      "apps/web/src/ui/consumer-page.ts",
+      "tests/browser_unified.py"
+    ],
+    "limit": "运营、审核、收银与顾客 H5；89 项 DOM/HTTP 桥检查不是浏览器原生 Cookie、导航和存储验收。"
+  },
+  {
+    "name": "批准历史与重复领券",
+    "status": "真实 HTTP / 仓储并发回归通过",
+    "evidence": [
+      "tests/unified-backend.test.ts",
+      "packages/db/src/repository.ts"
+    ],
+    "limit": "历史批准内容 append-only；同会员同优惠一次领取，重复请求重用令牌；真实供应商副作用仍关闭。"
+  },
+  {
     "name": "报表与任务门店权限",
     "status": "离线回归通过",
     "evidence": [
@@ -97,7 +127,7 @@
     "evidence": [
       "apps/worker/src/index.ts"
     ],
-    "limit": "只有 maintenance handler；最终发送前校验、外部调用和中断恢复仍待实现。"
+    "limit": "现已支持持久化只读 control run 与 maintenance；真实渠道发送、最终发送前授权和人工回执对账 worker 仍未接通。"
   },
   {
     "name": "真实模型技能",
@@ -114,7 +144,7 @@
       "apps/web/src/ui.ts",
       "tests/e2e.test.ts"
     ],
-    "limit": "缺受控 OWNER 初始化/邀请及完整业务界面；现有 e2e 为 HTTP 测试。"
+    "limit": "运营、语言审核、收银和顾客端已共用主题并连接实际 API；受控生产 OWNER 初始化/邀请未实现；原生浏览器导航验收待执行。"
   },
   {
     "name": "真实渠道与客户验收",

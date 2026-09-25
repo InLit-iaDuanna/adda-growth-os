@@ -45,3 +45,16 @@ D038（2026-09-23 视觉改版）：后台和顾客页使用暖纸色、深绿�
 D039（2026-09-24 前端结构重构）：将后台/顾客页 CSS 与共享 HTML 文档壳从 `apps/web/src/ui.ts` 拆到 `apps/web/src/ui/`；浏览器端行为继续以内联函数运行，保持离线 DEMO、DOM ID、接口和安全边界不变。
 
 D040（2026-09-24 甲方素材）：SUIWU 随物作为母品牌，ADDA 作为子品牌；甲方提供的 JPG 进入本地品牌资源清单，授权范围确认前状态保持 `needs_confirmation`，仅用于界面演示与参考。
+
+
+## D2026-09-25 — Uploaded-source unified implementation
+
+Owner supplied the complete archive. Preserve the implemented TypeScript / native HTTP / JSON file-dev architecture and working domain routes instead of replacing them with a standalone prototype or claiming a Next.js/PostgreSQL migration. UI is split into shared controller, pages, public renderer and a single token library; `/admin`, `/review`, `/staff` are role-appropriate views of the same application.
+
+ADDA is the endorsed sub-brand; SUIWU 随物 is the parent. Preserve original image bytes and both parent slogans, never infer health claims or approve marketing asset rights from UI use.
+
+Read-only control jobs run through persisted evidence snapshots and atomic checkpoints in the existing worker. No async network call or external side effect happens under the file lock. Recheck current membership before each worker checkpoint. Frozen results cannot change metric snapshots or fabricate source references; retry only declared transient failure and never successful upstream nodes. This does not implement a live LLM or delivery worker.
+
+Keep legacy content revision IDs as working-document handles for API compatibility, while storing approved history append-only and rejecting stale editor hashes. One member can claim each offer once; idempotent replay derives and returns the same server-secret bearer, without storing its raw value. Dedupe its business conversion touch event; page views remain separate.
+
+Run all original and new TypeScript tests after tsc compilation and preserve the MJS evidence tests. The archive may include that exact compiled dist for offline startup. Existing lock dependency declarations remain; preinstalled TypeScript 5.8.3 was used because npm ci failed DNS. Browser policy was not disabled: DOM tests use an explicit real-HTTP bridge and are not labeled native E2E. Production readiness remains false.

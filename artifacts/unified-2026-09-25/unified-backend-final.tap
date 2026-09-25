@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: Unified: background checkpoints finish without any further browser commands
+ok 1 - Unified: background checkpoints finish without any further browser commands
+  ---
+  duration_ms: 344.718022
+  type: 'test'
+  ...
+# Subtest: Unified: evidence is a real frozen snapshot, not a timestamp applied to mutable facts
+ok 2 - Unified: evidence is a real frozen snapshot, not a timestamp applied to mutable facts
+  ---
+  duration_ms: 247.34693
+  type: 'test'
+  ...
+# Subtest: Unified: two repository workers cannot double-execute a checkpoint
+ok 3 - Unified: two repository workers cannot double-execute a checkpoint
+  ---
+  duration_ms: 251.367027
+  type: 'test'
+  ...
+# Subtest: Unified: actual process interruption before commit leaves a resumable checkpoint
+ok 4 - Unified: actual process interruption before commit leaves a resumable checkpoint
+  ---
+  duration_ms: 1433.030682
+  type: 'test'
+  ...
+# Subtest: Unified: revoking a membership cancels queued background work before reading evidence
+ok 5 - Unified: revoking a membership cancels queued background work before reading evidence
+  ---
+  duration_ms: 249.707099
+  type: 'test'
+  ...
+# Subtest: Unified: cancellation persists and the worker does not resume it
+ok 6 - Unified: cancellation persists and the worker does not resume it
+  ---
+  duration_ms: 236.851298
+  type: 'test'
+  ...
+# Subtest: Unified: deadline failure is explicit and cannot be blindly retried
+ok 7 - Unified: deadline failure is explicit and cannot be blindly retried
+  ---
+  duration_ms: 225.346344
+  type: 'test'
+  ...
+# Subtest: Unified: output contracts reject fabricated refs and changed metric values
+ok 8 - Unified: output contracts reject fabricated refs and changed metric values
+  ---
+  duration_ms: 246.051814
+  type: 'test'
+  ...
+# Subtest: Unified: transient retry keeps completed upstream results and enforces attempt caps
+ok 9 - Unified: transient retry keeps completed upstream results and enforces attempt caps
+  ---
+  duration_ms: 247.771433
+  type: 'test'
+  ...
+# Subtest: Unified: input validation blocks excessive budgets, injection and request-key conflicts
+ok 10 - Unified: input validation blocks excessive budgets, injection and request-key conflicts
+  ---
+  duration_ms: 256.502971
+  type: 'test'
+  ...
+# Subtest: Unified: explicit store scope applies to all authenticated module lists
+ok 11 - Unified: explicit store scope applies to all authenticated module lists
+  ---
+  duration_ms: 231.034561
+  type: 'test'
+  ...
+# Subtest: Unified: cashier cannot read brand facts or any agent runs
+ok 12 - Unified: cashier cannot read brand facts or any agent runs
+  ---
+  duration_ms: 271.39697
+  type: 'test'
+  ...
+# Subtest: Unified: approved content snapshots survive edit and optimistic concurrency blocks lost updates
+ok 13 - Unified: approved content snapshots survive edit and optimistic concurrency blocks lost updates
+  ---
+  duration_ms: 250.035428
+  type: 'test'
+  ...
+# Subtest: Unified: repeated export reuses an execution intent instead of authorizing duplicate work
+ok 14 - Unified: repeated export reuses an execution intent instead of authorizing duplicate work
+  ---
+  duration_ms: 240.324283
+  type: 'test'
+  ...
+# Subtest: Unified: explicit rejection requires approval role, reason and current pending version
+ok 15 - Unified: explicit rejection requires approval role, reason and current pending version
+  ---
+  duration_ms: 283.530428
+  type: 'test'
+  ...
+# Subtest: Unified: concurrent registration cannot mutate the first registrant consent or mint unusable passes
+ok 16 - Unified: concurrent registration cannot mutate the first registrant consent or mint unusable passes
+  ---
+  duration_ms: 229.489821
+  type: 'test'
+  ...
+# Subtest: Unified: 20 duplicate coupon claims create exactly one coupon and preserve the bearer on retry
+ok 17 - Unified: 20 duplicate coupon claims create exactly one coupon and preserve the bearer on retry
+  ---
+  duration_ms: 320.016546
+  type: 'test'
+  ...
+# Subtest: Unified: session restore and unsubscribe require the member bearer; malformed cookie is not a 500
+ok 18 - Unified: session restore and unsubscribe require the member bearer; malformed cookie is not a 500
+  ---
+  duration_ms: 253.966722
+  type: 'test'
+  ...
+# Subtest: Unified: datetime-local inputs use store timezone and reject invalid/DST ambiguity
+ok 19 - Unified: datetime-local inputs use store timezone and reject invalid/DST ambiguity
+  ---
+  duration_ms: 13.839845
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5905.440726

@@ -214,8 +214,14 @@ export class JsonRepository {
     const directory = path.dirname(this.filePath);
     await fs.mkdir(directory, { recursive: true });
     const temporary = `${this.filePath}.${process.pid}.${randomBytes(5).toString('hex')}.tmp`;
-    await fs.writeFile(temporary, `${JSON.stringify(next, null, 2)}\n`, { mode: 0o600 });
-    await fs.rename(temporary, this.filePath);
+    const handle = await fs.open(temporary, 'wx', 0o600);
+    try { await handle.writeFile(`${JSON.stringify(next, null, 2)}\n`); await handle.sync(); }
+    finally { await handle.close(); }
+    try { await fs.rename(temporary, this.filePath); }
+    catch (error) { await fs.unlink(temporary).catch(()=>undefined); throw error; }
+    // Directory fsync is supported on POSIX. The file adapter is not a substitute
+    // for a transactional production database on arbitrary network filesystems.
+    if (process.platform !== 'win32') { const dir = await fs.open(directory, 'r'); try { await dir.sync(); } finally { await dir.close(); } }
   }
 
   async mutate<T>(mutator: (state: DatabaseState) => T | Promise<T>): Promise<T> {
@@ -700,12 +706,17 @@ export class JsonRepository {
       return link;
     });
   }
-  findSourceLinkByTokenHash(tokenHash: string): SourceLink | undefined { return this.requireState().sourceLinks.find((item) => item.tokenHash === tokenHash && item.status === 'active'); }
+  findSourceLinkByTokenHash(tokenHash: string): SourceLink | undefined { const state=this.requireState(); return state.sourceLinks.find((item) => item.tokenHash === tokenHash && item.status === 'active' && state.tenants.some(t=>t.id===item.tenantId && t.status==='active') && state.stores.some(s=>s.id===item.storeId && s.tenantId===item.tenantId && s.status==='active')); }
   findSourceLink(id: string): SourceLink | undefined { return this.requireState().sourceLinks.find((item) => item.id === id); }
   listSourceLinks(tenantId: string, storeIds: string[]): SourceLink[] { return this.requireState().sourceLinks.filter((item) => item.tenantId === tenantId && storeIds.includes(item.storeId)); }
   async addTouchEvent(input: Omit<TouchEvent, 'id' | 'occurredAt'> & { occurredAt?: string }): Promise<TouchEvent> {
     return this.mutate((state) => {
       requireCondition(state.sourceLinks.some((link) => link.id === input.sourceLinkId && link.tenantId === input.tenantId && link.storeId === input.storeId && link.status === 'active'), 'source_link_not_found', 404);
+      // Business conversion events are idempotent; page views remain separate.
+      if (input.eventType === 'coupon_issue') {
+        const prior = state.touchEvents.find(e => e.tenantId === input.tenantId && e.storeId === input.storeId && e.sourceLinkId === input.sourceLinkId && e.eventType === input.eventType && e.sessionTokenHash === input.sessionTokenHash);
+        if (prior) return prior;
+      }
       const event: TouchEvent = { ...input, id: randomUUID(), occurredAt: input.occurredAt || nowIso() }; state.touchEvents.push(event); return event;
     });
   }
@@ -745,6 +756,8 @@ export class JsonRepository {
   findOffer(id: string): Offer | undefined { return this.requireState().offers.find((item) => item.id === id); }
   async issueCoupon(input: { tenantId: string; storeId: string; offerId: string; memberId: string; sourceLinkId: string | null; tokenHash: string }): Promise<IssuedCoupon> {
     return this.mutate((state) => {
+      const prior = state.issuedCoupons.find(c=>c.tenantId===input.tenantId && c.storeId===input.storeId && c.offerId===input.offerId && c.memberId===input.memberId);
+      if (prior) { requireCondition(prior.tokenHash===input.tokenHash,'coupon_already_issued'); return prior; }
       const offer = state.offers.find((item) => item.id === input.offerId && item.tenantId === input.tenantId && item.storeId === input.storeId);
       if (!offer || offer.status !== 'active' || !activeDuring(nowIso(), offer.validFrom, offer.validTo) || (offer.maxRedemptions !== null && offer.issuedCount >= offer.maxRedemptions)) throw new Error('offer_unavailable');
       const campaign = state.campaigns.find((item) => item.id === offer.campaignId && item.tenantId === input.tenantId && item.storeId === input.storeId);
@@ -816,11 +829,13 @@ export class JsonRepository {
   }
   findContentRevision(id: string): ContentRevision | undefined { return this.requireState().contentRevisions.find((item) => item.id === id); }
   listContentRevisions(tenantId: string, storeIds: string[]): ContentRevision[] { return this.requireState().contentRevisions.filter((item) => item.tenantId === tenantId && this.requireState().contentBriefs.some((brief) => brief.id === item.briefId && storeIds.includes(brief.storeId))); }
-  async updateContentRevision(id: string, packageData: ContentRevision['packageData'], _actorUserId: string): Promise<ContentRevision | undefined> {
+  async updateContentRevision(id: string, packageData: ContentRevision['packageData'], _actorUserId: string, expectedHash?: string): Promise<ContentRevision | undefined> {
     return this.mutate((state) => {
       if (validateContentPackage(packageData).length) throw new Error('content_schema_invalid');
       const current = state.contentRevisions.find((item) => item.id === id);
       if (!current) return undefined;
+      if (expectedHash !== undefined) requireCondition(current.contentHash === expectedHash, 'content_version_conflict');
+      archiveContentRevision(state, current, 'before_edit');
       current.currentApprovalId = null;
       current.packageData = structuredClone(packageData);
       for (const variant of current.packageData.variants.filter(v => v.locale === 'bn')) { variant.review_status = 'needs_local_review'; variant.reviewer_id = null; }
@@ -835,6 +850,7 @@ export class JsonRepository {
       if (!revision) return undefined;
       const variant = revision.packageData.variants.find((item) => item.locale === 'bn');
       if (!variant) return revision;
+      archiveContentRevision(state, revision, 'before_local_review');
       revision.currentApprovalId = null;
       variant.review_status = decision; variant.reviewer_id = reviewerId;
       revision.contentHash = createHash('sha256').update(JSON.stringify(revision.packageData)).digest('hex');
@@ -882,6 +898,7 @@ export class JsonRepository {
       for (const prior of state.contentApprovals.filter(a => a.resourceRevisionId === revision.id && a.status === 'approved')) prior.status = 'stale';
       approval.status = 'approved'; approval.approvedBy = actorUserId; approval.approvedAt = nowIso();
       revision.status = 'approved'; revision.currentApprovalId = approval.id;
+      archiveContentRevision(state, revision, 'approved');
       return approval;
     });
   }
@@ -896,6 +913,8 @@ export class JsonRepository {
       requireCondition(check.ok, check.errors[0]?.code || 'approval_validation_failed');
       requireCondition(input.channel === approval.channel, 'approval_scope_mismatch');
       requireCondition(input.mode === 'manual', 'live_publication_unimplemented');
+      const existing = state.publicationIntents.find(i=>i.tenantId===input.tenantId && i.storeId===input.storeId && i.approvalId===approval.id && i.channel===input.channel && i.mode===input.mode);
+      if (existing) return existing;
       const intent: PublicationIntent = { ...input, id: randomUUID(), approvalId: approval.id, payloadHash: revision.contentHash, packageData: structuredClone(revision.packageData), status: 'manual_ready', createdAt: nowIso() };
       state.publicationIntents.push(intent);
       return intent;
@@ -1736,4 +1755,13 @@ function extractFacts(tenantId: string, revision: BrandRevision, content: string
     id: randomUUID(), tenantId, revisionId: revision.id, key: row.key, value: row.value, valueType: row.valueType,
     sourceCitation: revision.id, status: revision.status, effectiveFrom: revision.effectiveFrom, effectiveTo: revision.effectiveTo
   }));
+}
+
+/** Append-only immutable payload snapshots; the legacy revision ID remains a
+ * working-document handle so existing clients keep working. Snapshots are the
+ * historical approved revisions, not overwriteable copies of the latest draft. */
+function archiveContentRevision(state: DatabaseState, revision: ContentRevision, reason: string): void {
+  state.contentHistory ??= [];
+  if (state.contentHistory.some(v=>v.resourceId===revision.id && v.contentHash===revision.contentHash && v.reason===reason)) return;
+  state.contentHistory.push({ id:randomUUID(), resourceId:revision.id, tenantId:revision.tenantId, reason, contentHash:revision.contentHash, capturedAt:nowIso(), revision:structuredClone(revision) });
 }

@@ -1,0 +1,697 @@
+{
+  "mode": "in_memory_DOM_with_real_HTTP_bridge",
+  "business_data": "isolated synthetic tenant; actual application HTTP routes and JSON repository",
+  "native_navigation_verified": false,
+  "browser_cookie_security_verified": false,
+  "native_storage_verified": false,
+  "limitations": [
+    "Chromium only",
+    "No live model/channel writes",
+    "Browser navigation blocked by environment; DOM loads via set_content; fetch uses Python cookie jar; images embedded unchanged; no native cookies/storage/navigation acceptance"
+  ],
+  "passed": 89,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "owner real login and scoped render",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "homepage has real campaign name, not a bare UUID",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new-run modal takes focus",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Escape closes modal and restores focus",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "UI-created background task completes through real persistent worker",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "background run cannot be advanced by UI step button",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "new document reload recovers saved server run",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "orchestration switches to English",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "overview/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "orchestration/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "content/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "imports/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "brand/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "campaigns/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "crm/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "campus/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "voice/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "control/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "cashier/1500 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1500,
+        "scroll": 1500,
+        "body": 1500
+      }
+    },
+    {
+      "name": "overview/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "orchestration/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "content/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "imports/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "brand/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "campaigns/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "crm/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "campus/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "voice/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "control/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "cashier/1024 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1024,
+        "scroll": 1024,
+        "body": 1024
+      }
+    },
+    {
+      "name": "overview/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "orchestration/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "content/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "imports/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "brand/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "campaigns/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "crm/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "campus/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "voice/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "control/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "cashier/768 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 768,
+        "scroll": 768,
+        "body": 768
+      }
+    },
+    {
+      "name": "overview/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "orchestration/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "content/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "imports/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "brand/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "campaigns/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "crm/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "campus/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "voice/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "control/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "cashier/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "overview/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "orchestration/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "content/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "imports/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "brand/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "campaigns/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "crm/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "campus/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "voice/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "control/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "cashier/360 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 360,
+        "scroll": 360,
+        "body": 360
+      }
+    },
+    {
+      "name": "all management views have no browser JavaScript errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "editor saves with expected hash; old local review reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "reviewer real login and scoped render",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "review surface removes generation and owner approval controls",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "local reviewer completes Bengali review via existing API",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "review/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "Bengali review -> submit -> owner approve through real backend",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "UI exposes immutable approved history",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "rejection dialog persists reason and removes pending approval",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "marketing consent is unchecked by default",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "consumer/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "consumer registers through real API; no repeated form",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "consumer verifies and claims a real isolated test coupon",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "consumer can withdraw channel consents",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "consumer switches to Bengali",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "consumer/1100 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 1100,
+        "scroll": 1100,
+        "body": 1100
+      }
+    },
+    {
+      "name": "cashier real login and scoped render",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "cashier only sees the operational module",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "cashier reservation cannot be converted into payment without POS import",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "real source -> member -> coupon -> cashier -> POS CSV -> redeemed chain",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "staff/390 no horizontal page overflow",
+      "passed": true,
+      "detail": {
+        "viewport": 390,
+        "scroll": 390,
+        "body": 390
+      }
+    },
+    {
+      "name": "fault injection: failed read is not shown as an empty successful queue",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "admin final JavaScript error check",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "review final JavaScript error check",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "staff final JavaScript error check",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "consumer final JavaScript error check",
+      "passed": true,
+      "detail": []
+    }
+  ]
+}

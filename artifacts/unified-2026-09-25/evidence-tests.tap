@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: A01: unchanged source and actual successful command logs generate capabilities
+ok 1 - A01: unchanged source and actual successful command logs generate capabilities
+  ---
+  duration_ms: 152.173403
+  type: 'test'
+  ...
+# Subtest: A01: adding a previously unrecorded source file invalidates old evidence
+ok 2 - A01: adding a previously unrecorded source file invalidates old evidence
+  ---
+  duration_ms: 33.210773
+  type: 'test'
+  ...
+# Subtest: A01: deleted, changed and renamed sources invalidate old evidence
+ok 3 - A01: deleted, changed and renamed sources invalidate old evidence
+  ---
+  duration_ms: 99.934225
+  type: 'test'
+  ...
+# Subtest: A01: lockfile and actual package scripts are part of the source snapshot
+ok 4 - A01: lockfile and actual package scripts are part of the source snapshot
+  ---
+  duration_ms: 71.745147
+  type: 'test'
+  ...
+# Subtest: A01: different toolchain, omitted commands and changed logs cannot claim a current validation
+ok 5 - A01: different toolchain, omitted commands and changed logs cannot claim a current validation
+  ---
+  duration_ms: 478.862903
+  type: 'test'
+  ...
+# Subtest: A01: a file created during the gate run makes that run invalid
+ok 6 - A01: a file created during the gate run makes that run invalid
+  ---
+  duration_ms: 1051.176729
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3049.145507

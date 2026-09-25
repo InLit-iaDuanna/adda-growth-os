@@ -2,7 +2,7 @@
   "name": "adda-growth-os",
   "version": "0.1.0",
   "private": true,
-  "description": "ADDA Growth OS \u2014 executable G00-G10 offline vertical slices",
+  "description": "ADDA Growth OS — executable G00-G10 offline vertical slices",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -32,7 +32,7 @@
     "test:integration": "node --test --import tsx tests/integration.test.ts",
     "test:e2e": "node --test --import tsx tests/e2e.test.ts",
     "test:ai": "node scripts/test-ai-contracts.mjs",
-    "test": "npm run test:unit && npm run test:g01 && npm run test:g02 && npm run test:g03 && npm run test:g04 && npm run test:g05 && npm run test:g06 && npm run test:g07-g10 && npm run test:metrics-remediation && npm run test:whatsapp-remediation && npm run test:jobs-cookie-remediation && npm run test:audit-remediation-p0 && npm run test:integration && npm run test:e2e && npm run test:audit-n01-n08 && npm run test:audit-b01-b05 && npm run test:validation-evidence && npm run test:usability-regressions",
+    "test": "npm run build && node scripts/test-compiled.mjs",
     "db:migrate": "node --import tsx scripts/migrate.ts",
     "db:seed:demo": "node --import tsx scripts/seed-demo.ts",
     "fixtures:verify": "node scripts/verify-fixtures.mjs",
@@ -46,7 +46,14 @@
     "test:audit-b01-b05": "node --test --import tsx tests/audit-b01-b05.test.ts",
     "test:validation-evidence": "node --test tests/validation-evidence.test.mjs",
     "test:usability-regressions": "node --test --import tsx tests/usability-regressions.test.ts",
-    "test:codebuddy-ai": "node scripts/test-codebuddy-ai.mjs"
+    "test:codebuddy-ai": "node scripts/test-codebuddy-ai.mjs",
+    "test:compiled": "node scripts/test-compiled.mjs",
+    "test:unified": "npm run build && node --test dist/tests/ab-workspace.test.js dist/tests/unified-backend.test.js",
+    "test:browser": "node scripts/browser-tests.mjs",
+    "demo": "npm run build && node scripts/demo.mjs",
+    "demo:ready": "node scripts/demo.mjs",
+    "worker:ready": "node dist/apps/worker/src/index.js",
+    "validate:unified": "node scripts/validate-unified.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

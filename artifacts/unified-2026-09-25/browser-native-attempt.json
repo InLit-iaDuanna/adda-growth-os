@@ -1,0 +1,20 @@
+{
+  "mode": "native_browser_e2e",
+  "business_data": "isolated synthetic tenant; actual application HTTP routes and JSON repository",
+  "native_navigation_verified": false,
+  "browser_cookie_security_verified": false,
+  "native_storage_verified": false,
+  "limitations": [
+    "Chromium only",
+    "No live model/channel writes"
+  ],
+  "passed": 0,
+  "failed": 1,
+  "checks": [
+    {
+      "name": "execution_stopped",
+      "passed": false,
+      "detail": "Page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:33503/\nCall log:\n  - navigating to \"http://127.0.0.1:33503/\", waiting until \"load\"\n"
+    }
+  ]
+}

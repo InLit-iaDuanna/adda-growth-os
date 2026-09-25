@@ -90,7 +90,7 @@ export function parseCookies(header: string | undefined): Record<string, string>
     if (index < 0) continue;
     const key = part.slice(0, index).trim();
     const value = part.slice(index + 1).trim();
-    if (key) result[key] = decodeURIComponent(value);
+    if (key) { try { result[key] = decodeURIComponent(value); } catch { /* Malformed cookies never cause a 500. */ } }
   }
   return result;
 }

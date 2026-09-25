@@ -1,0 +1,35 @@
+{
+  "parent_brand": "SUIWU 随物",
+  "endorsed_brand": "ADDA",
+  "relationship_source": "project owner explicitly confirmed in conversation",
+  "assets": [
+    {
+      "file": "7846e5a3d39a673b230a47f52f4532ca.jpg",
+      "sha256": "dfe14e482e2a75ee5f5f13135956f0998f67c372b74b0e53a2322d1f2137ffc8",
+      "source": "client-supplied image via project owner",
+      "modified": false,
+      "use": "project interface; does not approve marketing reuse"
+    },
+    {
+      "file": "99b0b4ec1602cc2760ffed5944b53444.jpg",
+      "sha256": "affd00c8cd4a2e89e8912e03000663e7f650926852d94f017509b0f9f0d2bcc3",
+      "source": "client-supplied image via project owner",
+      "modified": false,
+      "use": "project interface; does not approve marketing reuse"
+    },
+    {
+      "file": "f78fd9085f6bde2ab8101aac1de72da9.jpg",
+      "sha256": "230f28cd1562cac4b6f418a8340f183dfd628a52da94efa0c4ace558d2959c02",
+      "source": "client-supplied image via project owner",
+      "modified": false,
+      "use": "project interface; does not approve marketing reuse"
+    },
+    {
+      "file": "4da38778134ae0fc6f4fb0046521903b.jpg",
+      "sha256": "05db143193402f645de8453c97b03580d63a7df1e122a3fce3c04a4b79e2eb5a",
+      "source": "client-supplied image via project owner",
+      "modified": false,
+      "use": "project interface; does not approve marketing reuse"
+    }
+  ]
+}

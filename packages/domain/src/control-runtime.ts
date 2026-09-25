@@ -1,24 +1,18 @@
-import { ALLOWED_METRICS, SKILL_NAMES, type MetricEvidence, type RouterRequest, type RouterResult } from './control';
+import { type MetricEvidence, type RouterRequest, type RouterResult } from './control';
+import { routerRequestErrors } from './control-request';
+import { explicitTimestamp, requireCondition } from './validation';
 
 const INJECTION = /(ignore\s+(all|previous)|system\s+prompt|export\s+(all|full)|手机号|token|验证码|send\s+externally|shell|sql)/i;
 
-export function validateRouterRequest(input: RouterRequest): string[] {
-  const errors: string[] = [];
-  if (!SKILL_NAMES.includes(input.skill)) errors.push('skill_not_allowlisted');
-  if (typeof input.prompt !== 'string' || input.prompt.length > 4000) errors.push('prompt_invalid');
-  if (INJECTION.test(input.prompt || '')) errors.push('untrusted_instruction_blocked');
-  if (input.maxSteps !== undefined && (!Number.isSafeInteger(input.maxSteps) || input.maxSteps < 1 || input.maxSteps > 6)) errors.push('max_steps_exceeded');
-  if (input.maxRetries !== undefined && (!Number.isSafeInteger(input.maxRetries) || input.maxRetries < 0 || input.maxRetries > 2)) errors.push('max_retries_exceeded');
-  if (input.deadlineSeconds !== undefined && (!Number.isSafeInteger(input.deadlineSeconds) || input.deadlineSeconds < 1 || input.deadlineSeconds > 180)) errors.push('deadline_exceeded');
-  if (input.budgetMinor !== undefined && (!Number.isSafeInteger(input.budgetMinor) || input.budgetMinor < 0)) errors.push('budget_invalid');
-  if ((input.metricQueries || []).length + 1 > (input.maxSteps ?? 6)) errors.push('max_steps_exceeded');
-  if (input.budgetMinor !== undefined && input.budgetMinor > 100000) errors.push('budget_limit_exceeded');
-  for (const query of input.metricQueries || []) if (!query || typeof query !== 'object' || !ALLOWED_METRICS.has(query.metricKey)) errors.push('metric_not_allowlisted');
-  for (const tool of input.allowedTools || []) if (!['metric_query', 'approved_knowledge', 'feedback_cases'].includes(tool)) errors.push(`tool_not_allowlisted:${tool}`);
-  return errors;
+export function validateRouterRequest(input: unknown): string[] {
+  return routerRequestErrors(input);
 }
 
 export function runDeterministicRouter(input: RouterRequest, metrics: MetricEvidence[], ownerUserId: string, asOf: string): RouterResult {
+  const errors = validateRouterRequest(input);
+  // Preserve the existing blocked result for an otherwise-valid injected prompt.
+  requireCondition(!errors.length || (errors.length === 1 && errors[0] === 'untrusted_instruction_blocked'), errors[0] || 'router_contract_invalid', 400);
+  requireCondition(explicitTimestamp(asOf), 'as_of_invalid', 400);
   const limits = { maxSteps: Math.min(input.maxSteps || 6, 6), maxRetries: Math.min(input.maxRetries ?? 2, 2), deadlineSeconds: Math.min(input.deadlineSeconds || 180, 180), budgetMinor: input.budgetMinor ?? 0 };
   const refs = metrics.map(metric => metric.id);
   if (INJECTION.test(input.prompt || '')) return { skill: input.skill, status: 'blocked', observations: [], hypotheses: [], proposedActions: [], metricEvidence: [], limits };

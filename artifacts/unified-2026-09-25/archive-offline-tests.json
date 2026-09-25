@@ -1,0 +1,6 @@
+{
+  "command": "node scripts/test-compiled.mjs",
+  "environment": "freshly extracted full source ZIP, no node_modules, precompiled dist",
+  "exit_code": 0,
+  "node": "v22.16.0"
+}

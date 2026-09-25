@@ -1,0 +1,20 @@
+{
+  "base_archive": "adda-growth-os-source-2026-09-25.zip",
+  "base_sha256": "6e865ad58c49a380b2fa10ed3b93347fafa8f9688d0f38363e456e6bf2b23438",
+  "implementation": "uploaded source with integrated changes and compiled JavaScript",
+  "remote_pushed": false,
+  "delivery_date": "2026-09-25",
+  "application_tests": {
+    "total": 145,
+    "passed": 145,
+    "failed": 0,
+    "skipped": 0,
+    "cancelled": 0
+  },
+  "dom_http_checks": 89,
+  "native_browser_e2e_verified": false,
+  "runtime_without_node_modules_checks": 10,
+  "production_ready": false,
+  "validation": "artifacts/unified-2026-09-25/validation.json",
+  "handoff": "docs/UNIFIED_HANDOFF.md"
+}

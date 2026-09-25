@@ -181,6 +181,7 @@ export interface DatabaseState {
   redemptionAttempts: RedemptionAttempt[];
   contentBriefs: ContentBrief[];
   contentRevisions: ContentRevision[];
+  contentHistory?: Array<{id:string;resourceId:string;tenantId:string;reason:string;contentHash:string;capturedAt:string;revision:ContentRevision}>;
   contentApprovals: ContentApproval[];
   publicationIntents: PublicationIntent[];
   publicationReceipts: PublicationReceipt[];
@@ -205,6 +206,8 @@ export interface DatabaseState {
   webhookEvents: WebhookEvent[];
   dailyReports: DailyReport[];
   controlTasks: ControlTask[];
+  /** Optional for backwards-compatible v1 file-dev databases. */
+  controlRuns?: import('./control-runs').ControlRun[];
   externalWritesKillSwitch: boolean;
   auditEvents: AuditEvent[];
   jobs: Job[];
