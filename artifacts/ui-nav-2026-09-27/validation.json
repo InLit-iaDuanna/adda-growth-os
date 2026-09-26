@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "goal": "ui-nav-2026-09-27",
+  "scope": "authenticated admin workbench navigation presentation",
+  "checks": [
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "npm run validate:unified",
+      "exit_code": 0,
+      "result": "passed",
+      "details": "lint, typecheck, build, 147/147 tests, test:ai, fixtures:verify and security:scan"
+    }
+  ],
+  "browser_check": {
+    "url": "http://127.0.0.1:3111/admin#overview",
+    "tab": 6,
+    "observed_sections": ["工作台", "经营", "内容", "现场", "系统"],
+    "observed_entries": 11,
+    "observed_agent_entry": true,
+    "observed_nested_sidebar_scrollbar": false,
+    "route_smoke": {
+      "imports": "opened from POS 与指标 and returned to 总览",
+      "overview_restored": true
+    },
+    "note": "Visual and accessibility-tree check in the local demo; this is not native browser E2E."
+  }
+}

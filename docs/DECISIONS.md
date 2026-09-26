@@ -50,6 +50,8 @@ D041（2026-09-25 CodeBuddy CLI provider）：真实模型调用采用显式 `AI
 
 D042（2026-09-26 完整合成测试数据）：新增可重复的 `scripts/seed-complete-test-data.mjs` 与 `npm run data:seed`。生成器从干净 demo seed 构建完整 JSON 仓储，另写 members/orders/refunds CSV 与 manifest；所有记录使用合成租户、固定 demo 账号和明确的 bearer token，外部连接器 kill switch 保持开启。fixture 可以用于本地 UI、HTTP、POS、顾客和 Agent 流程检查，但不能作为客户数据、真实渠道验收或生产初始化。
 
+D043（2026-09-27 导航简化）：工作台侧栏保留全部已授权入口，按工作台、经营、内容、现场、系统分组；隐藏重复的编号和箭头装饰，桌面端取消侧栏内部滚动，移动端继续使用现有菜单按钮和两列入口。此次调整只改变导航呈现，不改变页面路由、权限或业务状态。
+
 
 ## D2026-09-25 — Uploaded-source unified implementation
 
