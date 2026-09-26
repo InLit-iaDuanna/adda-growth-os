@@ -28,5 +28,19 @@ test('CodeBuddy provider executes without a shell and unwraps structured JSON', 
   if (result.ok) {
     assert.equal(result.conversationId, 'data-test-1');
     assert.deepEqual(result.value, { rows: [{ id: 'synthetic-1' }], notes: [] });
+    assert.deepEqual(result.checks, { transport_ok: true, parse_ok: true, schema_ok: true, evidence_ok: null, policy_ok: null, human_review_status: 'not_assessed' });
+  }
+});
+
+test('CodeBuddy provider rejects parseable JSON that violates the role contract', async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'adda-codebuddy-invalid-'));
+  const binary = path.join(directory, 'fake-codebuddy');
+  await writeFile(binary, '#!/usr/bin/env node\nprocess.stdout.write(JSON.stringify({structured_output:{rows:[],extra:true}}));\n');
+  await chmod(binary, 0o755);
+  const result = await runCodeBuddyRole(config(binary, 'codebuddy_cli'), { role: 'data_generator', prompt: '{}' });
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(result.errorCode, 'schema_invalid');
+    assert.deepEqual(result.checks, { transport_ok: true, parse_ok: true, schema_ok: false, evidence_ok: null, policy_ok: null, human_review_status: 'not_assessed' });
   }
 });

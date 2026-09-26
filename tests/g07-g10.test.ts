@@ -33,6 +33,26 @@ test('G07 feedback risk escalation, dedupe, correction, reply approval and manua
   } finally { await app.close(); }
 });
 
+test('G07 existing pending reply task is rechecked after approval and becomes executable', async () => {
+  const app = await startTestApp({ seedDemo: true });
+  try {
+    const client = new TestClient(app.baseUrl);
+    await client.login('owner@demo.adda.local');
+    const feedback = await client.request('/api/feedback', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ store_id: 'sto_demo_01', source: 'manual', external_id: 'fb-idempotent-1', text: 'Customer reports food poisoning and wants help.' }) });
+    assert.equal(feedback.response.status, 201);
+    const reply = await client.request('/api/support-cases/' + feedback.body.case.id + '/replies', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ channel: 'manual', body: 'We have escalated this report to the store manager.' }) });
+    const id = reply.body.item.id;
+    assert.equal((await client.request('/api/reply-revisions/' + id + '/submit', { method: 'POST' })).response.status, 200);
+    const taskId = 'synthetic-preexisting-task';
+    await app.repository.mutate(state => state.voiceTasks.push({ id: taskId, tenantId: 'ten_demo_01', caseId: feedback.body.case.id, ownerUserId: 'usr_demo_owner', kind: 'manual_reply', replyRevisionId: id, status: 'open', dueAt: new Date(Date.now() + 86400000).toISOString(), evidence: `reply_revision:${id}`, createdAt: new Date().toISOString(), completedAt: null }));
+    assert.equal((await client.request('/api/reply-revisions/' + id + '/approve', { method: 'POST' })).response.status, 200);
+    const execute = await client.request('/api/reply-revisions/' + id + '/execute', { method: 'POST' });
+    assert.equal(execute.response.status, 200);
+    assert.equal(execute.body.item.status, 'manual_task');
+    assert.equal(execute.body.task.id, taskId);
+  } finally { await app.close(); }
+});
+
 test('G08 router blocks prompt injection and daily report is versioned with at most three tasks', async () => {
   const app = await startTestApp({ seedDemo: true });
   try {

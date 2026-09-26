@@ -47,10 +47,12 @@
     ]
   },
   "cashier": {
-    "pending_coupon": "coupon_noor_001",
+    "pending_coupon": "coupon_rina_001",
     "reserve_expected": "pending_pos_verification",
     "unknown_order_match_expected": "pos_order_not_found",
-    "authoritative_order": "POS-1003"
+    "authoritative_order": "POS-1003",
+    "member_mismatch_coupon": "coupon_noor_001",
+    "member_mismatch_expected": "member_mismatch"
   },
   "imports": {
     "files": [

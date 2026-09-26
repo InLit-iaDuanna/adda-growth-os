@@ -3,7 +3,16 @@ import { randomUUID } from 'node:crypto';
 import type { AppConfig } from './config';
 
 export type CodeBuddyRole = 'data_generator' | 'agent_planner' | 'content_writer' | 'reviewer';
-export type CodeBuddyErrorCode = 'provider_disabled' | 'binary_missing' | 'timeout' | 'output_too_large' | 'process_failed' | 'invalid_json';
+export type CodeBuddyErrorCode = 'provider_disabled' | 'binary_missing' | 'timeout' | 'output_too_large' | 'process_failed' | 'invalid_json' | 'schema_invalid';
+
+export interface CodeBuddyChecks {
+  transport_ok: boolean;
+  parse_ok: boolean;
+  schema_ok: boolean;
+  evidence_ok: boolean | null;
+  policy_ok: boolean | null;
+  human_review_status: 'not_assessed' | 'required' | 'pending' | 'passed' | 'failed';
+}
 
 export interface CodeBuddyRunRequest {
   role: CodeBuddyRole;
@@ -19,6 +28,7 @@ export interface CodeBuddyRunSuccess {
   model: string;
   value: unknown;
   elapsedMs: number;
+  checks: CodeBuddyChecks;
 }
 
 export interface CodeBuddyRunFailure {
@@ -29,6 +39,7 @@ export interface CodeBuddyRunFailure {
   errorCode: CodeBuddyErrorCode;
   message: string;
   elapsedMs: number;
+  checks: CodeBuddyChecks;
 }
 
 export type CodeBuddyRunResult = CodeBuddyRunSuccess | CodeBuddyRunFailure;
@@ -61,7 +72,7 @@ const ROLE_SCHEMAS: Record<CodeBuddyRole, Record<string, unknown>> = {
     required: ['skill', 'status', 'observations', 'hypotheses', 'proposedActions', 'metricEvidence', 'sourceRecords', 'needsInput', 'limits']
   },
   content_writer: {
-    type: 'object', additionalProperties: true,
+    type: 'object', additionalProperties: false,
     properties: {
       brief_id: { type: 'string' }, campaign_id: { type: 'string' }, brand_revision_id: { type: 'string' }, target_metric: { type: 'string' }, content_pillar: { type: 'string' }, channel: { type: 'string' },
       product_refs: { type: 'array', items: { type: 'string' } }, hook_variants: { type: 'array', maxItems: 10, items: { type: 'string' } }, shot_list: { type: 'array', maxItems: 20, items: { type: 'object' } }, operator_notes_zh: { type: 'string' },
@@ -79,6 +90,46 @@ const ROLE_SCHEMAS: Record<CodeBuddyRole, Record<string, unknown>> = {
 function messageFromStderr(stderr: string): string {
   const compact = stderr.replace(/\s+/g, ' ').trim();
   return compact ? compact.slice(0, 500) : 'CodeBuddy CLI 未返回错误详情';
+}
+
+function checks(overrides: Partial<CodeBuddyChecks> = {}): CodeBuddyChecks {
+  return {
+    transport_ok: false, parse_ok: false, schema_ok: false,
+    evidence_ok: null, policy_ok: null, human_review_status: 'not_assessed', ...overrides
+  };
+}
+
+function typeMatches(value: unknown, expected: unknown): boolean {
+  if (Array.isArray(expected)) return expected.some((item) => typeMatches(value, item));
+  if (expected === 'null') return value === null;
+  if (expected === 'array') return Array.isArray(value);
+  if (expected === 'object') return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+  if (expected === 'integer') return typeof value === 'number' && Number.isSafeInteger(value);
+  return typeof value === expected;
+}
+
+/** Small local JSON-schema validator for the role contracts. It intentionally
+ * supports only the schema vocabulary declared above, so a new contract must
+ * also add a test instead of silently being accepted by a permissive parser. */
+function schemaErrors(value: unknown, schema: Record<string, unknown>, path = '$'): string[] {
+  const errors: string[] = [];
+  if (schema.type !== undefined && !typeMatches(value, schema.type)) errors.push(`${path}:type`);
+  if (Array.isArray(schema.enum) && !schema.enum.includes(value)) errors.push(`${path}:enum`);
+  if (typeof schema.minItems === 'number' && Array.isArray(value) && value.length < schema.minItems) errors.push(`${path}:minItems`);
+  if (typeof schema.maxItems === 'number' && Array.isArray(value) && value.length > schema.maxItems) errors.push(`${path}:maxItems`);
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const record = value as Record<string, unknown>;
+    const properties = schema.properties && typeof schema.properties === 'object' ? schema.properties as Record<string, Record<string, unknown>> : {};
+    for (const key of Array.isArray(schema.required) ? schema.required : []) if (typeof key === 'string' && !(key in record)) errors.push(`${path}.${key}:required`);
+    if (schema.additionalProperties === false) for (const key of Object.keys(record)) if (!Object.hasOwn(properties, key)) errors.push(`${path}.${key}:additionalProperties`);
+    for (const [key, child] of Object.entries(properties)) if (key in record && child && typeof child === 'object') errors.push(...schemaErrors(record[key], child, `${path}.${key}`));
+  }
+  if (Array.isArray(value) && schema.items && typeof schema.items === 'object') for (const [index, item] of value.entries()) errors.push(...schemaErrors(item, schema.items as Record<string, unknown>, `${path}[${index}]`));
+  return errors;
+}
+
+export function validateRoleOutput(role: CodeBuddyRole, value: unknown): string[] {
+  return schemaErrors(value, ROLE_SCHEMAS[role]).slice(0, 20);
 }
 
 function parseJsonCandidate(raw: string): unknown | null {
@@ -120,7 +171,7 @@ function unwrapResult(value: unknown): unknown {
   for (let index = 0; index < 3; index += 1) {
     if (!current || typeof current !== 'object' || Array.isArray(current)) return current;
     const record = current as Record<string, unknown>;
-    const nested = [record.result, record.output, record.data, record.content].find((item) => typeof item === 'string' || (item && typeof item === 'object'));
+    const nested = [record.structured_output, record.structuredOutput, record.result, record.output, record.data, record.content].find((item) => typeof item === 'string' || (item && typeof item === 'object'));
     if (nested === undefined || nested === current) return current;
     if (typeof nested === 'string') {
       const parsed = parseJsonCandidate(nested);
@@ -131,9 +182,14 @@ function unwrapResult(value: unknown): unknown {
   return current;
 }
 
+function providerEnv(): NodeJS.ProcessEnv {
+  const allowed = new Set(['PATH', 'HOME', 'USER', 'LANG', 'LC_ALL', 'TMPDIR']);
+  return Object.fromEntries(Object.entries(process.env).filter(([key]) => allowed.has(key) || key.startsWith('CODEBUDDY_')));
+}
+
 async function execute(config: AppConfig, args: string[]): Promise<{ code: number | null; signal: NodeJS.Signals | null; stdout: string; stderr: string; timedOut: boolean; tooLarge: boolean }> {
   return new Promise((resolve) => {
-    const child = spawn(config.codebuddyBin, args, { cwd: process.cwd(), env: process.env, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(config.codebuddyBin, args, { cwd: process.cwd(), env: providerEnv(), stdio: ['ignore', 'pipe', 'pipe'] });
     const stdout: Buffer[] = [];
     const stderr: Buffer[] = [];
     let size = 0;
@@ -152,10 +208,18 @@ async function execute(config: AppConfig, args: string[]): Promise<{ code: numbe
     };
     child.stdout.on('data', (chunk: Buffer) => collect(stdout, chunk));
     child.stderr.on('data', (chunk: Buffer) => collect(stderr, chunk));
-    const timer = setTimeout(() => { timedOut = true; child.kill('SIGTERM'); }, config.codebuddyTimeoutMs);
+    let forceTimer: NodeJS.Timeout | undefined;
+    const stop = (timeout: boolean): void => {
+      if (timeout) timedOut = true;
+      child.kill('SIGTERM');
+      forceTimer = setTimeout(() => { if (!settled) child.kill('SIGKILL'); }, 250);
+      forceTimer.unref();
+    };
+    const timer = setTimeout(() => stop(true), config.codebuddyTimeoutMs);
     timer.unref();
     child.once('error', (error) => {
       clearTimeout(timer);
+      if (forceTimer) clearTimeout(forceTimer);
       if (settled) return;
       settled = true;
       const code = (error as NodeJS.ErrnoException).code === 'ENOENT' ? null : -1;
@@ -163,6 +227,7 @@ async function execute(config: AppConfig, args: string[]): Promise<{ code: numbe
     });
     child.once('close', (code, signal) => {
       clearTimeout(timer);
+      if (forceTimer) clearTimeout(forceTimer);
       if (settled) return;
       settled = true;
       resolve({ code, signal, stdout: Buffer.concat(stdout).toString('utf8'), stderr: Buffer.concat(stderr).toString('utf8'), timedOut, tooLarge });
@@ -178,19 +243,22 @@ export async function runCodeBuddyRole(config: AppConfig, request: CodeBuddyRunR
   const startedAt = Date.now();
   const conversationId = request.conversationId || randomUUID();
   const base = { role: request.role, conversationId, model: config.codebuddyModel };
-  if (config.aiProvider !== 'codebuddy_cli') return { ...base, ok: false, errorCode: 'provider_disabled', message: 'AI_PROVIDER 未启用 codebuddy_cli', elapsedMs: Date.now() - startedAt };
+  if (config.aiProvider !== 'codebuddy_cli') return { ...base, ok: false, errorCode: 'provider_disabled', message: 'AI_PROVIDER 未启用 codebuddy_cli', elapsedMs: Date.now() - startedAt, checks: checks() };
   const args = [
-    '--print', '--model', config.codebuddyModel, '--effort', 'low', '--tools', '', '--max-turns', '1', '--output-format', 'text',
+    '--print', '--model', config.codebuddyModel, '--effort', 'low', '--tools', '', '--max-turns', '1', '--output-format', 'json',
     '--json-schema', JSON.stringify(ROLE_SCHEMAS[request.role]), '--permission-mode', 'dontAsk', '--no-session-persistence',
     '--session-id', conversationId, '--system-prompt', ROLE_SYSTEM_PROMPTS[request.role], request.prompt
   ];
   const result = await execute(config, args);
   const elapsedMs = Date.now() - startedAt;
-  if (result.timedOut) return { ...base, ok: false, errorCode: 'timeout', message: `CodeBuddy 超时（${config.codebuddyTimeoutMs}ms）`, elapsedMs };
-  if (result.tooLarge) return { ...base, ok: false, errorCode: 'output_too_large', message: `CodeBuddy 输出超过 ${config.codebuddyMaxOutputBytes} bytes`, elapsedMs };
-  if (result.code === null && result.stderr.includes('ENOENT')) return { ...base, ok: false, errorCode: 'binary_missing', message: `找不到 CodeBuddy CLI：${config.codebuddyBin}`, elapsedMs };
-  if (result.code !== 0) return { ...base, ok: false, errorCode: 'process_failed', message: messageFromStderr(result.stderr), elapsedMs };
+  if (result.timedOut) return { ...base, ok: false, errorCode: 'timeout', message: `CodeBuddy 超时（${config.codebuddyTimeoutMs}ms）`, elapsedMs, checks: checks() };
+  if (result.tooLarge) return { ...base, ok: false, errorCode: 'output_too_large', message: `CodeBuddy 输出超过 ${config.codebuddyMaxOutputBytes} bytes`, elapsedMs, checks: checks({ transport_ok: true }) };
+  if (result.code === null && result.stderr.includes('ENOENT')) return { ...base, ok: false, errorCode: 'binary_missing', message: `找不到 CodeBuddy CLI：${config.codebuddyBin}`, elapsedMs, checks: checks() };
+  if (result.code !== 0) return { ...base, ok: false, errorCode: 'process_failed', message: messageFromStderr(result.stderr), elapsedMs, checks: checks({ transport_ok: true }) };
   const parsed = parseJsonCandidate(result.stdout);
-  if (parsed === null) return { ...base, ok: false, errorCode: 'invalid_json', message: 'CodeBuddy 没有返回可解析 JSON', elapsedMs };
-  return { ...base, ok: true, value: unwrapResult(parsed), elapsedMs };
+  if (parsed === null) return { ...base, ok: false, errorCode: 'invalid_json', message: 'CodeBuddy 没有返回可解析 JSON', elapsedMs, checks: checks({ transport_ok: true }) };
+  const value = unwrapResult(parsed);
+  const errors = validateRoleOutput(request.role, value);
+  if (errors.length) return { ...base, ok: false, errorCode: 'schema_invalid', message: `CodeBuddy 输出未通过 ${request.role} schema：${errors.join(', ')}`, elapsedMs, checks: checks({ transport_ok: true, parse_ok: true }) };
+  return { ...base, ok: true, value, elapsedMs, checks: checks({ transport_ok: true, parse_ok: true, schema_ok: true }) };
 }

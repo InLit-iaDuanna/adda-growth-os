@@ -119,11 +119,60 @@ export function validateControlOutput(output: RouterResult, evidence: ControlEvi
       requireCondition(item && typeof item === 'object', 'skill_output_invalid');
       const refs = (item as unknown as Record<string, unknown>)[key];
       requireCondition(Array.isArray(refs) && refs.every(ref => typeof ref === 'string' && allowed.has(ref)), 'source_reference_invalid');
-      if ('text' in item) requireCondition(typeof item.text === 'string' && item.text.length <= 16000, 'skill_output_invalid');
+      if ('text' in item) {
+        const text = (item as unknown as { text?: unknown }).text;
+        requireCondition(typeof text === 'string' && text.length <= 16000, 'skill_output_invalid');
+      }
+      if (key === 'sourceRefs') {
+        const metricRefs = (refs as string[]).map((ref) => evidence.metrics.find((metric) => metric.id === ref)).filter(Boolean);
+        // A model may describe a record in prose, but it may not invent a
+        // number next to a legitimate metric reference. Metric observations
+        // are rendered from the frozen snapshot by the program instead.
+        if (metricRefs.length) {
+          requireCondition(metricRefs.length === 1 && (refs as string[]).length === 1, 'metric_observation_shape_invalid');
+          const metric = metricRefs[0]!;
+          requireCondition((item as unknown as { text?: unknown }).text === `${metric.metricKey}=${metric.value}`, 'metric_observation_not_rendered');
+        }
+      }
     }
   }
   requireCondition(output.proposedActions.length <= 3, 'action_limit_exceeded');
   for (const action of output.proposedActions) requireCondition(action.ownerUserId === evidence.ownerUserId && action.budgetMinor === 0 && explicitTimestamp(action.dueAt) && typeof action.title === 'string' && Array.isArray(action.guardrails) && action.guardrails.every(v=>typeof v==='string'), 'action_output_invalid');
+}
+
+export function buildControlProviderPrompt(evidence: ControlEvidence): string {
+  const request = { ...evidence.request, prompt: evidence.request.prompt.slice(0, 4000) };
+  const locked = {
+    skill: evidence.request.skill, as_of: evidence.asOf, owner_user_id: evidence.ownerUserId, tenant_scope: evidence.tenantId,
+    store_ids: evidence.storeIds, budget_minor: 0, max_steps: evidence.request.maxSteps ?? 6, max_retries: evidence.request.maxRetries ?? 2,
+    deadline_seconds: evidence.request.deadlineSeconds ?? 180, metric_evidence: evidence.metrics, source_records: evidence.records,
+    required_needs_input: evidence.needsInput, allowed_reference_ids: [...evidence.metrics.map((metric) => metric.id), ...evidence.records.map((record) => record.id)]
+  };
+  return [
+    '只输出 RouterResult JSON，不要 Markdown 或解释文字。',
+    '输出必须是合法 JSON 对象；不要代码围栏、注释、NaN、尾逗号或对象外文字。不得输出 locked 或 allowed_reference_ids 顶层字段。',
+    'locked 区块是服务端事实，只能用于生成引用；metricEvidence、sourceRecords、skill、limits 必须原样回传。',
+    '观察、假设和 proposedActions 的 sourceRefs/evidenceRefs 只能引用 allowed_reference_ids；最多 3 个建议。每个建议必须完整包含 title、ownerUserId、dueAt、budgetMinor、guardrails、evidenceRefs 六个字段；ownerUserId 必须是 locked.owner_user_id，budgetMinor 必须为 0。',
+    '如果 required_needs_input 非空，status 必须是 needs_input；不能执行发送、支付、导出、SQL、shell 或任何外部动作。',
+    '<locked>', JSON.stringify(locked, null, 2), '</locked>',
+    '<request_data>', JSON.stringify(request, null, 2), '</request_data>',
+    '<json_skeleton>', JSON.stringify({ skill: evidence.request.skill, status: evidence.needsInput.length ? 'needs_input' : 'completed', observations: [], hypotheses: [], proposedActions: [], metricEvidence: evidence.metrics, sourceRecords: evidence.records, needsInput: evidence.needsInput, limits: { maxSteps: evidence.request.maxSteps ?? 6, maxRetries: evidence.request.maxRetries ?? 2, deadlineSeconds: evidence.request.deadlineSeconds ?? 180, budgetMinor: 0 } }, null, 2), '</json_skeleton>'
+  ].join('\n');
+}
+
+export function normalizeControlProviderResult(value: unknown): RouterResult {
+  const raw = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  return {
+    skill: raw.skill,
+    status: raw.status,
+    observations: raw.observations,
+    hypotheses: raw.hypotheses,
+    proposedActions: raw.proposedActions,
+    metricEvidence: raw.metricEvidence,
+    sourceRecords: raw.sourceRecords,
+    needsInput: raw.needsInput,
+    limits: raw.limits
+  } as unknown as RouterResult;
 }
 
 export function runControl(state: DatabaseState, actor: ActorContext, input: RouterRequest, asOf: string): RouterResult {

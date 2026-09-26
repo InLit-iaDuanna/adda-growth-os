@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
+import { chmod, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { JsonRepository } from '../packages/db/src/repository';
 import { commandControlRun } from '../packages/domain/src/control-runs';
@@ -22,6 +23,18 @@ test('Unified: background checkpoints finish without any further browser command
  await processControlRunsOnce(disk);await processControlRunsOnce(disk);
  const list=await f.owner.request('/api/control/runs');const run=list.body.items[0];
  assert.equal(run.status,'completed');assert.deepEqual(run.nodes.map((n:any)=>n.attempts),[1,1]);assert.equal(run.externalWrites,false);assert.equal(run.actualCostMinor,0);
+});
+
+test('Unified: live CodeBuddy provider is used by durable background checkpoints', async t => {
+ const fake = path.join(process.cwd(), `.tmp-codebuddy-${randomUUID()}.mjs`);
+ await writeFile(fake, '#!/usr/bin/env node\nconst args=process.argv.slice(2); const system=args[args.indexOf("--system-prompt")+1]||""; const prompt=args.at(-1)||""; if(system.includes("三语言内容草稿员")){ const v=(locale)=>({locale,title:"Synthetic draft",caption:"Synthetic draft",subtitle_srt:"1\\n00:00:00,000 --> 00:00:05,000\\nSynthetic draft",cta:"Review",review_status:"draft",reviewer_id:null}); process.stdout.write(JSON.stringify({structured_output:{brief_id:"synthetic",campaign_id:"synthetic",brand_revision_id:"synthetic",target_metric:"qualified_order_count",content_pillar:"synthetic",channel:"manual",product_refs:[],hook_variants:["Synthetic hook"],shot_list:[{index:1,duration_seconds:5,visual:"Synthetic visual",spoken_line:"Synthetic line",onscreen_text:"Synthetic",rights_needed:["asset_use_approved"]}],operator_notes_zh:"Synthetic review required",variants:[v("zh-CN"),v("en"),{...v("bn"),review_status:"needs_local_review"}],source_link_id:null,sources:[],needs_input:[],risk_flags:[]}})); } else { const match=prompt.match(/<json_skeleton>\\s*([\\s\\S]*?)\\s*<\\/json_skeleton>/); if(!match) process.exit(2); process.stdout.write(JSON.stringify({structured_output:JSON.parse(match[1])})); }\n');
+ await chmod(fake, 0o755);
+ const f=await unifiedFixture({config:{aiProvider:'codebuddy_cli', codebuddyBin:fake}});t.after(async()=>{await f.close(); await import('node:fs/promises').then(fs=>fs.rm(fake,{force:true}));});
+ const created=await post(f.owner,'/api/control/runs',body());assert.equal(created.response.status,200);assert.equal(created.body.item.mode,'codebuddy_cli');assert.equal(created.body.item.actualCostMinor,null);
+ await processControlRunsOnce(f.app.repository, new Date().toISOString(), f.app.config);
+ await processControlRunsOnce(f.app.repository, new Date().toISOString(), f.app.config);
+ const run=(await f.owner.request('/api/control/runs/'+created.body.item.id)).body.item;
+ assert.equal(run.status,'completed');assert.equal(run.actualCostMinor,null);assert.ok(run.nodes.every((node:any)=>node.provider==='codebuddy_cli' && node.checks.schema_ok===true));assert.ok(run.events.some((event:any)=>event.type==='node_claimed'));
 });
 
 test('Unified: evidence is a real frozen snapshot, not a timestamp applied to mutable facts',async t=>{
@@ -78,6 +91,18 @@ test('Unified: output contracts reject fabricated refs and changed metric values
  const second=(await post(f.owner,'/api/control/runs',body({execution:'manual',plan:'voice'}))).body.item;
  const bad=await f.app.repository.mutate(state=>commandControlRun(state,actor,'advance',second.id,{expected_version:1},new Date().toISOString(),input=>{const out=evaluateControlInput(input);out.metricEvidence=[] as any;out.metricEvidence.push({id:'fabricated',value:999} as any);return out;}));
  assert.equal(bad.nodes[0].error,'metric_evidence_mismatch');
+});
+
+test('Unified: a valid metric reference cannot support an invented numeric narrative', async t => {
+ const f=await unifiedFixture();t.after(f.close);const r=(await post(f.owner,'/api/control/runs',body({execution:'manual',plan:'growth'}))).body.item;
+ const actor={userId:'usr_demo_owner',tenantId:'ten_demo_01',role:'OWNER' as const,storeIds:[storeId],sessionId:'test'};
+ let current=(await post(f.owner,`/api/control/runs/${r.id}/advance`,{expected_version:r.version})).body.item;
+ current=(await post(f.owner,`/api/control/runs/${r.id}/advance`,{expected_version:current.version})).body.item;
+ const result=await f.app.repository.mutate(state=>commandControlRun(state,actor,'advance',r.id,{expected_version:current.version},new Date().toISOString(),input=>{
+   const out=evaluateControlInput(input); const metric=input.metrics.find((item:any)=>item.metricKey==='net_revenue_minor')!;
+   out.observations.push({text:'net_revenue_minor=99999999；本次活动已证实增长300%',sourceRefs:[metric.id]}); return out;
+ }));
+ assert.equal(result.status,'failed'); assert.equal(result.nodes[2].error,'metric_observation_not_rendered');
 });
 
 test('Unified: transient retry keeps completed upstream results and enforces attempt caps',async t=>{

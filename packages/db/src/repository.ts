@@ -1353,13 +1353,14 @@ export class JsonRepository {
     return this.mutate((state) => {
       const item = state.replyRevisions.find((entry) => entry.id === id && entry.tenantId === tenantId);
       if (!item) throw new Error('reply_not_found');
-      const existingTask = state.voiceTasks.find(t => t.replyRevisionId === item.id);
-      if (existingTask) return { revision: item, task: existingTask };
-      if (item.status !== 'approved') throw new Error('reply_not_approved');
-      requireCondition(item.approvalHash === hashOpaque(JSON.stringify([item.id,item.caseId,hashOpaque(item.body),item.channel,item.expiresAt])) && Date.parse(item.expiresAt) > Date.now(), 'reply_approval_stale_or_expired');
       const supportCase = state.supportCases.find((entry) => entry.id === item.caseId && entry.tenantId === tenantId);
       if (!supportCase) throw new Error('case_not_found');
+      const existingTask = state.voiceTasks.find(t => t.replyRevisionId === item.id);
+      if (existingTask && item.status === 'manual_task') return { revision: item, task: existingTask };
+      if (item.status !== 'approved') throw new Error('reply_not_approved');
+      requireCondition(item.approvalHash === hashOpaque(JSON.stringify([item.id,item.caseId,hashOpaque(item.body),item.channel,item.expiresAt])) && Date.parse(item.expiresAt) > Date.now(), 'reply_approval_stale_or_expired');
       item.status = 'manual_task';
+      if (existingTask) return { revision: item, task: existingTask };
       const task: VoiceTask = { id: randomUUID(), tenantId, caseId: item.caseId, ownerUserId: supportCase.ownerUserId || actorUserId, kind: 'manual_reply', replyRevisionId: item.id, status: 'open', dueAt: new Date(Date.now() + 24 * 3600_000).toISOString(), evidence: `reply_revision:${item.id}`, createdAt: nowIso(), completedAt: null };
       state.voiceTasks.push(task);
       return { revision: item, task };

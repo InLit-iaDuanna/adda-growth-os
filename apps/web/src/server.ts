@@ -26,13 +26,13 @@ import { runCodeBuddyRole } from '../../../packages/adapters/src/codebuddy';
 import { JsonRepository, verifyPassword, nowIso } from '../../../packages/db/src/repository';
 import { parseMembersCsv, parseOrdersCsv, parseRefundsCsv, type ImportKind } from '../../../packages/domain/src/imports';
 import { calculateMetrics } from '../../../packages/domain/src/metric-service';
-import type { RouterRequest, RouterResult } from '../../../packages/domain/src/control';
+import type { RouterRequest } from '../../../packages/domain/src/control';
 import { runDeterministicRouter } from '../../../packages/domain/src/control-runtime';
-import { prepareControlInput, queryMetrics, runControl, validateControlOutput, type ControlEvidence } from '../../../packages/domain/src/control-service';
+import { buildControlProviderPrompt, normalizeControlProviderResult, prepareControlInput, queryMetrics, runControl, validateControlOutput } from '../../../packages/domain/src/control-service';
 import { parseControlRequest } from '../../../packages/domain/src/control-request';
 import { commandControlRun, listControlRuns } from '../../../packages/domain/src/control-runs';
 import { ATTRIBUTION_MODEL } from '../../../packages/domain/src/attribution-policy';
-import { DomainError, explicitTimestamp, timestampInput, requireTimeRange } from '../../../packages/domain/src/validation';
+import { DomainError, timestampInput, requireTimeRange } from '../../../packages/domain/src/validation';
 import { renderAdminPage, renderConsumerPage } from './ui';
 
 const MAX_BODY_BYTES = 256 * 1024;
@@ -494,15 +494,19 @@ async function route(
   if (pathname === '/api/control/runs' || runMatch) {
     if (!hasPermission(context.actor, 'report:read')) return forbidden(res, requestId, 'control_read_forbidden');
     if (method === 'GET' && !runMatch) {
-      sendJson(res, 200, { items: listControlRuns(repository.snapshot(), context.actor), limit: 100, model: { mode: 'deterministic_offline', external_call: false } });
+      sendJson(res, 200, { items: listControlRuns(repository.snapshot(), context.actor), limit: 100, model: { mode: config.aiProvider, external_call: config.aiProvider === 'codebuddy_cli' } });
       return;
     }
     if (method !== 'POST') return notFound(res, requestId);
     if (!checkCsrf(req, context)) return csrfFailure(res, requestId);
     const body = await readJson(req);
+    if (config.aiProvider === 'codebuddy_cli' && body?.execution === 'manual') {
+      sendJson(res, 400, { error_code: 'live_run_requires_background', message: '启用真实模型时必须使用后台编排 / Live runs require background execution', retryable: false });
+      return;
+    }
     const command = runMatch ? runMatch[2] as 'advance' | 'retry' | 'cancel' : 'create';
-    const item = await repository.mutate(state => commandControlRun(state, context.actor, command, runMatch ? runMatch[1] : null, body, nowIso()));
-    sendJson(res, 200, { item, model: { mode: 'deterministic_offline', external_call: false } });
+    const item = await repository.mutate(state => commandControlRun(state, context.actor, command, runMatch ? runMatch[1] : null, body, nowIso(), undefined, config.aiProvider));
+    sendJson(res, 200, { item, model: { mode: config.aiProvider, external_call: config.aiProvider === 'codebuddy_cli' } });
     return;
   }
 
@@ -516,12 +520,12 @@ async function route(
       const asOf = nowIso();
       if (config.aiProvider === 'codebuddy_cli') {
         const evidence = prepareControlInput(repository.snapshot(), context.actor, input, asOf);
-        const live = await runCodeBuddyRole(config, { role: 'agent_planner', conversationId: `agent-${requestId}`, prompt: buildAgentPrompt(evidence) });
+        const live = await runCodeBuddyRole(config, { role: 'agent_planner', conversationId: `agent-${requestId}`, prompt: buildControlProviderPrompt(evidence) });
         if (!live.ok) {
           sendJson(res, 503, { status: 'external_blocked', error_code: 'ai_provider_unavailable', provider_error: live.errorCode, message: live.message, retryable: ['timeout', 'process_failed'].includes(live.errorCode), model: { mode: 'codebuddy_cli', role: 'agent_planner', external_call: true, conversation_id: live.conversationId } });
           return;
         }
-        const result = normalizeAgentResult(live.value, evidence);
+        const result = normalizeControlProviderResult(live.value);
         try { validateControlOutput(result, evidence); }
         catch (error) {
           const code = error instanceof DomainError ? error.code : 'ai_output_invalid';
@@ -939,14 +943,17 @@ async function route(
       return;
     }
     if (!approvedRevision) {
-      const failed = generateDeterministicContent({ briefId: 'not-created', campaignId: campaign.id, brandRevisionId: 'missing', brandName: '', productRefs, channel: String(body.channel || 'manual'), contentPillar: String(body.content_pillar || 'Campus Adda'), targetMetric: String(body.target_metric || 'verified_orders'), sourceLinkId: null, sourceExcerpt: '', hasApprovedAssets: false }, unsafeInstruction);
+      const failed = generateDeterministicContent({ briefId: 'not-created', campaignId: campaign.id, brandRevisionId: 'missing', brandName: '', productRefs, channel: String(body.channel || 'manual'), contentPillar: String(body.content_pillar || 'Campus Adda'), targetMetric: String(body.target_metric || 'conversion_7d_rate'), sourceLinkId: null, sourceExcerpt: '', hasApprovedAssets: false }, unsafeInstruction);
       sendJson(res, 422, { status: 'failed', error_code: failed.errorCode || 'content_generation_blocked', manual_edit_available: true, reason: failed.manualEditReason || 'approved facts missing' });
       return;
     }
-    const brandNameFact = state.brandFacts.find((fact) => fact.revisionId === approvedRevision.id && (fact.key === 'brand_name' || fact.key.endsWith('.brand_name')) && fact.status === 'approved');
+    const approvedBrandFacts = state.brandFacts.filter((fact) => fact.revisionId === approvedRevision.id && fact.status === 'approved');
+    const brandNameFact = approvedBrandFacts.find((fact) => ['sub_brand', 'product_brand'].includes(fact.key) || fact.key.endsWith('.sub_brand') || fact.key.endsWith('.product_brand'))
+      || approvedBrandFacts.find((fact) => fact.key === 'brand_name' || fact.key.endsWith('.brand_name'));
+    const brandSourceExcerpt = approvedBrandFacts.filter((fact) => ['brand_name', 'sub_brand', 'product_brand', 'slogan', 'service_promise'].some((key) => fact.key === key || fact.key.endsWith('.' + key))).map((fact) => `${fact.key}: ${fact.value}`).join('; ');
     const sourceLinkId = typeof body.source_link_id === 'string' && state.sourceLinks.some((item) => item.id === body.source_link_id && item.tenantId === context.actor.tenantId && item.campaignId === campaign.id) ? body.source_link_id : null;
-    const brief = await repository.createContentBrief({ tenantId: context.actor.tenantId, storeId: campaign.storeId, campaignId: campaign.id, targetMetric: typeof body.target_metric === 'string' ? body.target_metric : 'verified_orders', contentPillar: typeof body.content_pillar === 'string' ? body.content_pillar : 'Campus Adda', channel: typeof body.channel === 'string' ? body.channel : 'manual', productIds: requestedProductIds, assetIds: Array.isArray(body.asset_ids) ? body.asset_ids.filter((item: unknown): item is string => typeof item === 'string') : (campaign.assetIds || []), sourceLinkId, createdBy: context.actor.userId });
-    const generationInput: ContentGenerationInput = { briefId: brief.id, campaignId: campaign.id, brandRevisionId: approvedRevision.id, brandName: brandNameFact?.value || '', productRefs, channel: brief.channel, contentPillar: brief.contentPillar, targetMetric: brief.targetMetric, sourceLinkId, sourceExcerpt: brandNameFact?.value || 'approved brand revision', hasApprovedAssets: brief.assetIds.length > 0 && brief.assetIds.every((assetId) => state.mediaAssets.some((asset) => asset.id === assetId && asset.rightsStatus === 'approved')) };
+    const brief = await repository.createContentBrief({ tenantId: context.actor.tenantId, storeId: campaign.storeId, campaignId: campaign.id, targetMetric: typeof body.target_metric === 'string' ? body.target_metric : 'conversion_7d_rate', contentPillar: typeof body.content_pillar === 'string' ? body.content_pillar : 'Campus Adda', channel: typeof body.channel === 'string' ? body.channel : 'manual', productIds: requestedProductIds, assetIds: Array.isArray(body.asset_ids) ? body.asset_ids.filter((item: unknown): item is string => typeof item === 'string') : (campaign.assetIds || []), sourceLinkId, createdBy: context.actor.userId });
+    const generationInput: ContentGenerationInput = { briefId: brief.id, campaignId: campaign.id, brandRevisionId: approvedRevision.id, brandName: brandNameFact?.value || '', productRefs, channel: brief.channel, contentPillar: brief.contentPillar, targetMetric: brief.targetMetric, sourceLinkId, sourceExcerpt: brandSourceExcerpt || 'approved brand revision', hasApprovedAssets: brief.assetIds.length > 0 && brief.assetIds.every((assetId) => state.mediaAssets.some((asset) => asset.id === assetId && asset.rightsStatus === 'approved')) };
     // Reuse the deterministic guard only for prompt-safety and required-input calculation.
     const guard = generateDeterministicContent(generationInput, unsafeInstruction);
     if (!guard.ok || !guard.packageData) {
@@ -1960,58 +1967,6 @@ function normalizeLiveContentPackage(value: unknown, input: ContentGenerationInp
   const shots = candidate.shot_list as Array<Record<string, unknown>>;
   if (!shots.every((shot) => shot && typeof shot === 'object' && Number.isSafeInteger(shot.index) && typeof shot.duration_seconds === 'number' && typeof shot.visual === 'string' && typeof shot.spoken_line === 'string' && typeof shot.onscreen_text === 'string' && Array.isArray(shot.rights_needed) && shot.rights_needed.every((item) => typeof item === 'string'))) return null;
   return candidate as unknown as ContentPackageData;
-}
-
-function buildAgentPrompt(evidence: ControlEvidence): string {
-  const request = { ...evidence.request, prompt: evidence.request.prompt.slice(0, 4000) };
-  const locked = {
-    skill: evidence.request.skill, as_of: evidence.asOf, owner_user_id: evidence.ownerUserId, tenant_scope: evidence.tenantId,
-    store_ids: evidence.storeIds, budget_minor: 0, max_steps: evidence.request.maxSteps ?? 6, max_retries: evidence.request.maxRetries ?? 2,
-    deadline_seconds: evidence.request.deadlineSeconds ?? 180, metric_evidence: evidence.metrics, source_records: evidence.records,
-    required_needs_input: evidence.needsInput, allowed_reference_ids: [...evidence.metrics.map((metric) => metric.id), ...evidence.records.map((record) => record.id)]
-  };
-  return [
-    '只输出 RouterResult JSON，不要 Markdown 或解释文字。',
-    '输出必须是合法 JSON 对象，双引号包裹键和值；不要代码围栏、注释、NaN、尾逗号或对象外文字。可以复制下面的最小骨架，再填入观察和建议。',
-    'locked 字段是服务端事实，必须原样使用；metricEvidence、sourceRecords、skill、limits 不得改写。',
-    '观察、假设和 proposedActions 的 sourceRefs/evidenceRefs 只能引用 allowed_reference_ids；最多 3 个建议。每个建议必须完整包含 title、ownerUserId、dueAt、budgetMinor、guardrails、evidenceRefs 六个字段：ownerUserId 必须是 locked.owner_user_id，budgetMinor 必须为 0，dueAt 使用完整 ISO 8601 时间（例如 2026-10-01T09:00:00.000Z），guardrails 和 evidenceRefs 使用字符串数组；不确定时 proposedActions 输出空数组。',
-    '如果 required_needs_input 非空，status 必须是 needs_input；不能执行发送、支付、导出、SQL、shell 或任何外部动作。',
-    '<locked>', JSON.stringify(locked, null, 2), '</locked>',
-    '<request_data>', JSON.stringify(request, null, 2), '</request_data>',
-    '<json_skeleton>', JSON.stringify({ skill: evidence.request.skill, status: evidence.needsInput.length ? 'needs_input' : 'completed', observations: [], hypotheses: [], proposedActions: [], metricEvidence: evidence.metrics, sourceRecords: evidence.records, needsInput: evidence.needsInput, limits: { maxSteps: evidence.request.maxSteps ?? 6, maxRetries: evidence.request.maxRetries ?? 2, deadlineSeconds: evidence.request.deadlineSeconds ?? 180, budgetMinor: 0 } }, null, 2), '</json_skeleton>'
-  ].join('\n');
-}
-
-function normalizeAgentResult(value: unknown, evidence: ControlEvidence): RouterResult {
-  const raw = asRecord(value) || {};
-  const allowedRefs = new Set([...evidence.metrics.map((metric) => metric.id), ...evidence.records.map((record) => record.id)]);
-  const observations = Array.isArray(raw.observations) ? raw.observations.filter((item) => {
-    const row = asRecord(item);
-    return Boolean(row && typeof row.text === 'string' && Array.isArray(row.sourceRefs) && row.sourceRefs.every((ref) => typeof ref === 'string' && allowedRefs.has(ref)));
-  }) : [];
-  const hypotheses = Array.isArray(raw.hypotheses) ? raw.hypotheses.filter((item) => {
-    const row = asRecord(item);
-    return Boolean(row && typeof row.text === 'string' && Array.isArray(row.evidenceRefs) && row.evidenceRefs.every((ref) => typeof ref === 'string' && allowedRefs.has(ref)));
-  }) : [];
-  const actionInput = Array.isArray(raw.proposedActions) ? raw.proposedActions : [];
-  const proposedActions = actionInput.filter((item) => {
-    const action = asRecord(item);
-    return Boolean(action && typeof action.title === 'string' && explicitTimestamp(action.dueAt) && Array.isArray(action.guardrails) && action.guardrails.every((guardrail) => typeof guardrail === 'string') && Array.isArray(action.evidenceRefs) && action.evidenceRefs.every((ref) => typeof ref === 'string' && allowedRefs.has(ref)));
-  }).slice(0, 3).map((item) => ({ ...item as Record<string, unknown>, ownerUserId: evidence.ownerUserId, budgetMinor: 0 }));
-  const droppedModelOutput = observations.length !== (Array.isArray(raw.observations) ? raw.observations.length : 0) || hypotheses.length !== (Array.isArray(raw.hypotheses) ? raw.hypotheses.length : 0) || proposedActions.length !== actionInput.length;
-  const needsInput = [...new Set([...evidence.needsInput, ...stringItems(raw.needsInput), ...(droppedModelOutput ? ['model_output_needs_review'] : [])])];
-  const status = needsInput.length ? 'needs_input' : raw.status;
-  return {
-    skill: evidence.request.skill,
-    status,
-    observations,
-    hypotheses,
-    proposedActions,
-    metricEvidence: evidence.metrics,
-    sourceRecords: evidence.records,
-    needsInput,
-    limits: { maxSteps: evidence.request.maxSteps ?? 6, maxRetries: evidence.request.maxRetries ?? 2, deadlineSeconds: evidence.request.deadlineSeconds ?? 180, budgetMinor: 0 }
-  } as unknown as RouterResult;
 }
 
 function sendJson(res: ServerResponse, status: number, payload: unknown): void {

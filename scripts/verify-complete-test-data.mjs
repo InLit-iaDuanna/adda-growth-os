@@ -24,6 +24,7 @@ const secret = 'local-complete-test-secret-change-me';
 const state = JSON.parse(await readFile(fixturePath, 'utf8'));
 const manifest = JSON.parse(await readFile(path.join(artifactDir, 'manifest.json'), 'utf8'));
 const hash = (value) => createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(value)).digest('hex');
+const byteHash = (value) => createHash('sha256').update(value).digest('hex');
 const couponToken = (memberId) => createHmac('sha256', secret).update(JSON.stringify(['coupon-v2', state.tenants[0].id, state.stores[0].id, state.offers[0].id, memberId])).digest('base64url');
 const checks = [];
 async function check(name, fn) { await fn(); checks.push(name); }
@@ -52,6 +53,47 @@ await check('content approval is executable and draft is blocked', () => {
   assert.deepEqual(checkContentApproval(state, state.contentApprovals[0], now), { ok: true, errors: [] });
   assert.equal(state.contentRevisions.find((item) => item.id === 'content_rev_draft').status, 'needs_local_review');
   assert.ok(state.contentRevisions.find((item) => item.id === 'content_rev_draft').packageData.needs_input.length);
+});
+await check('approved asset checksums bind to image bytes', async () => {
+  const assets = new Map(state.mediaAssets.map((item) => [item.id, item]));
+  for (const [id, file] of [['asset_lotus_water', '4da38778134ae0fc6f4fb0046521903b.jpg'], ['asset_suiwu_logo', '99b0b4ec1602cc2760ffed5944b53444.jpg']]) {
+    const bytes = await readFile(path.join(artifactDir, 'assets', 'originals', file));
+    assert.equal(assets.get(id)?.checksum, byteHash(bytes));
+  }
+  assert.equal(assets.get('asset_needs_confirmation')?.checksum, null);
+});
+await check('source and attribution timelines are causally ordered', async () => {
+  const links = new Map(state.sourceLinks.map((item) => [item.id, item]));
+  const campaign = state.campaigns.find((item) => item.id === 'camp_spring_wellness');
+  for (const touch of state.touchEvents) {
+    const link = links.get(touch.sourceLinkId);
+    assert.ok(link && Date.parse(link.createdAt) <= Date.parse(touch.occurredAt));
+    assert.ok(!campaign || Date.parse(campaign.startAt) <= Date.parse(touch.occurredAt));
+  }
+  for (const attribution of state.attributionEvidence) {
+    const order = state.orders.find((item) => item.id === attribution.orderId);
+    assert.ok(order && Date.parse(attribution.occurredAt) <= Date.parse(order.paidAt));
+    if (attribution.method === 'linked_first_party_touch') assert.ok(Date.parse(order.paidAt) - Date.parse(attribution.occurredAt) <= 7 * 86_400_000);
+  }
+  const pending = state.issuedCoupons.find((item) => item.id === 'coupon_rina_001');
+  assert.equal(pending?.status, 'pending_pos_verification');
+  assert.equal(state.attributionEvidence.find((item) => item.orderId === 'ord_rina_001')?.method, 'linked_first_party_touch');
+});
+await check('cashier scenarios keep positive and mismatch members distinct', async () => {
+  const scenarios = JSON.parse(await readFile(path.join(artifactDir, 'scenarios.json'), 'utf8'));
+  const order = state.orders.find((item) => item.externalOrderId === scenarios.cashier.authoritative_order);
+  const positive = state.issuedCoupons.find((item) => item.id === scenarios.cashier.pending_coupon);
+  const mismatch = state.issuedCoupons.find((item) => item.id === scenarios.cashier.member_mismatch_coupon);
+  assert.equal(positive?.memberId, order?.memberId);
+  assert.notEqual(mismatch?.memberId, order?.memberId);
+  assert.equal(scenarios.cashier.member_mismatch_expected, 'member_mismatch');
+});
+await check('pending reply has no executable manual task', () => {
+  const pending = state.replyRevisions.find((item) => item.id === 'reply_routine_01');
+  assert.equal(pending?.status, 'pending_approval');
+  assert.equal(state.voiceTasks.some((task) => task.replyRevisionId === pending?.id), false);
+  const allowedMetrics = new Set(['orders_count', 'qualified_order_count', 'revenue_minor', 'net_revenue_minor', 'aov_minor', 'average_order_value_minor', 'identity_coverage', 'repeat_purchase_rate', 'repeat_30d_rate', 'mature_30d_cohort_count', 'mature_30d_repeat_rate', 'conversion_7d_rate']);
+  assert.ok(state.contentBriefs.every((brief) => allowedMetrics.has(brief.targetMetric)));
 });
 await check('coupon and outreach hashes match runtime contracts', () => {
   for (const [memberId, couponId] of [['member_ana', 'coupon_ana_001'], ['member_rina', 'coupon_rina_001'], ['member_noor', 'coupon_noor_001']]) {

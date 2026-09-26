@@ -46,11 +46,13 @@ D039（2026-09-24 前端结构重构）：将后台/顾客页 CSS 与共享 HTML
 
 D040（2026-09-24 甲方素材）：SUIWU 随物作为母品牌，ADDA 作为子品牌；甲方提供的 JPG 进入本地品牌资源清单，授权范围确认前状态保持 `needs_confirmation`，仅用于界面演示与参考。
 
-D041（2026-09-25 CodeBuddy CLI provider）：真实模型调用采用显式 `AI_PROVIDER=codebuddy_cli` 开关，默认仍为 `deterministic_offline`。CodeBuddy 每次以独立会话、单回合、无工具、超时和输出上限运行；内容写作与增长 Agent 使用不同角色提示词。服务端只把当前租户/门店的冻结批准事实和指标交给模型，并锁定来源、身份、预算、权限和孟语复核状态；JSON 或领域合同失败返回 `external_blocked`/`ai_output_invalid`，不回退成确定性假成功。真实冒烟只使用合成 demo 数据，证据保存在 `artifacts/G04/` 和 `artifacts/G08/`。持久化后台 control-run worker 仍保持离线确定性执行，待异步 provider bridge 单独验收。
+D041（2026-09-25 CodeBuddy CLI provider）：真实模型调用采用显式 `AI_PROVIDER=codebuddy_cli` 开关，默认仍为 `deterministic_offline`。CodeBuddy 每次以独立会话、单回合、无工具、超时和输出上限运行；内容写作与增长 Agent 使用不同角色提示词。服务端只把当前租户/门店的冻结批准事实和指标交给模型，并锁定来源、身份、预算、权限和孟语复核状态；JSON 或领域合同失败返回 `external_blocked`/`ai_output_invalid`，不回退成确定性假成功。真实冒烟只使用合成 demo 数据，证据保存在 `artifacts/G04/` 和 `artifacts/G08/`。持久化后台 control-run worker 当时仍保持离线确定性执行，异步 provider bridge 由 D044 完成。
 
 D042（2026-09-26 完整合成测试数据）：新增可重复的 `scripts/seed-complete-test-data.mjs` 与 `npm run data:seed`。生成器从干净 demo seed 构建完整 JSON 仓储，另写 members/orders/refunds CSV 与 manifest；所有记录使用合成租户、固定 demo 账号和明确的 bearer token，外部连接器 kill switch 保持开启。fixture 可以用于本地 UI、HTTP、POS、顾客和 Agent 流程检查，但不能作为客户数据、真实渠道验收或生产初始化。
 
 D043（2026-09-27 导航简化）：工作台侧栏保留全部已授权入口，按工作台、经营、内容、现场、系统分组；隐藏重复的编号和箭头装饰，桌面端取消侧栏内部滚动，移动端继续使用现有菜单按钮和两列入口。此次调整只改变导航呈现，不改变页面路由、权限或业务状态。
+
+D044（2026-09-27 AI 审查修复）：CodeBuddy 结果依次经过进程/JSON、角色 JSON Schema、冻结证据与业务规则校验；`ok` 只表示前述合同通过，不代表人工审核通过。真实 provider 的持久化 control-run 由 worker 在文件锁外调用、在锁内 claim/commit，并在回写时重新检查截止时间、租户/门店权限、取消状态、版本和输出引用；超时、崩溃和撤销只能进入失败或可恢复状态。指标叙述必须由结构化指标引用渲染，模型不能用合法引用包装未经证实的数字。合成 fixture 的素材摘要使用图片字节、来源触点先于事件，收银正向券与 POS 会员一致，客服回复必须先批准再转人工任务。
 
 
 ## D2026-09-25 — Uploaded-source unified implementation

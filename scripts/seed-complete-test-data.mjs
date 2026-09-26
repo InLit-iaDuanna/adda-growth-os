@@ -39,13 +39,11 @@ function iso(date) { return date.toISOString(); }
 function daysFromNow(days) { return iso(new Date(anchor + days * 86_400_000)); }
 function daysAgo(days) { return daysFromNow(-days); }
 function hash(value) { return createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(value)).digest('hex'); }
+function byteHash(value) { return createHash('sha256').update(value).digest('hex'); }
 function hmac(value) { return createHmac('sha256', secret).update(value).digest('hex'); }
 function rowHash(value) { return hash(JSON.stringify(value)); }
 function clone(value) { return JSON.parse(JSON.stringify(value)); }
-async function assetChecksum(fileName, fallback) {
-  try { return hash(await readFile(path.join(clientAssetRoot, fileName))); }
-  catch { return hash(fallback); }
-}
+async function assetChecksum(fileName) { return byteHash(await readFile(path.join(clientAssetRoot, fileName))); }
 
 // Keep staged rows in the same shape as the normal import preview.  The
 // fixture already contains a committed snapshot, but these rows make the CSV
@@ -178,7 +176,7 @@ const campaignId = 'camp_spring_wellness';
 const campaignNeedsInputId = 'camp_exam_reset_needs_input';
 const campaign = {
   id: campaignId, tenantId, storeId, name: 'Lotus Reset · 春日自然茶饮', objective: 'verified first orders', budgetMinor: 150000,
-  startAt: daysAgo(30), endAt: daysFromNow(90), productIds: ['prod_tea_original', 'prod_lemon_mate', 'prod_matcha_cloud'],
+  startAt: daysAgo(60), endAt: daysFromNow(90), productIds: ['prod_tea_original', 'prod_lemon_mate', 'prod_matcha_cloud'],
   assetIds: ['asset_lotus_water', 'asset_suiwu_logo'], status: 'approved', needsInput: [], createdBy: ownerId, createdAt: daysAgo(28), updatedAt: daysAgo(2), revision: 2
 };
 state.campaigns.push(campaign, {
@@ -208,17 +206,17 @@ for (const [id, en, zh, amountMinor] of products) {
 state.mediaAssets.push(
   { id: 'asset_lotus_water', tenantId, storeId, storageKey: 'brand/4da38778134ae0fc6f4fb0046521903b.jpg', checksum: null, mimeType: 'image/jpeg', rightsStatus: 'approved', allowedUses: ['content', 'manual_publish', 'social'], expiresAt: null, sourceCitation: 'client-asset-fixture: lotus water ripple', createdBy: ownerId, createdAt: daysAgo(27) },
   { id: 'asset_suiwu_logo', tenantId, storeId: null, storageKey: 'brand/99b0b4ec1602cc2760ffed5944b53444.jpg', checksum: null, mimeType: 'image/jpeg', rightsStatus: 'approved', allowedUses: ['brand', 'content', 'manual_publish'], expiresAt: null, sourceCitation: 'client-asset-fixture: SUIWU lotus logo', createdBy: ownerId, createdAt: daysAgo(27) },
-  { id: 'asset_needs_confirmation', tenantId, storeId, storageKey: 'brand/7846e5a3d39a673b230a47f52f4532ca.jpg', checksum: hash('asset_needs_confirmation'), mimeType: 'image/jpeg', rightsStatus: 'unknown', allowedUses: [], expiresAt: null, sourceCitation: null, createdBy: managerId, createdAt: daysAgo(2) }
+  { id: 'asset_needs_confirmation', tenantId, storeId, storageKey: 'brand/7846e5a3d39a673b230a47f52f4532ca.jpg', checksum: null, mimeType: 'image/jpeg', rightsStatus: 'unknown', allowedUses: [], expiresAt: null, sourceCitation: null, createdBy: managerId, createdAt: daysAgo(2) }
 );
-state.mediaAssets.find((item) => item.id === 'asset_lotus_water').checksum = await assetChecksum('4da38778134ae0fc6f4fb0046521903b.jpg', 'asset_lotus_water');
-state.mediaAssets.find((item) => item.id === 'asset_suiwu_logo').checksum = await assetChecksum('99b0b4ec1602cc2760ffed5944b53444.jpg', 'asset_suiwu_logo');
+state.mediaAssets.find((item) => item.id === 'asset_lotus_water').checksum = await assetChecksum('4da38778134ae0fc6f4fb0046521903b.jpg');
+state.mediaAssets.find((item) => item.id === 'asset_suiwu_logo').checksum = await assetChecksum('99b0b4ec1602cc2760ffed5944b53444.jpg');
 state.brandReferences.push({ id: 'brand_ref_campaign_01', tenantId, storeId, resourceType: 'campaign', resourceId: campaignId, productPriceRefs: products.map(([id]) => ({ productId: id, priceVersionId: `price_${id}_v1` })), brandRevisionIds: ['brand_rev_suiwu_01'], status: 'valid', createdAt: daysAgo(24), invalidatedAt: null, invalidationReason: null });
 
 const rawSourceTokens = { instagram: 'src-instagram-adda-synthetic-2026', campus: 'src-campus-adda-synthetic-2026', staff: 'src-staff-adda-synthetic-2026' };
 state.sourceLinks.push(
-  { id: 'source_instagram_01', tenantId, storeId, campaignId, label: 'Instagram / Lotus Reset', channel: 'instagram', variant: 'reel-a', tokenHash: hmac(rawSourceTokens.instagram), createdBy: managerId, createdAt: daysAgo(23), status: 'active' },
-  { id: 'source_campus_01', tenantId, storeId, campaignId, label: 'DU campus club / Lotus Reset', channel: 'campus', variant: 'club-a', tokenHash: hmac(rawSourceTokens.campus), createdBy: managerId, createdAt: daysAgo(23), status: 'active' },
-  { id: 'source_staff_01', tenantId, storeId, campaignId, label: 'Staff manual attribution', channel: 'manual', variant: 'counter', tokenHash: hmac(rawSourceTokens.staff), createdBy: ownerId, createdAt: daysAgo(20), status: 'active' }
+  { id: 'source_instagram_01', tenantId, storeId, campaignId, label: 'Instagram / Lotus Reset', channel: 'instagram', variant: 'reel-a', tokenHash: hmac(rawSourceTokens.instagram), createdBy: managerId, createdAt: daysAgo(58), status: 'active' },
+  { id: 'source_campus_01', tenantId, storeId, campaignId, label: 'DU campus club / Lotus Reset', channel: 'campus', variant: 'club-a', tokenHash: hmac(rawSourceTokens.campus), createdBy: managerId, createdAt: daysAgo(58), status: 'active' },
+  { id: 'source_staff_01', tenantId, storeId, campaignId, label: 'Staff manual attribution', channel: 'manual', variant: 'counter', tokenHash: hmac(rawSourceTokens.staff), createdBy: ownerId, createdAt: daysAgo(55), status: 'active' }
 );
 
 const memberTokens = { ana: 'member-token-ana-synthetic', rina: 'member-token-rina-synthetic', zara: 'member-token-zara-synthetic', noor: 'member-token-noor-synthetic', sami: 'member-token-sami-synthetic' };
@@ -259,13 +257,15 @@ state.sourceWatermarks.push({ tenantId, storeId, source: 'pos_demo', completeThr
 state.attributionEvidence.push(
   { id: 'attr_ana_001', tenantId, storeId, orderExternalId: 'POS-1001', orderSource: 'pos_demo', orderId: 'ord_ana_001', campaignId, method: 'verified_coupon', occurredAt: daysAgo(45) },
   { id: 'attr_ana_002', tenantId, storeId, orderExternalId: 'POS-1002', orderSource: 'pos_demo', orderId: 'ord_ana_002', campaignId, method: 'linked_first_party_touch', occurredAt: daysAgo(25) },
-  { id: 'attr_rina_001', tenantId, storeId, orderExternalId: 'POS-1003', orderSource: 'pos_demo', orderId: 'ord_rina_001', campaignId, method: 'verified_coupon', occurredAt: daysAgo(35) }
+  { id: 'attr_rina_001', tenantId, storeId, orderExternalId: 'POS-1003', orderSource: 'pos_demo', orderId: 'ord_rina_001', campaignId, method: 'linked_first_party_touch', occurredAt: daysAgo(40) }
 );
 state.touchEvents.push(
   { id: 'touch_view_01', tenantId, storeId, sourceLinkId: 'source_instagram_01', eventType: 'view', sessionTokenHash: hmac('touch-view-01'), occurredAt: daysAgo(52) },
   { id: 'touch_click_01', tenantId, storeId, sourceLinkId: 'source_instagram_01', eventType: 'click', sessionTokenHash: hmac('touch-click-01'), occurredAt: daysAgo(51) },
   { id: 'touch_register_01', tenantId, storeId, sourceLinkId: 'source_instagram_01', eventType: 'member_register', sessionTokenHash: hmac('touch-register-01'), occurredAt: daysAgo(50) },
-  { id: 'touch_coupon_01', tenantId, storeId, sourceLinkId: 'source_campus_01', eventType: 'coupon_issue', sessionTokenHash: hmac('touch-coupon-01'), occurredAt: daysAgo(35) }
+  { id: 'touch_coupon_01', tenantId, storeId, sourceLinkId: 'source_campus_01', eventType: 'coupon_issue', sessionTokenHash: hmac('touch-coupon-01'), occurredAt: daysAgo(35) },
+  { id: 'touch_ana_order_01', tenantId, storeId, sourceLinkId: 'source_instagram_01', eventType: 'click', sessionTokenHash: hmac('touch-ana-order-01'), occurredAt: daysAgo(25) },
+  { id: 'touch_rina_order_01', tenantId, storeId, sourceLinkId: 'source_instagram_01', eventType: 'click', sessionTokenHash: hmac('touch-rina-order-01'), occurredAt: daysAgo(40) }
 );
 
 const offerId = 'offer_first_cup_01';
@@ -283,7 +283,7 @@ state.redemptionAttempts.push(
 
 function contentPackage(briefId, revisionId, approved, productRefs, assetIds, sourceLinkId) {
   const packageData = {
-    brief_id: briefId, campaign_id: campaignId, brand_revision_id: 'brand_rev_suiwu_01', target_metric: 'verified_first_orders', content_pillar: approved ? 'natural reset' : 'exam reset', channel: 'manual', product_refs: productRefs,
+    brief_id: briefId, campaign_id: campaignId, brand_revision_id: 'brand_rev_suiwu_01', target_metric: 'conversion_7d_rate', content_pillar: approved ? 'natural reset' : 'exam reset', channel: 'manual', product_refs: productRefs,
     hook_variants: ['A softer reset for your study break.', '把自然带回学习间隙。'],
     shot_list: [{ index: 1, duration_seconds: 5, visual: 'Lotus water ripple with approved product packshot.', spoken_line: 'A calmer cup for the next chapter.', onscreen_text: 'Science meets a more natural life', rights_needed: ['asset_use_approved'] }],
     operator_notes_zh: '仅使用已批准品牌事实、产品价格与甲方素材；孟语版本必须由本地复核人确认。',
@@ -299,8 +299,8 @@ function contentPackage(briefId, revisionId, approved, productRefs, assetIds, so
 const approvedBriefId = 'brief_lotus_approved';
 const draftBriefId = 'brief_lotus_draft';
 state.contentBriefs.push(
-  { id: approvedBriefId, tenantId, storeId, campaignId, targetMetric: 'verified_first_orders', contentPillar: 'natural reset', channel: 'manual', productIds: ['prod_tea_original', 'prod_lemon_mate'], assetIds: ['asset_lotus_water', 'asset_suiwu_logo'], sourceLinkId: 'source_instagram_01', createdBy: ownerId, createdAt: daysAgo(18) },
-  { id: draftBriefId, tenantId, storeId, campaignId, targetMetric: 'verified_first_orders', contentPillar: 'exam reset', channel: 'manual', productIds: ['prod_matcha_cloud'], assetIds: ['asset_needs_confirmation'], sourceLinkId: 'source_campus_01', createdBy: managerId, createdAt: daysAgo(2) }
+  { id: approvedBriefId, tenantId, storeId, campaignId, targetMetric: 'conversion_7d_rate', contentPillar: 'natural reset', channel: 'manual', productIds: ['prod_tea_original', 'prod_lemon_mate'], assetIds: ['asset_lotus_water', 'asset_suiwu_logo'], sourceLinkId: 'source_instagram_01', createdBy: ownerId, createdAt: daysAgo(18) },
+  { id: draftBriefId, tenantId, storeId, campaignId, targetMetric: 'conversion_7d_rate', contentPillar: 'exam reset', channel: 'manual', productIds: ['prod_matcha_cloud'], assetIds: ['asset_needs_confirmation'], sourceLinkId: 'source_campus_01', createdBy: managerId, createdAt: daysAgo(2) }
 );
 const approvedPackage = contentPackage(approvedBriefId, 'content_rev_approved', true, ['prod_tea_original', 'prod_lemon_mate'], ['asset_lotus_water', 'asset_suiwu_logo'], 'source_instagram_01');
 const draftPackage = contentPackage(draftBriefId, 'content_rev_draft', false, ['prod_matcha_cloud'], ['asset_needs_confirmation'], 'source_campus_01');
@@ -350,7 +350,7 @@ state.feedbackClassifications.push({ id: 'classification_urgent_01', tenantId, f
 state.supportCases.push({ id: 'case_urgent_01', tenantId, storeId, feedbackId: 'feedback_urgent_01', ownerUserId: ownerId, slaDueAt: daysFromNow(2), status: 'open', escalationLevel: 'urgent', resolutionEvidence: null, createdAt: daysAgo(2), updatedAt: daysAgo(1) }, { id: 'case_routine_01', tenantId, storeId, feedbackId: 'feedback_routine_01', ownerUserId: managerId, slaDueAt: daysFromNow(1), status: 'in_progress', escalationLevel: 'normal', resolutionEvidence: null, createdAt: daysAgo(3), updatedAt: daysAgo(2) });
 const routineReplyBody = 'Thanks for checking. A staff member will confirm the approved offer window.';
 state.replyRevisions.push({ id: 'reply_routine_01', tenantId, caseId: 'case_routine_01', revision: 1, channel: 'manual', body: routineReplyBody, bodyHash: hash(routineReplyBody), status: 'pending_approval', createdBy: managerId, approvedBy: null, approvedAt: null, approvalHash: null, expiresAt: daysFromNow(7), createdAt: daysAgo(1) });
-state.voiceTasks.push({ id: 'voice_task_urgent', tenantId, caseId: 'case_urgent_01', ownerUserId: ownerId, kind: 'safety_escalation', status: 'open', dueAt: daysFromNow(2), evidence: null, createdAt: daysAgo(2), completedAt: null }, { id: 'voice_task_routine', tenantId, caseId: 'case_routine_01', ownerUserId: managerId, kind: 'manual_reply', status: 'open', dueAt: daysFromNow(1), evidence: null, createdAt: daysAgo(1), completedAt: null, replyRevisionId: 'reply_routine_01' });
+state.voiceTasks.push({ id: 'voice_task_urgent', tenantId, caseId: 'case_urgent_01', ownerUserId: ownerId, kind: 'safety_escalation', status: 'open', dueAt: daysFromNow(2), evidence: null, createdAt: daysAgo(2), completedAt: null });
 
 const ownerActor = { userId: ownerId, tenantId, role: 'OWNER', storeIds: [storeId], sessionId: 'complete-fixture' };
 const reportMetrics = [
@@ -429,7 +429,7 @@ const scenarios = {
   expected_metrics: { net_revenue_minor: 64000, qualified_order_count: 4, average_order_value_minor: 16000, identity_coverage: 0.75, repeat_30d_rate: 0.5, conversion_7d_rate: 1 / 3 },
   content: { exportable_revision: 'content_rev_approved', export_expected: 'manual_ready', blocked_revision: 'content_rev_draft', blocked_reason: 'bn_local_review_required plus asset_rights_missing' },
   public_member: { source_token_name: 'campus', path_template: '/s/du-gate-demo/c/<source_token>', verification_code: '000000', coupon_token_names: ['ana', 'rina', 'noor'] },
-  cashier: { pending_coupon: 'coupon_noor_001', reserve_expected: 'pending_pos_verification', unknown_order_match_expected: 'pos_order_not_found', authoritative_order: 'POS-1003' },
+  cashier: { pending_coupon: 'coupon_rina_001', reserve_expected: 'pending_pos_verification', unknown_order_match_expected: 'pos_order_not_found', authoritative_order: 'POS-1003', member_mismatch_coupon: 'coupon_noor_001', member_mismatch_expected: 'member_mismatch' },
   imports: { files: ['members.csv', 'orders.csv', 'refunds.csv'], repeat_same_file_expected: 'deduplicated' },
   agent: { plans: ['growth', 'content', 'campus', 'voice'], mode: 'deterministic_offline', external_writes: false, actual_cost_minor: 0 }
 };

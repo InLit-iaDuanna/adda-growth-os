@@ -11,7 +11,7 @@ export interface RunningTestApp extends AppServer {
   close(): Promise<void>;
 }
 
-export async function startTestApp(options: { mode?: 'test' | 'production' | 'demo'; seedDemo?: boolean; dataFile?: string } = {}): Promise<RunningTestApp> {
+export async function startTestApp(options: { mode?: 'test' | 'production' | 'demo'; seedDemo?: boolean; dataFile?: string; config?: Partial<AppConfig> } = {}): Promise<RunningTestApp> {
   const dataDir = options.dataFile ? path.dirname(options.dataFile) : await fs.mkdtemp(path.join(process.cwd(), '.tmp-g00-'));
   const dataFile = options.dataFile || path.join(dataDir, 'db.json');
   const mode = options.mode || 'test';
@@ -29,7 +29,8 @@ export async function startTestApp(options: { mode?: 'test' | 'production' | 'de
     codebuddyBin: 'codebuddy',
     codebuddyModel: 'deepseek-v4.1-flash',
     codebuddyTimeoutMs: 120_000,
-    codebuddyMaxOutputBytes: 2_000_000
+    codebuddyMaxOutputBytes: 2_000_000,
+    ...options.config
   };
   const repository = new JsonRepository(dataFile, mode);
   await repository.ensure();

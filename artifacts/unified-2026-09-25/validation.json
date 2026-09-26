@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scope": "whole uploaded application / local file-dev integration",
-  "recorded_at": "2026-09-26T17:28:00.683Z",
+  "recorded_at": "2026-09-26T18:57:30.894Z",
   "toolchain": {
     "node": "v22.22.0",
     "npm": "10.9.4",
@@ -76,7 +76,7 @@
     },
     {
       "path": "apps/web/src/server.ts",
-      "sha256": "52dffeb9de1e92c2c5924e472e47d6d6b481ca1a6d158609a1d611ae36239b8f"
+      "sha256": "0d02b6293604cc75d24841c26602bea5f9a6609cd3dddf7518cd520f415e92b1"
     },
     {
       "path": "apps/web/src/ui.ts",
@@ -236,7 +236,7 @@
     },
     {
       "path": "packages/adapters/src/codebuddy.ts",
-      "sha256": "5bd88279c6c2a03d28502f75a5a7afa29f981dfa3e7502830185885be30ae48a"
+      "sha256": "eff08989e5a6cc469a83e84d53fbff70952bc0b0f504910746e6d2b398ec3e4f"
     },
     {
       "path": "packages/adapters/src/config.ts",
@@ -244,7 +244,7 @@
     },
     {
       "path": "packages/adapters/src/control-worker.ts",
-      "sha256": "8d2062d1c3de1905562fcbb27c25e231521bca7f63390dbacdc8a8c058ad0606"
+      "sha256": "f043e3249e14308dc99f72042d443ada4825822cb588423e3518c22206001ea4"
     },
     {
       "path": "packages/adapters/src/whatsapp.ts",
@@ -256,7 +256,7 @@
     },
     {
       "path": "packages/db/src/repository.ts",
-      "sha256": "8f3b65a4764646a03d293d1ec2d754197947c726e7290e248c2195a09ac34ee6"
+      "sha256": "03bc3800129ab813249c429005ac5d84069282e42ee1c4c2ce57f60e1bb54240"
     },
     {
       "path": "packages/domain/package.json",
@@ -300,7 +300,7 @@
     },
     {
       "path": "packages/domain/src/control-runs.ts",
-      "sha256": "1f58d552469f4e93949226e4f422707a19ab94af9850a1f4617190fd383a241d"
+      "sha256": "6d632c605d02b79922fc6e496b3aa4ebd6abe6f9f1fdedd71f2048105aa04afa"
     },
     {
       "path": "packages/domain/src/control-runtime.ts",
@@ -308,7 +308,7 @@
     },
     {
       "path": "packages/domain/src/control-service.ts",
-      "sha256": "5b1dc3412bb024f86a0090f7143c26aa025490694886df4f30650d481a1b806f"
+      "sha256": "bb073cfd70b2474bb4c02d1b5e1d9f2b849dba238ebe98f0324a088af23656e9"
     },
     {
       "path": "packages/domain/src/control.ts",
@@ -384,7 +384,7 @@
     },
     {
       "path": "packages/testing/src/http.ts",
-      "sha256": "5a3e5a6889182f95b62a64c6c1e7a17a0bc531dce481f9955e1c2cab6ef36059"
+      "sha256": "8bc534033d5c6a0f7e0dcb62e86c07120da51f2b4b7caa6ae0db6849aa615e54"
     },
     {
       "path": "packages/ui/package.json",
@@ -428,7 +428,7 @@
     },
     {
       "path": "scripts/run-codebuddy-roles.mjs",
-      "sha256": "8f9fb890433c14192fdc77f0c09e98248d9fb15401055305e29bdddb78556dd9"
+      "sha256": "667525d4576696d1a1fccee1223df374af06e116f5e32ecfaff9065b83697d55"
     },
     {
       "path": "scripts/security-scan.mjs",
@@ -436,7 +436,7 @@
     },
     {
       "path": "scripts/seed-complete-test-data.mjs",
-      "sha256": "5c509d3e6056af806da4820afbd7f0db70a07c8dd610637a254d04980a8aa90d"
+      "sha256": "9ce79f4974d788cb20aba218714a64db4da7857daecc1c94e2eb29abb74bc43d"
     },
     {
       "path": "scripts/seed-demo.ts",
@@ -468,7 +468,7 @@
     },
     {
       "path": "scripts/verify-complete-test-data.mjs",
-      "sha256": "2e03610d35aa2fc72f7998683f202d5aadaf7826ac797b8062051420cc17881c"
+      "sha256": "52c6e94630abbf3515db7d0306aa160997442fe55f0b7bf54e126725cfd563b6"
     },
     {
       "path": "scripts/verify-fixtures.mjs",
@@ -496,7 +496,7 @@
     },
     {
       "path": "tests/codebuddy-provider.test.ts",
-      "sha256": "5b87d0494065d1a5088cd276cae02504c3078dd51af6eaffcffcfeac88d21ca9"
+      "sha256": "3cd17dfe829948c546ed08a1a5e47e754fc281da1b194d0a395b84aa14acf6f4"
     },
     {
       "path": "tests/e2e.test.ts",
@@ -528,7 +528,7 @@
     },
     {
       "path": "tests/g07-g10.test.ts",
-      "sha256": "761b9f0eeb7636f6eb1f23fae94afb9fb8b7fc759482c2d3575ae05f812e93c2"
+      "sha256": "ccd6e081bd2d6f80dbc2b0e6bcbdca218afcc42d8e7aabb864d567ab9715133e"
     },
     {
       "path": "tests/integration.test.ts",
@@ -548,11 +548,11 @@
     },
     {
       "path": "tests/unified-backend.test.ts",
-      "sha256": "79bbe778867d3f11e7ec005ff5ec5f36aaf92beb7c06b7a7f040aa9b3161b9f0"
+      "sha256": "5ad382ae53cad845a025a9d20a603ace05945b551f4bb5f2c26e4fe8dcbb13a8"
     },
     {
       "path": "tests/unified-fixture.ts",
-      "sha256": "99b2f9529907d0a694de9881c72915b5c1fdf19c2d2f9d12d96f487139e18a52"
+      "sha256": "3d1897ab3e453c77e8dcd6187d2d9af92fded7e6718e11dbd032ccaaba82dd6a"
     },
     {
       "path": "tests/unit.test.ts",
@@ -582,8 +582,8 @@
   "checks": [
     {
       "command": "npm run lint",
-      "started_at": "2026-09-26T17:27:34.881Z",
-      "finished_at": "2026-09-26T17:27:36.550Z",
+      "started_at": "2026-09-26T18:57:03.749Z",
+      "finished_at": "2026-09-26T18:57:05.456Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/lint.log",
@@ -591,8 +591,8 @@
     },
     {
       "command": "npm run typecheck",
-      "started_at": "2026-09-26T17:27:36.552Z",
-      "finished_at": "2026-09-26T17:27:38.170Z",
+      "started_at": "2026-09-26T18:57:05.457Z",
+      "finished_at": "2026-09-26T18:57:07.151Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/typecheck.log",
@@ -600,8 +600,8 @@
     },
     {
       "command": "npm run build",
-      "started_at": "2026-09-26T17:27:38.170Z",
-      "finished_at": "2026-09-26T17:27:40.090Z",
+      "started_at": "2026-09-26T18:57:07.151Z",
+      "finished_at": "2026-09-26T18:57:09.115Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/build.log",
@@ -609,15 +609,15 @@
     },
     {
       "command": "npm run test",
-      "started_at": "2026-09-26T17:27:40.090Z",
-      "finished_at": "2026-09-26T17:28:00.209Z",
+      "started_at": "2026-09-26T18:57:09.116Z",
+      "finished_at": "2026-09-26T18:57:30.423Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/test.log",
-      "log_sha256": "2a19bc42b91fb190897fc1883bf7646d7fe9208692bc04c46a3994f2e4b5ec4b",
+      "log_sha256": "7fea0cb23e3bc580f7b286afb4da90588796d8656bdc98a4c0c1d4ac6b11f84e",
       "tests": {
-        "total": 147,
-        "passed": 147,
+        "total": 151,
+        "passed": 151,
         "failed": 0,
         "skipped": 0,
         "cancelled": 0
@@ -625,8 +625,8 @@
     },
     {
       "command": "npm run test:ai",
-      "started_at": "2026-09-26T17:28:00.209Z",
-      "finished_at": "2026-09-26T17:28:00.357Z",
+      "started_at": "2026-09-26T18:57:30.423Z",
+      "finished_at": "2026-09-26T18:57:30.576Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/test-ai.log",
@@ -634,8 +634,8 @@
     },
     {
       "command": "npm run fixtures:verify",
-      "started_at": "2026-09-26T17:28:00.357Z",
-      "finished_at": "2026-09-26T17:28:00.518Z",
+      "started_at": "2026-09-26T18:57:30.577Z",
+      "finished_at": "2026-09-26T18:57:30.733Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/fixtures-verify.log",
@@ -643,8 +643,8 @@
     },
     {
       "command": "npm run security:scan",
-      "started_at": "2026-09-26T17:28:00.518Z",
-      "finished_at": "2026-09-26T17:28:00.672Z",
+      "started_at": "2026-09-26T18:57:30.733Z",
+      "finished_at": "2026-09-26T18:57:30.889Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/security-scan.log",

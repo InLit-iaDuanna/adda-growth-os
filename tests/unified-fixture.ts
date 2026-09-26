@@ -7,8 +7,8 @@ export const post = (client:TestClient, path:string, data:unknown={}) => client.
 export const patch = (client:TestClient, path:string, data:unknown={}) => client.request(path,{method:'PATCH',headers:{'content-type':'application/json'},body:JSON.stringify(data)});
 
 /** Only synthetic records, in a new isolated temporary database. */
-export async function unifiedFixture() {
-  const app=await startTestApp({seedDemo:true}); const owner=new TestClient(app.baseUrl);
+export async function unifiedFixture(options: Parameters<typeof startTestApp>[0] = {}) {
+  const app=await startTestApp({seedDemo:true,...options}); const owner=new TestClient(app.baseUrl);
   assert.equal((await owner.login('owner@demo.adda.local')).response.status,200);
   const brand=await post(owner,'/api/brand/documents',{source_type:'form',store_id:'sto_demo_01',source_label:'QA SYNTHETIC brand facts',content:JSON.stringify({brand_name:'ADDA DEMO',parent_brand:'SUIWU 随物'})});
   assert.equal((await post(owner,`/api/brand/revisions/${brand.body.revision.id}/approve`)).response.status,200);

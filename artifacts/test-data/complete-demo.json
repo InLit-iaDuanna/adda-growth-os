@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "initializedAt": "2026-09-26T17:04:58.836Z",
+  "initializedAt": "2026-09-26T18:55:35.190Z",
   "tenants": [
     {
       "id": "ten_demo_01",
@@ -11,7 +11,7 @@
       "timezone": "Asia/Dhaka",
       "currency": "BDT",
       "launchDate": null,
-      "createdAt": "2026-09-26T17:04:58.859Z"
+      "createdAt": "2026-09-26T18:55:35.215Z"
     }
   ],
   "stores": [
@@ -23,7 +23,7 @@
       "timezone": "Asia/Dhaka",
       "currency": "BDT",
       "status": "active",
-      "createdAt": "2026-09-26T17:04:58.859Z",
+      "createdAt": "2026-09-26T18:55:35.215Z",
       "orderSources": [
         "pos_demo"
       ]
@@ -34,33 +34,33 @@
       "id": "usr_demo_owner",
       "email": "owner@demo.adda.local",
       "displayName": "Demo Owner",
-      "passwordHash": "scrypt$487fab86e818a8246ce5bfe85b72302d$06ce6eee61798fce1e4cf80842392f0c2cac4f3ca37de1a54c8b1150554f363f",
+      "passwordHash": "scrypt$fe5771fe64cf1528ffb032a138e4c634$a8126db345f9ab4b4b9e5169f47ac8781dd17b45958f305af6cbd30cfe7340bc",
       "status": "active",
-      "createdAt": "2026-09-26T17:04:58.859Z"
+      "createdAt": "2026-09-26T18:55:35.215Z"
     },
     {
       "id": "usr_demo_manager",
       "email": "manager@demo.adda.local",
       "displayName": "Demo Manager",
-      "passwordHash": "scrypt$0816d1ffaab8407ad3efc7c2236c4423$295faccf53f4c9534a11eb8cbe0a32b42868db8a2961a554591a06fb3d124335",
+      "passwordHash": "scrypt$fd40788b1b4b056d7e505d7e992124d3$e203aad8f9c6211fa5c86e34483f874fbd7c125c3297901cd98c3e410f10bfa3",
       "status": "active",
-      "createdAt": "2026-09-26T17:04:58.859Z"
+      "createdAt": "2026-09-26T18:55:35.215Z"
     },
     {
       "id": "usr_demo_reviewer",
       "email": "reviewer@demo.adda.local",
       "displayName": "Demo Local Reviewer",
-      "passwordHash": "scrypt$71554a16ddb35c1cf02fe7421357ae41$c273bd60e53373155d30f82b331b27f543b89da4b46eca9ab7bda1b767cad4c8",
+      "passwordHash": "scrypt$8b9c0ce10d5a4e98c6e0445af648107a$3a2682565de969edddd871533632a2d1de167dee183ad4b16205e1468daaf8ae",
       "status": "active",
-      "createdAt": "2026-09-26T17:04:58.859Z"
+      "createdAt": "2026-09-26T18:55:35.215Z"
     },
     {
       "id": "usr_demo_cashier",
       "email": "cashier@demo.adda.local",
       "displayName": "Demo Cashier",
-      "passwordHash": "scrypt$7f525f73868433d54aab7e652e02c80a$e5dcbece5216f9edd7e9387e895fe577c7c3ad0ba237a0bb69353bd5a7ce2965",
+      "passwordHash": "scrypt$062490c431b08a1cb542869b29b8c4d0$f1042d3125ea32b5b58cfa6af8e4f866c067b72bd5e2592ca4da09331cdef7bc",
       "status": "active",
-      "createdAt": "2026-09-26T17:04:58.859Z"
+      "createdAt": "2026-09-26T18:55:35.215Z"
     }
   ],
   "memberships": [
@@ -114,8 +114,8 @@
       "name": "Lotus Reset · 春日自然茶饮",
       "objective": "verified first orders",
       "budgetMinor": 150000,
-      "startAt": "2026-08-27T17:04:58.798Z",
-      "endAt": "2026-12-25T17:04:58.798Z",
+      "startAt": "2026-07-28T18:55:35.153Z",
+      "endAt": "2026-12-25T18:55:35.153Z",
       "productIds": [
         "prod_tea_original",
         "prod_lemon_mate",
@@ -128,8 +128,8 @@
       "status": "approved",
       "needsInput": [],
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-29T17:04:58.798Z",
-      "updatedAt": "2026-09-24T17:04:58.798Z",
+      "createdAt": "2026-08-29T18:55:35.153Z",
+      "updatedAt": "2026-09-24T18:55:35.153Z",
       "revision": 2
     },
     {
@@ -149,8 +149,8 @@
         "approved_budget"
       ],
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-23T17:04:58.798Z",
-      "updatedAt": "2026-09-23T17:04:58.798Z",
+      "createdAt": "2026-09-23T18:55:35.153Z",
+      "updatedAt": "2026-09-23T18:55:35.153Z",
       "revision": 1
     }
   ],
@@ -164,7 +164,7 @@
       "sourceUri": "fixture://brand/suiwu-adda",
       "checksum": "5ed8c03ee21aa4587c876f94e3ca2bc515ae29f9cc0f1e65eacb8f893a9460d6",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-25T17:04:58.798Z"
+      "createdAt": "2026-08-25T18:55:35.153Z"
     }
   ],
   "brandRevisions": [
@@ -175,13 +175,13 @@
       "version": 1,
       "status": "approved",
       "content": "SUIWU 随物\nADDA TEA\nScience meets a more natural life\nLive in harmony with life",
-      "effectiveFrom": "2026-08-25T17:04:58.798Z",
+      "effectiveFrom": "2026-08-25T18:55:35.153Z",
       "effectiveTo": null,
       "approvedBy": "usr_demo_owner",
-      "approvedAt": "2026-08-27T17:04:58.798Z",
+      "approvedAt": "2026-08-27T18:55:35.153Z",
       "supersedesId": null,
       "conflictKeys": [],
-      "createdAt": "2026-08-25T17:04:58.798Z"
+      "createdAt": "2026-08-25T18:55:35.153Z"
     }
   ],
   "brandFacts": [
@@ -194,7 +194,7 @@
       "valueType": "text",
       "sourceCitation": "brand_doc_suiwu_01#brand_name",
       "status": "approved",
-      "effectiveFrom": "2026-08-25T17:04:58.798Z",
+      "effectiveFrom": "2026-08-25T18:55:35.153Z",
       "effectiveTo": null
     },
     {
@@ -206,7 +206,7 @@
       "valueType": "text",
       "sourceCitation": "brand_doc_suiwu_01#sub_brand",
       "status": "approved",
-      "effectiveFrom": "2026-08-25T17:04:58.798Z",
+      "effectiveFrom": "2026-08-25T18:55:35.153Z",
       "effectiveTo": null
     },
     {
@@ -218,7 +218,7 @@
       "valueType": "text",
       "sourceCitation": "brand_doc_suiwu_01#slogan",
       "status": "approved",
-      "effectiveFrom": "2026-08-25T17:04:58.798Z",
+      "effectiveFrom": "2026-08-25T18:55:35.153Z",
       "effectiveTo": null
     },
     {
@@ -230,7 +230,7 @@
       "valueType": "text",
       "sourceCitation": "brand_doc_suiwu_01#service_promise",
       "status": "approved",
-      "effectiveFrom": "2026-08-25T17:04:58.798Z",
+      "effectiveFrom": "2026-08-25T18:55:35.153Z",
       "effectiveTo": null
     }
   ],
@@ -248,8 +248,8 @@
       "status": "active",
       "needsInput": [],
       "currentPriceVersionId": "price_prod_tea_original_v1",
-      "createdAt": "2026-08-29T17:04:58.798Z",
-      "updatedAt": "2026-09-01T17:04:58.798Z"
+      "createdAt": "2026-08-29T18:55:35.153Z",
+      "updatedAt": "2026-09-01T18:55:35.153Z"
     },
     {
       "id": "prod_lemon_mate",
@@ -264,8 +264,8 @@
       "status": "active",
       "needsInput": [],
       "currentPriceVersionId": "price_prod_lemon_mate_v1",
-      "createdAt": "2026-08-29T17:04:58.798Z",
-      "updatedAt": "2026-09-01T17:04:58.798Z"
+      "createdAt": "2026-08-29T18:55:35.153Z",
+      "updatedAt": "2026-09-01T18:55:35.153Z"
     },
     {
       "id": "prod_matcha_cloud",
@@ -280,8 +280,8 @@
       "status": "active",
       "needsInput": [],
       "currentPriceVersionId": "price_prod_matcha_cloud_v1",
-      "createdAt": "2026-08-29T17:04:58.798Z",
-      "updatedAt": "2026-09-01T17:04:58.798Z"
+      "createdAt": "2026-08-29T18:55:35.153Z",
+      "updatedAt": "2026-09-01T18:55:35.153Z"
     }
   ],
   "priceVersions": [
@@ -292,12 +292,12 @@
       "version": 1,
       "currency": "BDT",
       "amountMinor": 18000,
-      "validFrom": "2026-08-29T17:04:58.798Z",
+      "validFrom": "2026-08-29T18:55:35.153Z",
       "validTo": null,
       "status": "approved",
       "sourceCitation": "brand_rev_suiwu_01#price:prod_tea_original",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-29T17:04:58.798Z"
+      "createdAt": "2026-08-29T18:55:35.153Z"
     },
     {
       "id": "price_prod_lemon_mate_v1",
@@ -306,12 +306,12 @@
       "version": 1,
       "currency": "BDT",
       "amountMinor": 16000,
-      "validFrom": "2026-08-29T17:04:58.798Z",
+      "validFrom": "2026-08-29T18:55:35.153Z",
       "validTo": null,
       "status": "approved",
       "sourceCitation": "brand_rev_suiwu_01#price:prod_lemon_mate",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-29T17:04:58.798Z"
+      "createdAt": "2026-08-29T18:55:35.153Z"
     },
     {
       "id": "price_prod_matcha_cloud_v1",
@@ -320,12 +320,12 @@
       "version": 1,
       "currency": "BDT",
       "amountMinor": 22000,
-      "validFrom": "2026-08-29T17:04:58.798Z",
+      "validFrom": "2026-08-29T18:55:35.153Z",
       "validTo": null,
       "status": "approved",
       "sourceCitation": "brand_rev_suiwu_01#price:prod_matcha_cloud",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-29T17:04:58.798Z"
+      "createdAt": "2026-08-29T18:55:35.153Z"
     }
   ],
   "mediaAssets": [
@@ -334,7 +334,7 @@
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "storageKey": "brand/4da38778134ae0fc6f4fb0046521903b.jpg",
-      "checksum": "d921f041c7cd08e0fdbecf8017c5ad8b5c52a7569bc4bd3af66e0590ec77a7b6",
+      "checksum": "05db143193402f645de8453c97b03580d63a7df1e122a3fce3c04a4b79e2eb5a",
       "mimeType": "image/jpeg",
       "rightsStatus": "approved",
       "allowedUses": [
@@ -345,14 +345,14 @@
       "expiresAt": null,
       "sourceCitation": "client-asset-fixture: lotus water ripple",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-30T17:04:58.798Z"
+      "createdAt": "2026-08-30T18:55:35.153Z"
     },
     {
       "id": "asset_suiwu_logo",
       "tenantId": "ten_demo_01",
       "storeId": null,
       "storageKey": "brand/99b0b4ec1602cc2760ffed5944b53444.jpg",
-      "checksum": "bfdfc28f7b6d032b170d2ac312918af7d4d059dca7867b20d9f258947ca6f779",
+      "checksum": "affd00c8cd4a2e89e8912e03000663e7f650926852d94f017509b0f9f0d2bcc3",
       "mimeType": "image/jpeg",
       "rightsStatus": "approved",
       "allowedUses": [
@@ -363,21 +363,21 @@
       "expiresAt": null,
       "sourceCitation": "client-asset-fixture: SUIWU lotus logo",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-08-30T17:04:58.798Z"
+      "createdAt": "2026-08-30T18:55:35.153Z"
     },
     {
       "id": "asset_needs_confirmation",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "storageKey": "brand/7846e5a3d39a673b230a47f52f4532ca.jpg",
-      "checksum": "3718998b9e42e51150c13393e4a40748469023518bc8b0a3bdff60ae03662ea5",
+      "checksum": null,
       "mimeType": "image/jpeg",
       "rightsStatus": "unknown",
       "allowedUses": [],
       "expiresAt": null,
       "sourceCitation": null,
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "brandReferences": [
@@ -405,7 +405,7 @@
         "brand_rev_suiwu_01"
       ],
       "status": "valid",
-      "createdAt": "2026-09-02T17:04:58.798Z",
+      "createdAt": "2026-09-02T18:55:35.153Z",
       "invalidatedAt": null,
       "invalidationReason": null
     }
@@ -417,7 +417,7 @@
       "storeId": "sto_demo_01",
       "externalMemberId": "m_ana_001",
       "displayName": "Ana Synthetic",
-      "registeredAt": "2026-08-07T17:04:58.798Z",
+      "registeredAt": "2026-08-07T18:55:35.153Z",
       "language": "en",
       "contact": null,
       "contactHmac": "fa241ef10d68d29ba02a53edc5acb2d7aed97d6c15664852806cac082cf4f7cc",
@@ -425,8 +425,8 @@
       "isSynthetic": true,
       "contactVerified": true,
       "verificationProof": "test_outbox",
-      "verificationExpiresAt": "2026-10-26T17:04:58.798Z",
-      "createdAt": "2026-08-07T17:04:58.798Z"
+      "verificationExpiresAt": "2026-10-26T18:55:35.153Z",
+      "createdAt": "2026-08-07T18:55:35.153Z"
     },
     {
       "id": "member_rina",
@@ -434,7 +434,7 @@
       "storeId": "sto_demo_01",
       "externalMemberId": "m_rina_001",
       "displayName": "Rina Synthetic",
-      "registeredAt": "2026-07-18T17:04:58.798Z",
+      "registeredAt": "2026-07-18T18:55:35.153Z",
       "language": "bn",
       "contact": null,
       "contactHmac": "ec2e0579ab3dceb7ec9299a8a780a6dd02dc00ee32e54e568c4f01d3b2afd93f",
@@ -442,8 +442,8 @@
       "isSynthetic": true,
       "contactVerified": true,
       "verificationProof": "test_outbox",
-      "verificationExpiresAt": "2026-10-26T17:04:58.798Z",
-      "createdAt": "2026-07-18T17:04:58.798Z"
+      "verificationExpiresAt": "2026-10-26T18:55:35.153Z",
+      "createdAt": "2026-07-18T18:55:35.153Z"
     },
     {
       "id": "member_zara",
@@ -451,7 +451,7 @@
       "storeId": "sto_demo_01",
       "externalMemberId": "m_zara_001",
       "displayName": "Zara Synthetic",
-      "registeredAt": "2026-08-17T17:04:58.798Z",
+      "registeredAt": "2026-08-17T18:55:35.153Z",
       "language": "en",
       "contact": null,
       "contactHmac": "34b438fe68f22d7e84b8bf2862c4400e463a5e0d9ddd8c0288eb0cfda37cd6f5",
@@ -459,8 +459,8 @@
       "isSynthetic": true,
       "contactVerified": true,
       "verificationProof": "test_outbox",
-      "verificationExpiresAt": "2026-10-26T17:04:58.798Z",
-      "createdAt": "2026-08-17T17:04:58.798Z"
+      "verificationExpiresAt": "2026-10-26T18:55:35.153Z",
+      "createdAt": "2026-08-17T18:55:35.153Z"
     },
     {
       "id": "member_noor",
@@ -468,7 +468,7 @@
       "storeId": "sto_demo_01",
       "externalMemberId": "m_noor_001",
       "displayName": "Noor Synthetic",
-      "registeredAt": "2026-09-21T17:04:58.798Z",
+      "registeredAt": "2026-09-21T18:55:35.153Z",
       "language": "bn",
       "contact": null,
       "contactHmac": "6fee47cf771526f487a7f14a0fa495adc78b2b50fbdcb5a545fe6bf36ded8b57",
@@ -477,7 +477,7 @@
       "contactVerified": false,
       "verificationProof": null,
       "verificationExpiresAt": null,
-      "createdAt": "2026-09-21T17:04:58.798Z"
+      "createdAt": "2026-09-21T18:55:35.153Z"
     },
     {
       "id": "member_sami",
@@ -485,7 +485,7 @@
       "storeId": "sto_demo_01",
       "externalMemberId": "m_sami_001",
       "displayName": "Sami Synthetic",
-      "registeredAt": "2026-09-24T17:04:58.798Z",
+      "registeredAt": "2026-09-24T18:55:35.153Z",
       "language": "en",
       "contact": null,
       "contactHmac": "e4a14b6ffdbbfc83681712231cae48fe521d6898055bb0617f64ce25d5ffbad4",
@@ -494,7 +494,7 @@
       "contactVerified": false,
       "verificationProof": null,
       "verificationExpiresAt": null,
-      "createdAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "orders": [
@@ -505,16 +505,16 @@
       "source": "pos_demo",
       "externalOrderId": "POS-1001",
       "memberId": "member_ana",
-      "paidAt": "2026-08-12T17:04:58.798Z",
+      "paidAt": "2026-08-12T18:55:35.153Z",
       "currency": "BDT",
       "amountPaidMinor": 18000,
       "status": "paid",
       "revision": 1,
       "active": true,
       "correctionOfId": null,
-      "sourceRowHash": "47f265ff4024e23882dc827f239ebf95a2f10324d5f88118bf0f8fe8a3d4d28b",
-      "createdAt": "2026-08-12T17:04:58.798Z",
-      "updatedAt": "2026-08-12T17:04:58.798Z"
+      "sourceRowHash": "39553babf62b8ef6be1aad63a3375181cb1b2bf94bca97130c96a81928d90100",
+      "createdAt": "2026-08-12T18:55:35.153Z",
+      "updatedAt": "2026-08-12T18:55:35.153Z"
     },
     {
       "id": "ord_ana_002",
@@ -523,16 +523,16 @@
       "source": "pos_demo",
       "externalOrderId": "POS-1002",
       "memberId": "member_ana",
-      "paidAt": "2026-09-01T17:04:58.798Z",
+      "paidAt": "2026-09-01T18:55:35.153Z",
       "currency": "BDT",
       "amountPaidMinor": 16000,
       "status": "paid",
       "revision": 1,
       "active": true,
       "correctionOfId": null,
-      "sourceRowHash": "910afd5ddc2ec5e3410a1d0dfac21007e28ba4649ad1afc060398b744c91bff7",
-      "createdAt": "2026-09-01T17:04:58.798Z",
-      "updatedAt": "2026-09-01T17:04:58.798Z"
+      "sourceRowHash": "11ed832e995582d039f86a10c9c280e9eaf03fa936cc75c1ec2ace79bec357e8",
+      "createdAt": "2026-09-01T18:55:35.153Z",
+      "updatedAt": "2026-09-01T18:55:35.153Z"
     },
     {
       "id": "ord_rina_001",
@@ -541,16 +541,16 @@
       "source": "pos_demo",
       "externalOrderId": "POS-1003",
       "memberId": "member_rina",
-      "paidAt": "2026-08-22T17:04:58.798Z",
+      "paidAt": "2026-08-22T18:55:35.153Z",
       "currency": "BDT",
       "amountPaidMinor": 22000,
       "status": "paid",
       "revision": 1,
       "active": true,
       "correctionOfId": null,
-      "sourceRowHash": "7a09174ffcce1626d4a81993a8d2dc858fbbec815c0c1929afa7511c8858d577",
-      "createdAt": "2026-08-22T17:04:58.798Z",
-      "updatedAt": "2026-08-22T17:04:58.798Z"
+      "sourceRowHash": "675a571ded99241e44df750a7047f96c362561b1c9dde5b420bf27f5064729d0",
+      "createdAt": "2026-08-22T18:55:35.153Z",
+      "updatedAt": "2026-08-22T18:55:35.153Z"
     },
     {
       "id": "ord_zara_001",
@@ -559,16 +559,16 @@
       "source": "pos_demo",
       "externalOrderId": "POS-1004",
       "memberId": "member_zara",
-      "paidAt": "2026-09-16T17:04:58.798Z",
+      "paidAt": "2026-09-16T18:55:35.153Z",
       "currency": "BDT",
       "amountPaidMinor": 18000,
       "status": "paid",
       "revision": 1,
       "active": true,
       "correctionOfId": null,
-      "sourceRowHash": "f3de21127aaaef13cc09aba3c8dd792b03a352ab098c36a0a8a874ca922505b4",
-      "createdAt": "2026-09-16T17:04:58.798Z",
-      "updatedAt": "2026-09-16T17:04:58.798Z"
+      "sourceRowHash": "73de38e4f219c6464703cb7dc2e74a0a280c0809af954929f1b5a7fdfe5f3402",
+      "createdAt": "2026-09-16T18:55:35.153Z",
+      "updatedAt": "2026-09-16T18:55:35.153Z"
     },
     {
       "id": "ord_guest_001",
@@ -577,16 +577,16 @@
       "source": "pos_demo",
       "externalOrderId": "POS-1005",
       "memberId": null,
-      "paidAt": "2026-09-23T17:04:58.798Z",
+      "paidAt": "2026-09-23T18:55:35.153Z",
       "currency": "BDT",
       "amountPaidMinor": 12000,
       "status": "paid",
       "revision": 1,
       "active": true,
       "correctionOfId": null,
-      "sourceRowHash": "5dfaf95ed759b5e05e02df2bf810077f2ed461d1c4e09f4f18054d9e1ff3b79d",
-      "createdAt": "2026-09-23T17:04:58.798Z",
-      "updatedAt": "2026-09-23T17:04:58.798Z"
+      "sourceRowHash": "e2b7a69cdda56873614c2ea44aef4dd29141d85857d11bf47da337ab3433fbec",
+      "createdAt": "2026-09-23T18:55:35.153Z",
+      "updatedAt": "2026-09-23T18:55:35.153Z"
     },
     {
       "id": "ord_void_001",
@@ -595,16 +595,16 @@
       "source": "pos_demo",
       "externalOrderId": "POS-1006",
       "memberId": "member_sami",
-      "paidAt": "2026-09-24T17:04:58.798Z",
+      "paidAt": "2026-09-24T18:55:35.153Z",
       "currency": "BDT",
       "amountPaidMinor": 16000,
       "status": "void",
       "revision": 1,
       "active": true,
       "correctionOfId": null,
-      "sourceRowHash": "226a831034621a6911e381211c024b7760729a982a17018ff67d21cb5b76f4c1",
-      "createdAt": "2026-09-24T17:04:58.798Z",
-      "updatedAt": "2026-09-24T17:04:58.798Z"
+      "sourceRowHash": "cfb3b0a0bc3729842a1970bccba3f453052e6c48bc97160a5f8f01b75384f803",
+      "createdAt": "2026-09-24T18:55:35.153Z",
+      "updatedAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "refunds": [
@@ -615,10 +615,10 @@
       "source": "pos_demo",
       "externalAdjustmentId": "REF-2001",
       "externalOrderId": "POS-1002",
-      "occurredAt": "2026-09-06T17:04:58.798Z",
+      "occurredAt": "2026-09-06T18:55:35.153Z",
       "amountMinor": 4000,
       "sourceRowHash": "803007c12c7854e8e9fe1d0dda48942cf5678ab91b04737a7e1063056f725b1b",
-      "createdAt": "2026-09-06T17:04:58.798Z"
+      "createdAt": "2026-09-06T18:55:35.153Z"
     },
     {
       "id": "ref_zara_full",
@@ -627,10 +627,10 @@
       "source": "pos_demo",
       "externalAdjustmentId": "REF-2002",
       "externalOrderId": "POS-1004",
-      "occurredAt": "2026-09-21T17:04:58.798Z",
+      "occurredAt": "2026-09-21T18:55:35.153Z",
       "amountMinor": 18000,
       "sourceRowHash": "97ade72c83d849b125c300e4825b5cb97f14c78b22310972e81dc4bb16e7c18e",
-      "createdAt": "2026-09-21T17:04:58.798Z"
+      "createdAt": "2026-09-21T18:55:35.153Z"
     }
   ],
   "imports": [
@@ -641,15 +641,15 @@
       "kind": "orders",
       "source": "pos_demo",
       "fileName": "orders-complete.csv",
-      "fileHash": "5b14d1a187b9ef2a5583dfc28c704888e54cdb598ee87a29976b37dab9181f6a",
+      "fileHash": "730530ec86269d84e0db7db34c0d45aa6cca5023004d3a6c923f10a5dc697d03",
       "status": "committed",
       "rowCount": 6,
       "validRowCount": 6,
       "errorCount": 0,
-      "completeThrough": "2026-09-26T17:04:58.798Z",
+      "completeThrough": "2026-09-26T18:55:35.153Z",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-25T17:04:58.798Z",
-      "committedAt": "2026-09-25T17:04:58.798Z"
+      "createdAt": "2026-09-25T18:55:35.153Z",
+      "committedAt": "2026-09-25T18:55:35.153Z"
     },
     {
       "id": "import_refunds_complete",
@@ -658,15 +658,15 @@
       "kind": "refunds",
       "source": "pos_demo",
       "fileName": "refunds-complete.csv",
-      "fileHash": "7a560987b5503b3d4d9aefc6cc4bdac0f72a283d54441bee99415d6fff07b1ad",
+      "fileHash": "c342c93d7d57bf4791db35789257e35a41ac0e58895850e259a571ada02cfa93",
       "status": "committed",
       "rowCount": 2,
       "validRowCount": 2,
       "errorCount": 0,
-      "completeThrough": "2026-09-26T17:04:58.798Z",
+      "completeThrough": "2026-09-26T18:55:35.153Z",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-25T17:04:58.798Z",
-      "committedAt": "2026-09-25T17:04:58.798Z"
+      "createdAt": "2026-09-25T18:55:35.153Z",
+      "committedAt": "2026-09-25T18:55:35.153Z"
     }
   ],
   "importErrors": [],
@@ -682,7 +682,7 @@
         "source": "pos_demo",
         "external_order_id": "POS-1001",
         "member_id": "m_ana_001",
-        "paid_at": "2026-08-12T17:04:58.798Z",
+        "paid_at": "2026-08-12T18:55:35.153Z",
         "currency": "BDT",
         "amount_paid_minor": "18000",
         "status": "paid"
@@ -693,7 +693,7 @@
         "source": "pos_demo",
         "externalOrderId": "POS-1001",
         "memberId": "m_ana_001",
-        "paidAt": "2026-08-12T17:04:58.798Z",
+        "paidAt": "2026-08-12T18:55:35.153Z",
         "currency": "BDT",
         "amountPaidMinor": 18000,
         "status": "paid"
@@ -711,7 +711,7 @@
         "source": "pos_demo",
         "external_order_id": "POS-1002",
         "member_id": "m_ana_001",
-        "paid_at": "2026-09-01T17:04:58.798Z",
+        "paid_at": "2026-09-01T18:55:35.153Z",
         "currency": "BDT",
         "amount_paid_minor": "16000",
         "status": "paid"
@@ -722,7 +722,7 @@
         "source": "pos_demo",
         "externalOrderId": "POS-1002",
         "memberId": "m_ana_001",
-        "paidAt": "2026-09-01T17:04:58.798Z",
+        "paidAt": "2026-09-01T18:55:35.153Z",
         "currency": "BDT",
         "amountPaidMinor": 16000,
         "status": "paid"
@@ -740,7 +740,7 @@
         "source": "pos_demo",
         "external_order_id": "POS-1003",
         "member_id": "m_rina_001",
-        "paid_at": "2026-08-22T17:04:58.798Z",
+        "paid_at": "2026-08-22T18:55:35.153Z",
         "currency": "BDT",
         "amount_paid_minor": "22000",
         "status": "paid"
@@ -751,7 +751,7 @@
         "source": "pos_demo",
         "externalOrderId": "POS-1003",
         "memberId": "m_rina_001",
-        "paidAt": "2026-08-22T17:04:58.798Z",
+        "paidAt": "2026-08-22T18:55:35.153Z",
         "currency": "BDT",
         "amountPaidMinor": 22000,
         "status": "paid"
@@ -769,7 +769,7 @@
         "source": "pos_demo",
         "external_order_id": "POS-1004",
         "member_id": "m_zara_001",
-        "paid_at": "2026-09-16T17:04:58.798Z",
+        "paid_at": "2026-09-16T18:55:35.153Z",
         "currency": "BDT",
         "amount_paid_minor": "18000",
         "status": "paid"
@@ -780,7 +780,7 @@
         "source": "pos_demo",
         "externalOrderId": "POS-1004",
         "memberId": "m_zara_001",
-        "paidAt": "2026-09-16T17:04:58.798Z",
+        "paidAt": "2026-09-16T18:55:35.153Z",
         "currency": "BDT",
         "amountPaidMinor": 18000,
         "status": "paid"
@@ -798,7 +798,7 @@
         "source": "pos_demo",
         "external_order_id": "POS-1005",
         "member_id": "",
-        "paid_at": "2026-09-23T17:04:58.798Z",
+        "paid_at": "2026-09-23T18:55:35.153Z",
         "currency": "BDT",
         "amount_paid_minor": "12000",
         "status": "paid"
@@ -809,7 +809,7 @@
         "source": "pos_demo",
         "externalOrderId": "POS-1005",
         "memberId": null,
-        "paidAt": "2026-09-23T17:04:58.798Z",
+        "paidAt": "2026-09-23T18:55:35.153Z",
         "currency": "BDT",
         "amountPaidMinor": 12000,
         "status": "paid"
@@ -827,7 +827,7 @@
         "source": "pos_demo",
         "external_order_id": "POS-1006",
         "member_id": "m_sami_001",
-        "paid_at": "2026-09-24T17:04:58.798Z",
+        "paid_at": "2026-09-24T18:55:35.153Z",
         "currency": "BDT",
         "amount_paid_minor": "16000",
         "status": "void"
@@ -838,7 +838,7 @@
         "source": "pos_demo",
         "externalOrderId": "POS-1006",
         "memberId": "m_sami_001",
-        "paidAt": "2026-09-24T17:04:58.798Z",
+        "paidAt": "2026-09-24T18:55:35.153Z",
         "currency": "BDT",
         "amountPaidMinor": 16000,
         "status": "void"
@@ -856,7 +856,7 @@
         "source": "pos_demo",
         "external_adjustment_id": "REF-2001",
         "external_order_id": "POS-1002",
-        "occurred_at": "2026-09-06T17:04:58.798Z",
+        "occurred_at": "2026-09-06T18:55:35.153Z",
         "amount_minor": "4000"
       },
       "value": {
@@ -865,7 +865,7 @@
         "source": "pos_demo",
         "externalAdjustmentId": "REF-2001",
         "externalOrderId": "POS-1002",
-        "occurredAt": "2026-09-06T17:04:58.798Z",
+        "occurredAt": "2026-09-06T18:55:35.153Z",
         "amountMinor": 4000
       },
       "valid": true
@@ -881,7 +881,7 @@
         "source": "pos_demo",
         "external_adjustment_id": "REF-2002",
         "external_order_id": "POS-1004",
-        "occurred_at": "2026-09-21T17:04:58.798Z",
+        "occurred_at": "2026-09-21T18:55:35.153Z",
         "amount_minor": "18000"
       },
       "value": {
@@ -890,7 +890,7 @@
         "source": "pos_demo",
         "externalAdjustmentId": "REF-2002",
         "externalOrderId": "POS-1004",
-        "occurredAt": "2026-09-21T17:04:58.798Z",
+        "occurredAt": "2026-09-21T18:55:35.153Z",
         "amountMinor": 18000
       },
       "valid": true
@@ -901,8 +901,8 @@
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "source": "pos_demo",
-      "completeThrough": "2026-09-26T17:04:58.798Z",
-      "updatedAt": "2026-09-26T17:04:58.798Z",
+      "completeThrough": "2026-09-26T18:55:35.153Z",
+      "updatedAt": "2026-09-26T18:55:35.153Z",
       "confirmed": true
     }
   ],
@@ -916,7 +916,7 @@
       "orderId": "ord_ana_001",
       "campaignId": "camp_spring_wellness",
       "method": "verified_coupon",
-      "occurredAt": "2026-08-12T17:04:58.798Z"
+      "occurredAt": "2026-08-12T18:55:35.153Z"
     },
     {
       "id": "attr_ana_002",
@@ -927,7 +927,7 @@
       "orderId": "ord_ana_002",
       "campaignId": "camp_spring_wellness",
       "method": "linked_first_party_touch",
-      "occurredAt": "2026-09-01T17:04:58.798Z"
+      "occurredAt": "2026-09-01T18:55:35.153Z"
     },
     {
       "id": "attr_rina_001",
@@ -937,8 +937,8 @@
       "orderSource": "pos_demo",
       "orderId": "ord_rina_001",
       "campaignId": "camp_spring_wellness",
-      "method": "verified_coupon",
-      "occurredAt": "2026-08-22T17:04:58.798Z"
+      "method": "linked_first_party_touch",
+      "occurredAt": "2026-08-17T18:55:35.153Z"
     }
   ],
   "sourceLinks": [
@@ -952,7 +952,7 @@
       "variant": "reel-a",
       "tokenHash": "db28c03ffa5ba7bc28e8ef74f20c27e411ad8fd9b8313796df91cb4dd248b06b",
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-03T17:04:58.798Z",
+      "createdAt": "2026-07-30T18:55:35.153Z",
       "status": "active"
     },
     {
@@ -965,7 +965,7 @@
       "variant": "club-a",
       "tokenHash": "ce5734ac2b9d1f20d4829a105c65a1edf0d44593e7cd9beaa3db83654bb83d55",
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-03T17:04:58.798Z",
+      "createdAt": "2026-07-30T18:55:35.153Z",
       "status": "active"
     },
     {
@@ -978,7 +978,7 @@
       "variant": "counter",
       "tokenHash": "4dbd5f3a8418ee57e2c538dff8a7b3f6e4fb5349e1cf73690945d0619c958f3e",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-06T17:04:58.798Z",
+      "createdAt": "2026-08-02T18:55:35.153Z",
       "status": "active"
     }
   ],
@@ -990,7 +990,7 @@
       "sourceLinkId": "source_instagram_01",
       "eventType": "view",
       "sessionTokenHash": "eed18c161bc1dbfc678c1e2ebf3a76e3cb29c6d2ea481eb2cb664eab00e3a91b",
-      "occurredAt": "2026-08-05T17:04:58.798Z"
+      "occurredAt": "2026-08-05T18:55:35.153Z"
     },
     {
       "id": "touch_click_01",
@@ -999,7 +999,7 @@
       "sourceLinkId": "source_instagram_01",
       "eventType": "click",
       "sessionTokenHash": "b225ebd8683b6e035e225ce39fc59416264655d43472c8c8563101169bc66dbf",
-      "occurredAt": "2026-08-06T17:04:58.798Z"
+      "occurredAt": "2026-08-06T18:55:35.153Z"
     },
     {
       "id": "touch_register_01",
@@ -1008,7 +1008,7 @@
       "sourceLinkId": "source_instagram_01",
       "eventType": "member_register",
       "sessionTokenHash": "feb32651445ab1d26bb8551723c4d95806f0ba35cad2c30e61a48db2b1b3808b",
-      "occurredAt": "2026-08-07T17:04:58.798Z"
+      "occurredAt": "2026-08-07T18:55:35.153Z"
     },
     {
       "id": "touch_coupon_01",
@@ -1017,7 +1017,25 @@
       "sourceLinkId": "source_campus_01",
       "eventType": "coupon_issue",
       "sessionTokenHash": "cafa93151530a2ebb95b000ebb01447ec2842daf8e6733a0c1be45a4b9701ae7",
-      "occurredAt": "2026-08-22T17:04:58.798Z"
+      "occurredAt": "2026-08-22T18:55:35.153Z"
+    },
+    {
+      "id": "touch_ana_order_01",
+      "tenantId": "ten_demo_01",
+      "storeId": "sto_demo_01",
+      "sourceLinkId": "source_instagram_01",
+      "eventType": "click",
+      "sessionTokenHash": "c9d65cb60b59810e376196d077c74f8a6586b8a3e164cb8051eefba428a0d9db",
+      "occurredAt": "2026-09-01T18:55:35.153Z"
+    },
+    {
+      "id": "touch_rina_order_01",
+      "tenantId": "ten_demo_01",
+      "storeId": "sto_demo_01",
+      "sourceLinkId": "source_instagram_01",
+      "eventType": "click",
+      "sessionTokenHash": "7e4f8a9cdca6f90c319e2e081e4589bd3879c0be1dd181a66a0ab23d9fcc866c",
+      "occurredAt": "2026-08-17T18:55:35.153Z"
     }
   ],
   "consentEvents": [
@@ -1030,7 +1048,7 @@
       "granted": true,
       "noticeVersion": "adda-demo-v1",
       "source": "fixture_seed",
-      "occurredAt": "2026-07-29T17:04:58.798Z"
+      "occurredAt": "2026-07-29T18:55:35.153Z"
     },
     {
       "id": "consent_rina",
@@ -1041,7 +1059,7 @@
       "granted": true,
       "noticeVersion": "adda-demo-v1",
       "source": "fixture_seed",
-      "occurredAt": "2026-07-19T17:04:58.798Z"
+      "occurredAt": "2026-07-19T18:55:35.153Z"
     },
     {
       "id": "consent_zara",
@@ -1052,7 +1070,7 @@
       "granted": true,
       "noticeVersion": "adda-demo-v1",
       "source": "fixture_seed",
-      "occurredAt": "2026-08-18T17:04:58.798Z"
+      "occurredAt": "2026-08-18T18:55:35.153Z"
     },
     {
       "id": "consent_sami",
@@ -1063,7 +1081,7 @@
       "granted": true,
       "noticeVersion": "adda-demo-v1",
       "source": "fixture_seed",
-      "occurredAt": "2026-09-25T17:04:58.798Z"
+      "occurredAt": "2026-09-25T18:55:35.153Z"
     },
     {
       "id": "consent_sami_revoke",
@@ -1074,7 +1092,7 @@
       "granted": false,
       "noticeVersion": "adda-demo-v1",
       "source": "fixture_revoke",
-      "occurredAt": "2026-09-26T17:04:58.798Z"
+      "occurredAt": "2026-09-26T18:55:35.153Z"
     }
   ],
   "suppressionEntries": [
@@ -1085,7 +1103,7 @@
       "channel": "whatsapp",
       "purpose": "marketing",
       "reason": "synthetic opt-out test",
-      "occurredAt": "2026-09-26T17:04:58.798Z"
+      "occurredAt": "2026-09-26T18:55:35.153Z"
     }
   ],
   "offers": [
@@ -1096,13 +1114,13 @@
       "campaignId": "camp_spring_wellness",
       "name": "[测试] First cup BDT 40 off",
       "terms": "Synthetic fixture only. First verified order; POS order match required.",
-      "validFrom": "2026-07-28T17:04:58.798Z",
-      "validTo": "2026-10-26T17:04:58.798Z",
+      "validFrom": "2026-07-28T18:55:35.153Z",
+      "validTo": "2026-10-26T18:55:35.153Z",
       "status": "active",
       "maxRedemptions": 100,
       "issuedCount": 3,
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-04T17:04:58.798Z"
+      "createdAt": "2026-09-04T18:55:35.153Z"
     }
   ],
   "issuedCoupons": [
@@ -1116,12 +1134,12 @@
       "sourceLinkId": "source_instagram_01",
       "tokenHash": "4ce7096bcdd4007113f5b36a13812b45ddf70fa536e074387e492373244b6dd5",
       "status": "redeemed",
-      "issuedAt": "2026-08-12T17:04:58.798Z",
-      "reservedAt": "2026-08-12T17:04:58.798Z",
+      "issuedAt": "2026-08-12T18:55:35.153Z",
+      "reservedAt": "2026-08-12T18:55:35.153Z",
       "posOrderRef": "POS-1001",
       "posOrderSource": "pos_demo",
       "posOrderId": "ord_ana_001",
-      "redeemedAt": "2026-08-12T17:04:58.798Z",
+      "redeemedAt": "2026-08-12T18:55:35.153Z",
       "reversedAt": null
     },
     {
@@ -1134,8 +1152,8 @@
       "sourceLinkId": "source_campus_01",
       "tokenHash": "52c5211900a019171c0e674f37458ca7a8a2e0ef4f8798da0bfac0e047ff8ac5",
       "status": "pending_pos_verification",
-      "issuedAt": "2026-08-22T17:04:58.798Z",
-      "reservedAt": "2026-08-22T17:04:58.798Z",
+      "issuedAt": "2026-08-22T18:55:35.153Z",
+      "reservedAt": "2026-08-22T18:55:35.153Z",
       "posOrderRef": "POS-1003",
       "posOrderSource": "pos_demo",
       "posOrderId": null,
@@ -1152,7 +1170,7 @@
       "sourceLinkId": "source_instagram_01",
       "tokenHash": "64f916c3fda79efdcb05f851a0fb63e9f3d96e4613f3fa9ee4d47cf5dbee4531",
       "status": "issued",
-      "issuedAt": "2026-09-25T17:04:58.798Z",
+      "issuedAt": "2026-09-25T18:55:35.153Z",
       "reservedAt": null,
       "posOrderRef": null,
       "posOrderSource": null,
@@ -1173,7 +1191,7 @@
       "posOrderId": "ord_ana_001",
       "status": "matched",
       "errorCode": null,
-      "createdAt": "2026-08-12T17:04:58.798Z"
+      "createdAt": "2026-08-12T18:55:35.153Z"
     },
     {
       "id": "redemption_rina_001",
@@ -1186,7 +1204,7 @@
       "posOrderId": null,
       "status": "reserved",
       "errorCode": null,
-      "createdAt": "2026-08-22T17:04:58.798Z"
+      "createdAt": "2026-08-22T18:55:35.153Z"
     }
   ],
   "contentBriefs": [
@@ -1195,7 +1213,7 @@
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "campaignId": "camp_spring_wellness",
-      "targetMetric": "verified_first_orders",
+      "targetMetric": "conversion_7d_rate",
       "contentPillar": "natural reset",
       "channel": "manual",
       "productIds": [
@@ -1208,14 +1226,14 @@
       ],
       "sourceLinkId": "source_instagram_01",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-08T17:04:58.798Z"
+      "createdAt": "2026-09-08T18:55:35.153Z"
     },
     {
       "id": "brief_lotus_draft",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "campaignId": "camp_spring_wellness",
-      "targetMetric": "verified_first_orders",
+      "targetMetric": "conversion_7d_rate",
       "contentPillar": "exam reset",
       "channel": "manual",
       "productIds": [
@@ -1226,7 +1244,7 @@
       ],
       "sourceLinkId": "source_campus_01",
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "contentRevisions": [
@@ -1240,7 +1258,7 @@
         "brief_id": "brief_lotus_approved",
         "campaign_id": "camp_spring_wellness",
         "brand_revision_id": "brand_rev_suiwu_01",
-        "target_metric": "verified_first_orders",
+        "target_metric": "conversion_7d_rate",
         "content_pillar": "natural reset",
         "channel": "manual",
         "product_refs": [
@@ -1305,7 +1323,7 @@
         "needs_input": [],
         "risk_flags": []
       },
-      "contentHash": "cbe0748bbffe81cb8ba736638ee819cc833dcfbf76f73152e944242b77f4d669",
+      "contentHash": "2e15dd766fa278814129732c6ff2803e3de7f1dcbb9eb2333d8959155073021e",
       "generationFacts": {
         "campaignRevision": 2,
         "brandRevisionIds": [
@@ -1325,12 +1343,12 @@
           "asset_lotus_water",
           "asset_suiwu_logo"
         ],
-        "assetRightsHash": "5594081ff1eb178aa38d917e5d5801722ba427a0b0d0e0990d892a90cd23b487"
+        "assetRightsHash": "caddc0d9ff1c0c99197ee5d8e47686933c430cc3313e41aef75a4599d3aae1bc"
       },
       "currentApprovalId": "approval_lotus_approved",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-09T17:04:58.798Z",
-      "updatedAt": "2026-09-11T17:04:58.798Z"
+      "createdAt": "2026-09-09T18:55:35.153Z",
+      "updatedAt": "2026-09-11T18:55:35.153Z"
     },
     {
       "id": "content_rev_draft",
@@ -1342,7 +1360,7 @@
         "brief_id": "brief_lotus_draft",
         "campaign_id": "camp_spring_wellness",
         "brand_revision_id": "brand_rev_suiwu_01",
-        "target_metric": "verified_first_orders",
+        "target_metric": "conversion_7d_rate",
         "content_pillar": "exam reset",
         "channel": "manual",
         "product_refs": [
@@ -1410,7 +1428,7 @@
           "manual_review_required"
         ]
       },
-      "contentHash": "71eea5009628b1d53e0d68053ac65e3dace70c0128e6b3bb8f511608088c0812",
+      "contentHash": "7fc02288dd11149fc98fd9dec5f407aca64aca04a7cbb9bea99ccdc39b1603b5",
       "generationFacts": {
         "campaignRevision": 2,
         "brandRevisionIds": [
@@ -1425,12 +1443,12 @@
         "assetIds": [
           "asset_needs_confirmation"
         ],
-        "assetRightsHash": "22dbd9ce4a200582baec1be76c1dd7eeebdff46194511a1281ee9533bc83119c"
+        "assetRightsHash": "40b5a6db7c38179ddd11c5f69b7472d36da6f7a93087a8fecd4db10d8e4608dd"
       },
       "currentApprovalId": null,
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-24T17:04:58.798Z",
-      "updatedAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z",
+      "updatedAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "contentApprovals": [
@@ -1440,7 +1458,7 @@
       "resourceType": "content",
       "resourceId": "content_rev_approved",
       "resourceRevisionId": "content_rev_approved",
-      "payloadHash": "cbe0748bbffe81cb8ba736638ee819cc833dcfbf76f73152e944242b77f4d669",
+      "payloadHash": "2e15dd766fa278814129732c6ff2803e3de7f1dcbb9eb2333d8959155073021e",
       "audienceSnapshotId": null,
       "channel": "manual",
       "language": "zh-CN,en,bn",
@@ -1464,12 +1482,12 @@
         "asset_suiwu_logo"
       ],
       "policyVersion": "content-policy-v2",
-      "factsHash": "f29ba6ab1eb500808c773be2bda263643fa7f9d082a9acfb33707d65ce715c0f",
+      "factsHash": "6f377d2d2b388d301bbb660001a04e3cf041e888a4d1011a8c4ba3db7d891ca0",
       "approvedBy": "usr_demo_owner",
-      "approvedAt": "2026-09-12T17:04:58.798Z",
-      "expiresAt": "2026-10-10T17:04:58.798Z",
+      "approvedAt": "2026-09-12T18:55:35.153Z",
+      "expiresAt": "2026-10-10T18:55:35.153Z",
       "status": "approved",
-      "createdAt": "2026-09-11T17:04:58.798Z"
+      "createdAt": "2026-09-11T18:55:35.153Z"
     }
   ],
   "publicationIntents": [
@@ -1479,12 +1497,12 @@
       "storeId": "sto_demo_01",
       "contentRevisionId": "content_rev_approved",
       "approvalId": "approval_lotus_approved",
-      "payloadHash": "cbe0748bbffe81cb8ba736638ee819cc833dcfbf76f73152e944242b77f4d669",
+      "payloadHash": "2e15dd766fa278814129732c6ff2803e3de7f1dcbb9eb2333d8959155073021e",
       "packageData": {
         "brief_id": "brief_lotus_approved",
         "campaign_id": "camp_spring_wellness",
         "brand_revision_id": "brand_rev_suiwu_01",
-        "target_metric": "verified_first_orders",
+        "target_metric": "conversion_7d_rate",
         "content_pillar": "natural reset",
         "channel": "manual",
         "product_refs": [
@@ -1553,7 +1571,7 @@
       "mode": "manual",
       "status": "operator_attested",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-14T17:04:58.798Z"
+      "createdAt": "2026-09-14T18:55:35.153Z"
     }
   ],
   "publicationReceipts": [
@@ -1564,7 +1582,7 @@
       "externalPostId": "synthetic-post-001",
       "evidenceUrl": "https://example.invalid/synthetic-post-001",
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-15T17:04:58.798Z"
+      "createdAt": "2026-09-15T18:55:35.153Z"
     }
   ],
   "partners": [
@@ -1575,12 +1593,12 @@
       "kind": "club",
       "sourceUrl": "https://example.invalid/du-natural-living",
       "sourceNote": "Synthetic partner record for approval and source checks.",
-      "verifiedAt": "2026-09-10T17:04:58.798Z",
+      "verifiedAt": "2026-09-10T18:55:35.153Z",
       "contactPermission": false,
       "stage": "agreed",
       "followerCount": null,
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-06T17:04:58.798Z"
+      "createdAt": "2026-09-06T18:55:35.153Z"
     }
   ],
   "eventTemplates": [
@@ -1727,14 +1745,14 @@
       "campaignId": "camp_spring_wellness",
       "templateId": "tpl-study-break",
       "name": "[测试] Study Break Tea Circle",
-      "startsAt": "2026-09-25T17:04:58.798Z",
-      "endsAt": "2026-09-27T17:04:58.798Z",
+      "startsAt": "2026-09-25T18:55:35.153Z",
+      "endsAt": "2026-09-27T18:55:35.153Z",
       "capacity": 30,
       "registrationCount": 3,
       "checkinCount": 2,
       "status": "open",
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-16T17:04:58.798Z"
+      "createdAt": "2026-09-16T18:55:35.153Z"
     }
   ],
   "eventRegistrations": [
@@ -1745,7 +1763,7 @@
       "memberId": "member_ana",
       "contactHmac": "fa241ef10d68d29ba02a53edc5acb2d7aed97d6c15664852806cac082cf4f7cc",
       "status": "registered",
-      "createdAt": "2026-09-25T21:52:58.798Z"
+      "createdAt": "2026-09-25T23:43:35.153Z"
     },
     {
       "id": "registration_rina",
@@ -1754,7 +1772,7 @@
       "memberId": "member_rina",
       "contactHmac": "ec2e0579ab3dceb7ec9299a8a780a6dd02dc00ee32e54e568c4f01d3b2afd93f",
       "status": "registered",
-      "createdAt": "2026-09-26T00:16:58.798Z"
+      "createdAt": "2026-09-26T02:07:35.153Z"
     },
     {
       "id": "registration_sami",
@@ -1763,7 +1781,7 @@
       "memberId": "member_sami",
       "contactHmac": "e4a14b6ffdbbfc83681712231cae48fe521d6898055bb0617f64ce25d5ffbad4",
       "status": "registered",
-      "createdAt": "2026-09-26T02:40:58.798Z"
+      "createdAt": "2026-09-26T04:31:35.153Z"
     }
   ],
   "eventCheckins": [
@@ -1775,7 +1793,7 @@
       "registrationId": "registration_ana",
       "checkedInBy": "usr_demo_cashier",
       "method": "staff_confirmed",
-      "createdAt": "2026-09-26T05:04:58.798Z"
+      "createdAt": "2026-09-26T06:55:35.153Z"
     },
     {
       "id": "checkin_rina",
@@ -1785,7 +1803,7 @@
       "registrationId": "registration_rina",
       "checkedInBy": "usr_demo_cashier",
       "method": "scan",
-      "createdAt": "2026-09-26T07:28:58.798Z"
+      "createdAt": "2026-09-26T09:19:35.153Z"
     }
   ],
   "referrals": [
@@ -1799,7 +1817,7 @@
       "status": "qualified",
       "firstQualifiedOrderId": "ord_rina_001",
       "reason": null,
-      "createdAt": "2026-08-21T17:04:58.798Z"
+      "createdAt": "2026-08-21T18:55:35.153Z"
     }
   ],
   "rewardLedger": [
@@ -1813,7 +1831,7 @@
       "approvedBy": null,
       "approvedAt": null,
       "reason": "Synthetic reward awaiting owner approval.",
-      "createdAt": "2026-08-24T17:04:58.798Z"
+      "createdAt": "2026-08-24T18:55:35.153Z"
     }
   ],
   "segmentDefinitions": [
@@ -1824,7 +1842,7 @@
       "rule": "registered_unpurchased",
       "version": 1,
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-18T17:04:58.798Z",
+      "createdAt": "2026-09-18T18:55:35.153Z",
       "storeId": "sto_demo_01"
     },
     {
@@ -1834,7 +1852,7 @@
       "rule": "marketing_opt_in",
       "version": 1,
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-18T17:04:58.798Z",
+      "createdAt": "2026-09-18T18:55:35.153Z",
       "storeId": "sto_demo_01"
     }
   ],
@@ -1855,10 +1873,10 @@
         "member_rina": "holdout",
         "member_zara": "treatment"
       },
-      "frozenAt": "2026-09-20T17:04:58.798Z",
-      "policyHash": "2eac4fb311c2d997a3f41df8a61e9d161c7a3cfac58865d8dfab8b94e58ffaba",
+      "frozenAt": "2026-09-20T18:55:35.153Z",
+      "policyHash": "b355e5e448315feb4b3e6aff21e75b3cf53e5cc1fe5601387ac7510305a85296",
       "storeId": "sto_demo_01",
-      "asOf": "2026-09-26T17:04:58.798Z"
+      "asOf": "2026-09-26T18:55:35.153Z"
     }
   ],
   "outreachCampaigns": [
@@ -1879,12 +1897,12 @@
       "frequencyCapDays": 7,
       "status": "approved",
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-21T17:04:58.798Z",
+      "createdAt": "2026-09-21T18:55:35.153Z",
       "approvedBy": "usr_demo_owner",
-      "approvedAt": "2026-09-22T17:04:58.798Z",
+      "approvedAt": "2026-09-22T18:55:35.153Z",
       "policyVersion": "crm-policy-v2",
-      "approvalHash": "188083505ef0db7f4e095706f1575b8b51962f3a0cfd004bfb79848064e981f2",
-      "expiresAt": "2026-09-28T17:04:58.798Z"
+      "approvalHash": "19c8a9557d312a0f9e0b0455071b75435c7799c78629db17c2066ecbe5485a8d",
+      "expiresAt": "2026-09-28T18:55:35.153Z"
     }
   ],
   "messageAttempts": [
@@ -1898,9 +1916,9 @@
       "reason": "experiment_holdout",
       "providerReference": null,
       "dispatchKey": "dispatch-rina-01",
-      "approvalHash": "188083505ef0db7f4e095706f1575b8b51962f3a0cfd004bfb79848064e981f2",
+      "approvalHash": "19c8a9557d312a0f9e0b0455071b75435c7799c78629db17c2066ecbe5485a8d",
       "costMinor": 0,
-      "createdAt": "2026-09-22T17:04:58.798Z"
+      "createdAt": "2026-09-22T18:55:35.153Z"
     },
     {
       "id": "attempt_ana_manual",
@@ -1912,9 +1930,9 @@
       "reason": "global_kill_switch",
       "providerReference": null,
       "dispatchKey": "dispatch-ana-01",
-      "approvalHash": "188083505ef0db7f4e095706f1575b8b51962f3a0cfd004bfb79848064e981f2",
+      "approvalHash": "19c8a9557d312a0f9e0b0455071b75435c7799c78629db17c2066ecbe5485a8d",
       "costMinor": 0,
-      "createdAt": "2026-09-22T17:04:58.798Z"
+      "createdAt": "2026-09-22T18:55:35.153Z"
     }
   ],
   "feedback": [
@@ -1927,7 +1945,7 @@
       "externalId": "FB-001",
       "originalText": "Synthetic customer reports a possible food safety concern; do not publish a reply automatically.",
       "evidenceExcerpt": "possible food safety concern",
-      "receivedAt": "2026-09-24T17:04:58.798Z",
+      "receivedAt": "2026-09-24T18:55:35.153Z",
       "customerRefHash": "409627fca209ddbe4be2445b5cc90f0ee1bc28531e143196a08165e59c1980b0",
       "memberId": "member_sami",
       "tags": [
@@ -1940,9 +1958,9 @@
       "status": "escalated",
       "classificationVersion": 1,
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-24T17:04:58.798Z",
-      "updatedAt": "2026-09-25T17:04:58.798Z",
-      "originalTextRetentionUntil": "2026-10-26T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z",
+      "updatedAt": "2026-09-25T18:55:35.153Z",
+      "originalTextRetentionUntil": "2026-10-26T18:55:35.153Z"
     },
     {
       "id": "feedback_routine_01",
@@ -1953,7 +1971,7 @@
       "externalId": "FB-002",
       "originalText": "Synthetic customer asks whether the study break offer is still available.",
       "evidenceExcerpt": "study break offer",
-      "receivedAt": "2026-09-23T17:04:58.798Z",
+      "receivedAt": "2026-09-23T18:55:35.153Z",
       "customerRefHash": "27eca9dbf58e8cfc4cd85afd26a36ffce984eca2f9787c3b5e69c0c479718bfe",
       "memberId": "member_noor",
       "tags": [
@@ -1964,9 +1982,9 @@
       "status": "in_progress",
       "classificationVersion": 1,
       "createdBy": "usr_demo_manager",
-      "createdAt": "2026-09-23T17:04:58.798Z",
-      "updatedAt": "2026-09-24T17:04:58.798Z",
-      "originalTextRetentionUntil": "2026-10-26T17:04:58.798Z"
+      "createdAt": "2026-09-23T18:55:35.153Z",
+      "updatedAt": "2026-09-24T18:55:35.153Z",
+      "originalTextRetentionUntil": "2026-10-26T18:55:35.153Z"
     }
   ],
   "feedbackClassifications": [
@@ -1982,7 +2000,7 @@
       ],
       "method": "rule",
       "actorUserId": null,
-      "createdAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z"
     },
     {
       "id": "classification_routine_01",
@@ -1996,7 +2014,7 @@
       ],
       "method": "human",
       "actorUserId": "usr_demo_manager",
-      "createdAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "supportCases": [
@@ -2006,12 +2024,12 @@
       "storeId": "sto_demo_01",
       "feedbackId": "feedback_urgent_01",
       "ownerUserId": "usr_demo_owner",
-      "slaDueAt": "2026-09-28T17:04:58.798Z",
+      "slaDueAt": "2026-09-28T18:55:35.153Z",
       "status": "open",
       "escalationLevel": "urgent",
       "resolutionEvidence": null,
-      "createdAt": "2026-09-24T17:04:58.798Z",
-      "updatedAt": "2026-09-25T17:04:58.798Z"
+      "createdAt": "2026-09-24T18:55:35.153Z",
+      "updatedAt": "2026-09-25T18:55:35.153Z"
     },
     {
       "id": "case_routine_01",
@@ -2019,12 +2037,12 @@
       "storeId": "sto_demo_01",
       "feedbackId": "feedback_routine_01",
       "ownerUserId": "usr_demo_manager",
-      "slaDueAt": "2026-09-27T17:04:58.798Z",
+      "slaDueAt": "2026-09-27T18:55:35.153Z",
       "status": "in_progress",
       "escalationLevel": "normal",
       "resolutionEvidence": null,
-      "createdAt": "2026-09-23T17:04:58.798Z",
-      "updatedAt": "2026-09-24T17:04:58.798Z"
+      "createdAt": "2026-09-23T18:55:35.153Z",
+      "updatedAt": "2026-09-24T18:55:35.153Z"
     }
   ],
   "replyRevisions": [
@@ -2041,8 +2059,8 @@
       "approvedBy": null,
       "approvedAt": null,
       "approvalHash": null,
-      "expiresAt": "2026-10-03T17:04:58.798Z",
-      "createdAt": "2026-09-25T17:04:58.798Z"
+      "expiresAt": "2026-10-03T18:55:35.153Z",
+      "createdAt": "2026-09-25T18:55:35.153Z"
     }
   ],
   "voiceTasks": [
@@ -2053,23 +2071,10 @@
       "ownerUserId": "usr_demo_owner",
       "kind": "safety_escalation",
       "status": "open",
-      "dueAt": "2026-09-28T17:04:58.798Z",
+      "dueAt": "2026-09-28T18:55:35.153Z",
       "evidence": null,
-      "createdAt": "2026-09-24T17:04:58.798Z",
+      "createdAt": "2026-09-24T18:55:35.153Z",
       "completedAt": null
-    },
-    {
-      "id": "voice_task_routine",
-      "tenantId": "ten_demo_01",
-      "caseId": "case_routine_01",
-      "ownerUserId": "usr_demo_manager",
-      "kind": "manual_reply",
-      "status": "open",
-      "dueAt": "2026-09-27T17:04:58.798Z",
-      "evidence": null,
-      "createdAt": "2026-09-25T17:04:58.798Z",
-      "completedAt": null,
-      "replyRevisionId": "reply_routine_01"
     }
   ],
   "connectorStates": [
@@ -2087,8 +2092,8 @@
         "sendTemplate": false
       },
       "reason": "synthetic fixture; credentials and approved templates absent",
-      "checkedAt": "2026-09-26T17:04:58.798Z",
-      "updatedAt": "2026-09-26T17:04:58.798Z"
+      "checkedAt": "2026-09-26T18:55:35.153Z",
+      "updatedAt": "2026-09-26T18:55:35.153Z"
     }
   ],
   "deliveryIntents": [],
@@ -2107,14 +2112,14 @@
           "value": 64000,
           "numerator": null,
           "denominator": null,
-          "asOf": "2026-09-26T17:04:58.798Z",
-          "completeThrough": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
+          "completeThrough": "2026-09-26T18:55:35.153Z",
           "quality": "verified",
           "sourceCoverage": [
             {
               "storeId": "sto_demo_01",
               "source": "pos_demo",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "status": "complete"
             }
           ],
@@ -2148,21 +2153,21 @@
               "member_sami"
             ]
           },
-          "id": "metric_305937f80ce790a93cd5c503"
+          "id": "metric_df9999ecd4b866d9ca7d1445"
         },
         {
           "metricKey": "qualified_order_count",
           "value": 4,
           "numerator": null,
           "denominator": null,
-          "asOf": "2026-09-26T17:04:58.798Z",
-          "completeThrough": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
+          "completeThrough": "2026-09-26T18:55:35.153Z",
           "quality": "verified",
           "sourceCoverage": [
             {
               "storeId": "sto_demo_01",
               "source": "pos_demo",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "status": "complete"
             }
           ],
@@ -2196,21 +2201,21 @@
               "member_sami"
             ]
           },
-          "id": "metric_a7e4a42cc9e12edc67682485"
+          "id": "metric_b73094e9e61ca56e83507f82"
         },
         {
           "metricKey": "average_order_value_minor",
           "value": 16000,
           "numerator": 64000,
           "denominator": 4,
-          "asOf": "2026-09-26T17:04:58.798Z",
-          "completeThrough": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
+          "completeThrough": "2026-09-26T18:55:35.153Z",
           "quality": "verified",
           "sourceCoverage": [
             {
               "storeId": "sto_demo_01",
               "source": "pos_demo",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "status": "complete"
             }
           ],
@@ -2244,21 +2249,21 @@
               "member_sami"
             ]
           },
-          "id": "metric_1481ea1052ae978408e52e1b"
+          "id": "metric_b2247e1795c2b2397c46d929"
         },
         {
           "metricKey": "identity_coverage",
           "value": 0.75,
           "numerator": 3,
           "denominator": 4,
-          "asOf": "2026-09-26T17:04:58.798Z",
-          "completeThrough": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
+          "completeThrough": "2026-09-26T18:55:35.153Z",
           "quality": "verified",
           "sourceCoverage": [
             {
               "storeId": "sto_demo_01",
               "source": "pos_demo",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "status": "complete"
             }
           ],
@@ -2292,21 +2297,21 @@
               "member_sami"
             ]
           },
-          "id": "metric_b6a95840168bce981825fb8c"
+          "id": "metric_d726605c64660b3f2a2ad573"
         },
         {
           "metricKey": "repeat_30d_rate",
           "value": 0.5,
           "numerator": 1,
           "denominator": 2,
-          "asOf": "2026-09-26T17:04:58.798Z",
-          "completeThrough": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
+          "completeThrough": "2026-09-26T18:55:35.153Z",
           "quality": "verified",
           "sourceCoverage": [
             {
               "storeId": "sto_demo_01",
               "source": "pos_demo",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "status": "complete"
             }
           ],
@@ -2340,21 +2345,21 @@
               "member_sami"
             ]
           },
-          "id": "metric_a304947cf5bc0efe8c2f8019"
+          "id": "metric_e6ba6422ab1763b70afe3eda"
         },
         {
           "metricKey": "conversion_7d_rate",
           "value": 0.3333333333333333,
           "numerator": 1,
           "denominator": 3,
-          "asOf": "2026-09-26T17:04:58.798Z",
-          "completeThrough": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
+          "completeThrough": "2026-09-26T18:55:35.153Z",
           "quality": "verified",
           "sourceCoverage": [
             {
               "storeId": "sto_demo_01",
               "source": "pos_demo",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "status": "complete"
             }
           ],
@@ -2388,20 +2393,20 @@
               "member_sami"
             ]
           },
-          "id": "metric_b42e40ba81a97fff0fd5c83e"
+          "id": "metric_7745d11854b76723f09210e2"
         }
       ],
-      "dataHash": "6935562ad76130f8b50d28dd27e3a62108459e6066ae6780a81b05dd6ab2bddc",
+      "dataHash": "867d442235bafbfd158018753b0c8abaf2faf0fce777c0fdd12812060bdffbee",
       "version": 1,
-      "asOf": "2026-09-26T17:04:58.798Z",
-      "completeThrough": "2026-09-26T17:04:58.798Z",
+      "asOf": "2026-09-26T18:55:35.153Z",
+      "completeThrough": "2026-09-26T18:55:35.153Z",
       "status": "verified",
       "observations": [
         {
           "text": "[测试] POS order and refund metrics are computed from the fixture snapshot.",
           "metricRefs": [
-            "metric_a7e4a42cc9e12edc67682485",
-            "metric_305937f80ce790a93cd5c503"
+            "metric_b73094e9e61ca56e83507f82",
+            "metric_df9999ecd4b866d9ca7d1445"
           ]
         }
       ],
@@ -2409,7 +2414,7 @@
         {
           "text": "Attribution should be reviewed by source before any campaign conclusion.",
           "evidenceRefs": [
-            "metric_b6a95840168bce981825fb8c"
+            "metric_d726605c64660b3f2a2ad573"
           ]
         }
       ],
@@ -2421,7 +2426,7 @@
             "no automatic external send"
           ],
           "evidenceRefs": [
-            "metric_a7e4a42cc9e12edc67682485"
+            "metric_b73094e9e61ca56e83507f82"
           ]
         }
       ],
@@ -2434,7 +2439,7 @@
       ],
       "restatedFrom": null,
       "createdBy": "usr_demo_owner",
-      "createdAt": "2026-09-25T17:04:58.798Z"
+      "createdAt": "2026-09-25T18:55:35.153Z"
     }
   ],
   "controlTasks": [
@@ -2446,7 +2451,7 @@
       ],
       "ownerUserId": "usr_demo_manager",
       "title": "[测试] Review synthetic outreach holdout and blocked send",
-      "dueAt": "2026-09-28T17:04:58.798Z",
+      "dueAt": "2026-09-28T18:55:35.153Z",
       "targetMetric": "qualified_order_count",
       "budgetMinor": 0,
       "guardrails": [
@@ -2454,10 +2459,10 @@
         "no external send in demo"
       ],
       "evidenceRefs": [
-        "metric_a7e4a42cc9e12edc67682485"
+        "metric_b73094e9e61ca56e83507f82"
       ],
       "status": "open",
-      "createdAt": "2026-09-25T17:04:58.798Z"
+      "createdAt": "2026-09-25T18:55:35.153Z"
     }
   ],
   "externalWritesKillSwitch": true,
@@ -2474,202 +2479,202 @@
         "synthetic": true,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:58.798Z"
+      "createdAt": "2026-09-26T18:55:35.153Z"
     },
     {
-      "id": "10ca02b1-32ff-44d5-88dd-db01440204e0",
+      "id": "bcc0e5f6-a664-4897-9830-77dfec370cb6",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.created",
       "resourceType": "control_run",
-      "resourceId": "e111ba53-4b06-4844-84ef-2210c8f3d543",
+      "resourceId": "c06d1abc-e7d0-4a69-91a4-b8185ad8ed9b",
       "metadata": {
         "version": 1,
         "node": null,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:58.798Z"
+      "createdAt": "2026-09-26T18:55:35.153Z"
     },
     {
-      "id": "80df40e2-38f9-4e24-94cf-c1764e08892b",
+      "id": "d11a8bbe-cfac-4bf1-8f49-dd93af808810",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "e111ba53-4b06-4844-84ef-2210c8f3d543",
+      "resourceId": "c06d1abc-e7d0-4a69-91a4-b8185ad8ed9b",
       "metadata": {
         "version": 2,
         "node": 0,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:59.798Z"
+      "createdAt": "2026-09-26T18:55:36.153Z"
     },
     {
-      "id": "ada6d50c-c169-4626-99d4-6dcf70379e6a",
+      "id": "4a5c5658-cfb8-45b8-b7cf-4494c4047c34",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "e111ba53-4b06-4844-84ef-2210c8f3d543",
+      "resourceId": "c06d1abc-e7d0-4a69-91a4-b8185ad8ed9b",
       "metadata": {
         "version": 3,
         "node": 1,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:05:00.798Z"
+      "createdAt": "2026-09-26T18:55:37.153Z"
     },
     {
-      "id": "92213048-6d91-479a-be49-570e04a14bce",
+      "id": "1135b443-1fb2-4c0f-8f65-549c8283b3bf",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "e111ba53-4b06-4844-84ef-2210c8f3d543",
+      "resourceId": "c06d1abc-e7d0-4a69-91a4-b8185ad8ed9b",
       "metadata": {
         "version": 4,
         "node": 2,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:05:01.798Z"
+      "createdAt": "2026-09-26T18:55:38.153Z"
     },
     {
-      "id": "1e9cd506-0d0f-4ddd-bbba-ad312d144e37",
+      "id": "8eae58ca-16af-4ba1-8230-2c08f48f5d2f",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.created",
       "resourceType": "control_run",
-      "resourceId": "d464da13-137b-4f7d-b7b6-dd569b5382f3",
+      "resourceId": "6b7cec79-5220-4735-8bd1-5b95ffd0930c",
       "metadata": {
         "version": 1,
         "node": null,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:58.798Z"
+      "createdAt": "2026-09-26T18:55:35.153Z"
     },
     {
-      "id": "f2ec6333-f7bb-4a9a-9479-c3d76c40e38e",
+      "id": "18a32d6d-b56a-4fde-b02a-de367f55f6eb",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "d464da13-137b-4f7d-b7b6-dd569b5382f3",
+      "resourceId": "6b7cec79-5220-4735-8bd1-5b95ffd0930c",
       "metadata": {
         "version": 2,
         "node": 0,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:59.798Z"
+      "createdAt": "2026-09-26T18:55:36.153Z"
     },
     {
-      "id": "8d1914a6-beae-4c8e-869d-cbc4c6594096",
+      "id": "721cfb70-6ee8-4ca2-8e0d-474d5edec182",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "d464da13-137b-4f7d-b7b6-dd569b5382f3",
+      "resourceId": "6b7cec79-5220-4735-8bd1-5b95ffd0930c",
       "metadata": {
         "version": 3,
         "node": 1,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:05:00.798Z"
+      "createdAt": "2026-09-26T18:55:37.153Z"
     },
     {
-      "id": "388a4ed2-9b14-4c07-8940-5fa2bb27db6a",
+      "id": "e1598cd6-24b0-46d8-9916-7d2a1e793cc7",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.created",
       "resourceType": "control_run",
-      "resourceId": "ec2d6b0c-51de-4792-b985-bca506cc1ef4",
+      "resourceId": "63dba095-772a-431c-bb2d-dbddde174930",
       "metadata": {
         "version": 1,
         "node": null,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:58.798Z"
+      "createdAt": "2026-09-26T18:55:35.153Z"
     },
     {
-      "id": "602b7493-10c4-45fd-b1e9-d0f632f037b4",
+      "id": "e13794ab-5f77-459f-b98c-9662d2646d05",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "ec2d6b0c-51de-4792-b985-bca506cc1ef4",
+      "resourceId": "63dba095-772a-431c-bb2d-dbddde174930",
       "metadata": {
         "version": 2,
         "node": 0,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:59.798Z"
+      "createdAt": "2026-09-26T18:55:36.153Z"
     },
     {
-      "id": "71b429f8-3803-4d97-8cad-ef16a16bb80c",
+      "id": "db475463-89fa-4371-b9c1-1ce2b8e667dc",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "ec2d6b0c-51de-4792-b985-bca506cc1ef4",
+      "resourceId": "63dba095-772a-431c-bb2d-dbddde174930",
       "metadata": {
         "version": 3,
         "node": 1,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:05:00.798Z"
+      "createdAt": "2026-09-26T18:55:37.153Z"
     },
     {
-      "id": "5eb69158-9eda-48b6-8f86-cb63bd96e268",
+      "id": "80f982c1-6b9b-40bb-a8cc-df2874731113",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.created",
       "resourceType": "control_run",
-      "resourceId": "4cd2add2-c655-4e1f-8539-fcefd35c5442",
+      "resourceId": "a453010f-b8ed-4920-ba8c-6436b9964d9b",
       "metadata": {
         "version": 1,
         "node": null,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:58.798Z"
+      "createdAt": "2026-09-26T18:55:35.153Z"
     },
     {
-      "id": "e13762e1-6e73-4bf2-94f7-ec4394f6263e",
+      "id": "571f7c3e-965b-43fa-bbb5-7ff851c00aa1",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "4cd2add2-c655-4e1f-8539-fcefd35c5442",
+      "resourceId": "a453010f-b8ed-4920-ba8c-6436b9964d9b",
       "metadata": {
         "version": 2,
         "node": 0,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:04:59.798Z"
+      "createdAt": "2026-09-26T18:55:36.153Z"
     },
     {
-      "id": "eb2b8a1c-8677-45a3-8346-4347615a8978",
+      "id": "1d550585-1485-40e9-8365-d26879f59c73",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "actorUserId": "usr_demo_owner",
       "action": "control_run.node_completed",
       "resourceType": "control_run",
-      "resourceId": "4cd2add2-c655-4e1f-8539-fcefd35c5442",
+      "resourceId": "a453010f-b8ed-4920-ba8c-6436b9964d9b",
       "metadata": {
         "version": 3,
         "node": 1,
         "external_writes": false
       },
-      "createdAt": "2026-09-26T17:05:00.798Z"
+      "createdAt": "2026-09-26T18:55:37.153Z"
     }
   ],
   "jobs": [],
@@ -2679,7 +2684,7 @@
   "controlRuns": [
     {
       "schemaVersion": 1,
-      "id": "e111ba53-4b06-4844-84ef-2210c8f3d543",
+      "id": "c06d1abc-e7d0-4a69-91a4-b8185ad8ed9b",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "createdBy": "usr_demo_owner",
@@ -2689,10 +2694,10 @@
       "prompt": "[测试] 生成门店增长检查：只读指标、品牌事实和 CRM 风险。",
       "status": "completed",
       "version": 4,
-      "createdAt": "2026-09-26T17:04:58.798Z",
-      "updatedAt": "2026-09-26T17:05:01.798Z",
-      "asOf": "2026-09-26T17:04:58.798Z",
-      "deadlineAt": "2026-09-26T17:07:58.798Z",
+      "createdAt": "2026-09-26T18:55:35.153Z",
+      "updatedAt": "2026-09-26T18:55:38.153Z",
+      "asOf": "2026-09-26T18:55:35.153Z",
+      "deadlineAt": "2026-09-26T18:58:35.153Z",
       "execution": "background",
       "inputSnapshot": [
         {
@@ -2709,7 +2714,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -2764,7 +2769,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -2776,14 +2781,14 @@
               "value": 4,
               "numerator": null,
               "denominator": null,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -2817,21 +2822,21 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_a7e4a42cc9e12edc67682485"
+              "id": "metric_b73094e9e61ca56e83507f82"
             },
             {
               "metricKey": "net_revenue_minor",
               "value": 64000,
               "numerator": null,
               "denominator": null,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -2865,21 +2870,21 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_305937f80ce790a93cd5c503"
+              "id": "metric_df9999ecd4b866d9ca7d1445"
             },
             {
               "metricKey": "identity_coverage",
               "value": 0.75,
               "numerator": 3,
               "denominator": 4,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -2913,7 +2918,7 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_b6a95840168bce981825fb8c"
+              "id": "metric_d726605c64660b3f2a2ad573"
             }
           ],
           "records": [],
@@ -2944,7 +2949,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -2956,14 +2961,14 @@
               "value": 4,
               "numerator": null,
               "denominator": null,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -2997,21 +3002,21 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_a7e4a42cc9e12edc67682485"
+              "id": "metric_b73094e9e61ca56e83507f82"
             },
             {
               "metricKey": "net_revenue_minor",
               "value": 64000,
               "numerator": null,
               "denominator": null,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -3045,21 +3050,21 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_305937f80ce790a93cd5c503"
+              "id": "metric_df9999ecd4b866d9ca7d1445"
             },
             {
               "metricKey": "identity_coverage",
               "value": 0.75,
               "numerator": 3,
               "denominator": 4,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -3093,7 +3098,7 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_b6a95840168bce981825fb8c"
+              "id": "metric_d726605c64660b3f2a2ad573"
             }
           ],
           "records": [
@@ -3199,19 +3204,19 @@
               {
                 "text": "qualified_order_count=4",
                 "sourceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485"
+                  "metric_b73094e9e61ca56e83507f82"
                 ]
               },
               {
                 "text": "net_revenue_minor=64000",
                 "sourceRefs": [
-                  "metric_305937f80ce790a93cd5c503"
+                  "metric_df9999ecd4b866d9ca7d1445"
                 ]
               },
               {
                 "text": "identity_coverage=0.75",
                 "sourceRefs": [
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -3219,9 +3224,9 @@
               {
                 "text": "指标变化需要按来源和时间窗进一步验证，当前不推断因果。",
                 "evidenceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485",
-                  "metric_305937f80ce790a93cd5c503",
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_b73094e9e61ca56e83507f82",
+                  "metric_df9999ecd4b866d9ca7d1445",
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -3229,7 +3234,7 @@
               {
                 "title": "复核白名单指标并记录下一步实验",
                 "ownerUserId": "usr_demo_owner",
-                "dueAt": "2026-09-29T17:04:58.798Z",
+                "dueAt": "2026-09-29T18:55:35.153Z",
                 "budgetMinor": 0,
                 "guardrails": [
                   "先确认 complete_through",
@@ -3237,9 +3242,9 @@
                   "未经审批不发送"
                 ],
                 "evidenceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485",
-                  "metric_305937f80ce790a93cd5c503",
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_b73094e9e61ca56e83507f82",
+                  "metric_df9999ecd4b866d9ca7d1445",
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -3249,14 +3254,14 @@
                 "value": 4,
                 "numerator": null,
                 "denominator": null,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -3290,21 +3295,21 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_a7e4a42cc9e12edc67682485"
+                "id": "metric_b73094e9e61ca56e83507f82"
               },
               {
                 "metricKey": "net_revenue_minor",
                 "value": 64000,
                 "numerator": null,
                 "denominator": null,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -3338,21 +3343,21 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_305937f80ce790a93cd5c503"
+                "id": "metric_df9999ecd4b866d9ca7d1445"
               },
               {
                 "metricKey": "identity_coverage",
                 "value": 0.75,
                 "numerator": 3,
                 "denominator": 4,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -3386,7 +3391,7 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_b6a95840168bce981825fb8c"
+                "id": "metric_d726605c64660b3f2a2ad573"
               }
             ],
             "limits": {
@@ -3411,19 +3416,19 @@
               {
                 "text": "qualified_order_count=4",
                 "sourceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485"
+                  "metric_b73094e9e61ca56e83507f82"
                 ]
               },
               {
                 "text": "net_revenue_minor=64000",
                 "sourceRefs": [
-                  "metric_305937f80ce790a93cd5c503"
+                  "metric_df9999ecd4b866d9ca7d1445"
                 ]
               },
               {
                 "text": "identity_coverage=0.75",
                 "sourceRefs": [
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               },
               {
@@ -3437,9 +3442,9 @@
               {
                 "text": "指标变化需要按来源和时间窗进一步验证，当前不推断因果。",
                 "evidenceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485",
-                  "metric_305937f80ce790a93cd5c503",
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_b73094e9e61ca56e83507f82",
+                  "metric_df9999ecd4b866d9ca7d1445",
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -3447,7 +3452,7 @@
               {
                 "title": "复核白名单指标并记录下一步实验",
                 "ownerUserId": "usr_demo_owner",
-                "dueAt": "2026-09-29T17:04:58.798Z",
+                "dueAt": "2026-09-29T18:55:35.153Z",
                 "budgetMinor": 0,
                 "guardrails": [
                   "先确认 complete_through",
@@ -3455,9 +3460,9 @@
                   "未经审批不发送"
                 ],
                 "evidenceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485",
-                  "metric_305937f80ce790a93cd5c503",
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_b73094e9e61ca56e83507f82",
+                  "metric_df9999ecd4b866d9ca7d1445",
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -3467,14 +3472,14 @@
                 "value": 4,
                 "numerator": null,
                 "denominator": null,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -3508,21 +3513,21 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_a7e4a42cc9e12edc67682485"
+                "id": "metric_b73094e9e61ca56e83507f82"
               },
               {
                 "metricKey": "net_revenue_minor",
                 "value": 64000,
                 "numerator": null,
                 "denominator": null,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -3556,21 +3561,21 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_305937f80ce790a93cd5c503"
+                "id": "metric_df9999ecd4b866d9ca7d1445"
               },
               {
                 "metricKey": "identity_coverage",
                 "value": 0.75,
                 "numerator": 3,
                 "denominator": 4,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -3604,7 +3609,7 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_b6a95840168bce981825fb8c"
+                "id": "metric_d726605c64660b3f2a2ad573"
               }
             ],
             "limits": {
@@ -3629,31 +3634,31 @@
       ],
       "events": [
         {
-          "at": "2026-09-26T17:04:58.798Z",
+          "at": "2026-09-26T18:55:35.153Z",
           "type": "created",
           "node": null
         },
         {
-          "at": "2026-09-26T17:04:59.798Z",
+          "at": "2026-09-26T18:55:36.153Z",
           "type": "node_completed",
           "node": 0
         },
         {
-          "at": "2026-09-26T17:05:00.798Z",
+          "at": "2026-09-26T18:55:37.153Z",
           "type": "node_completed",
           "node": 1
         },
         {
-          "at": "2026-09-26T17:05:01.798Z",
+          "at": "2026-09-26T18:55:38.153Z",
           "type": "node_completed",
           "node": 2
         }
       ],
-      "inputHash": "7b2adf2c7ff1bd6fa4db77f87fe971abe9c4429934f9cf389ce941069de906d7"
+      "inputHash": "467429220143d33c5c9a3af2e23fbec5188a636521a7f376a44be99a2133d996"
     },
     {
       "schemaVersion": 1,
-      "id": "d464da13-137b-4f7d-b7b6-dd569b5382f3",
+      "id": "6b7cec79-5220-4735-8bd1-5b95ffd0930c",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "createdBy": "usr_demo_owner",
@@ -3663,10 +3668,10 @@
       "prompt": "[测试] 检查内容审批链和本地复核缺口。",
       "status": "completed",
       "version": 3,
-      "createdAt": "2026-09-26T17:04:58.798Z",
-      "updatedAt": "2026-09-26T17:05:00.798Z",
-      "asOf": "2026-09-26T17:04:58.798Z",
-      "deadlineAt": "2026-09-26T17:07:58.798Z",
+      "createdAt": "2026-09-26T18:55:35.153Z",
+      "updatedAt": "2026-09-26T18:55:37.153Z",
+      "asOf": "2026-09-26T18:55:35.153Z",
+      "deadlineAt": "2026-09-26T18:58:35.153Z",
       "execution": "background",
       "inputSnapshot": [
         {
@@ -3683,7 +3688,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -3728,7 +3733,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -3888,26 +3893,26 @@
       ],
       "events": [
         {
-          "at": "2026-09-26T17:04:58.798Z",
+          "at": "2026-09-26T18:55:35.153Z",
           "type": "created",
           "node": null
         },
         {
-          "at": "2026-09-26T17:04:59.798Z",
+          "at": "2026-09-26T18:55:36.153Z",
           "type": "node_completed",
           "node": 0
         },
         {
-          "at": "2026-09-26T17:05:00.798Z",
+          "at": "2026-09-26T18:55:37.153Z",
           "type": "node_completed",
           "node": 1
         }
       ],
-      "inputHash": "bedd4a75019d226937348ac12a186bf33684f6489b31edb503996b44e11cef0a"
+      "inputHash": "10a4748ad7fb934aee065dde3f8e2862b3106db4f86fa706943d6654a26218ce"
     },
     {
       "schemaVersion": 1,
-      "id": "ec2d6b0c-51de-4792-b985-bca506cc1ef4",
+      "id": "63dba095-772a-431c-bb2d-dbddde174930",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "createdBy": "usr_demo_owner",
@@ -3917,10 +3922,10 @@
       "prompt": "[测试] 检查校园伙伴与活动容量信息。",
       "status": "completed",
       "version": 3,
-      "createdAt": "2026-09-26T17:04:58.798Z",
-      "updatedAt": "2026-09-26T17:05:00.798Z",
-      "asOf": "2026-09-26T17:04:58.798Z",
-      "deadlineAt": "2026-09-26T17:07:58.798Z",
+      "createdAt": "2026-09-26T18:55:35.153Z",
+      "updatedAt": "2026-09-26T18:55:37.153Z",
+      "asOf": "2026-09-26T18:55:35.153Z",
+      "deadlineAt": "2026-09-26T18:58:35.153Z",
       "execution": "background",
       "inputSnapshot": [
         {
@@ -3937,7 +3942,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -3970,7 +3975,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -3981,7 +3986,7 @@
             {
               "id": "event_study_break_01",
               "kind": "event",
-              "summary": "[测试] Study Break Tea Circle; confirmed_time=2026-09-25T17:04:58.798Z; capacity=30"
+              "summary": "[测试] Study Break Tea Circle; confirmed_time=2026-09-25T18:55:35.153Z; capacity=30"
             }
           ],
           "needsInput": [
@@ -4049,7 +4054,7 @@
             "status": "needs_input",
             "observations": [
               {
-                "text": "[测试] Study Break Tea Circle; confirmed_time=2026-09-25T17:04:58.798Z; capacity=30",
+                "text": "[测试] Study Break Tea Circle; confirmed_time=2026-09-25T18:55:35.153Z; capacity=30",
                 "sourceRefs": [
                   "event_study_break_01"
                 ]
@@ -4073,7 +4078,7 @@
               {
                 "id": "event_study_break_01",
                 "kind": "event",
-                "summary": "[测试] Study Break Tea Circle; confirmed_time=2026-09-25T17:04:58.798Z; capacity=30"
+                "summary": "[测试] Study Break Tea Circle; confirmed_time=2026-09-25T18:55:35.153Z; capacity=30"
               }
             ],
             "needsInput": [
@@ -4086,26 +4091,26 @@
       ],
       "events": [
         {
-          "at": "2026-09-26T17:04:58.798Z",
+          "at": "2026-09-26T18:55:35.153Z",
           "type": "created",
           "node": null
         },
         {
-          "at": "2026-09-26T17:04:59.798Z",
+          "at": "2026-09-26T18:55:36.153Z",
           "type": "node_completed",
           "node": 0
         },
         {
-          "at": "2026-09-26T17:05:00.798Z",
+          "at": "2026-09-26T18:55:37.153Z",
           "type": "node_completed",
           "node": 1
         }
       ],
-      "inputHash": "a3e419fc0276bd36011a6c9f06ea857926c4d72c3730a1d3a9011d05a72a6eb7"
+      "inputHash": "b6e6bf1542c7107d5f2f86acdd4be79c8419496b98569f512afda8e7f06363f2"
     },
     {
       "schemaVersion": 1,
-      "id": "4cd2add2-c655-4e1f-8539-fcefd35c5442",
+      "id": "a453010f-b8ed-4920-ba8c-6436b9964d9b",
       "tenantId": "ten_demo_01",
       "storeId": "sto_demo_01",
       "createdBy": "usr_demo_owner",
@@ -4115,10 +4120,10 @@
       "prompt": "[测试] 检查顾客声音和待人工处理的工单。",
       "status": "completed",
       "version": 3,
-      "createdAt": "2026-09-26T17:04:58.798Z",
-      "updatedAt": "2026-09-26T17:05:00.798Z",
-      "asOf": "2026-09-26T17:04:58.798Z",
-      "deadlineAt": "2026-09-26T17:07:58.798Z",
+      "createdAt": "2026-09-26T18:55:35.153Z",
+      "updatedAt": "2026-09-26T18:55:37.153Z",
+      "asOf": "2026-09-26T18:55:35.153Z",
+      "deadlineAt": "2026-09-26T18:58:35.153Z",
       "execution": "background",
       "inputSnapshot": [
         {
@@ -4135,7 +4140,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -4146,12 +4151,12 @@
             {
               "id": "case_urgent_01",
               "kind": "support_case",
-              "summary": "urgent; status=open; sla=2026-09-28T17:04:58.798Z"
+              "summary": "urgent; status=open; sla=2026-09-28T18:55:35.153Z"
             },
             {
               "id": "case_routine_01",
               "kind": "support_case",
-              "summary": "normal; status=in_progress; sla=2026-09-27T17:04:58.798Z"
+              "summary": "normal; status=in_progress; sla=2026-09-27T18:55:35.153Z"
             }
           ],
           "needsInput": [
@@ -4182,7 +4187,7 @@
             "maxRetries": 0,
             "deadlineSeconds": 180
           },
-          "asOf": "2026-09-26T17:04:58.798Z",
+          "asOf": "2026-09-26T18:55:35.153Z",
           "ownerUserId": "usr_demo_owner",
           "tenantId": "ten_demo_01",
           "storeIds": [
@@ -4194,14 +4199,14 @@
               "value": 4,
               "numerator": null,
               "denominator": null,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -4235,21 +4240,21 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_a7e4a42cc9e12edc67682485"
+              "id": "metric_b73094e9e61ca56e83507f82"
             },
             {
               "metricKey": "net_revenue_minor",
               "value": 64000,
               "numerator": null,
               "denominator": null,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -4283,21 +4288,21 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_305937f80ce790a93cd5c503"
+              "id": "metric_df9999ecd4b866d9ca7d1445"
             },
             {
               "metricKey": "identity_coverage",
               "value": 0.75,
               "numerator": 3,
               "denominator": 4,
-              "asOf": "2026-09-26T17:04:58.798Z",
-              "completeThrough": "2026-09-26T17:04:58.798Z",
+              "asOf": "2026-09-26T18:55:35.153Z",
+              "completeThrough": "2026-09-26T18:55:35.153Z",
               "quality": "verified",
               "sourceCoverage": [
                 {
                   "storeId": "sto_demo_01",
                   "source": "pos_demo",
-                  "completeThrough": "2026-09-26T17:04:58.798Z",
+                  "completeThrough": "2026-09-26T18:55:35.153Z",
                   "status": "complete"
                 }
               ],
@@ -4331,7 +4336,7 @@
                   "member_sami"
                 ]
               },
-              "id": "metric_b6a95840168bce981825fb8c"
+              "id": "metric_d726605c64660b3f2a2ad573"
             }
           ],
           "records": [],
@@ -4354,13 +4359,13 @@
             "status": "needs_input",
             "observations": [
               {
-                "text": "urgent; status=open; sla=2026-09-28T17:04:58.798Z",
+                "text": "urgent; status=open; sla=2026-09-28T18:55:35.153Z",
                 "sourceRefs": [
                   "case_urgent_01"
                 ]
               },
               {
-                "text": "normal; status=in_progress; sla=2026-09-27T17:04:58.798Z",
+                "text": "normal; status=in_progress; sla=2026-09-27T18:55:35.153Z",
                 "sourceRefs": [
                   "case_routine_01"
                 ]
@@ -4384,12 +4389,12 @@
               {
                 "id": "case_urgent_01",
                 "kind": "support_case",
-                "summary": "urgent; status=open; sla=2026-09-28T17:04:58.798Z"
+                "summary": "urgent; status=open; sla=2026-09-28T18:55:35.153Z"
               },
               {
                 "id": "case_routine_01",
                 "kind": "support_case",
-                "summary": "normal; status=in_progress; sla=2026-09-27T17:04:58.798Z"
+                "summary": "normal; status=in_progress; sla=2026-09-27T18:55:35.153Z"
               }
             ],
             "needsInput": [
@@ -4409,19 +4414,19 @@
               {
                 "text": "qualified_order_count=4",
                 "sourceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485"
+                  "metric_b73094e9e61ca56e83507f82"
                 ]
               },
               {
                 "text": "net_revenue_minor=64000",
                 "sourceRefs": [
-                  "metric_305937f80ce790a93cd5c503"
+                  "metric_df9999ecd4b866d9ca7d1445"
                 ]
               },
               {
                 "text": "identity_coverage=0.75",
                 "sourceRefs": [
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -4429,9 +4434,9 @@
               {
                 "text": "指标变化需要按来源和时间窗进一步验证，当前不推断因果。",
                 "evidenceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485",
-                  "metric_305937f80ce790a93cd5c503",
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_b73094e9e61ca56e83507f82",
+                  "metric_df9999ecd4b866d9ca7d1445",
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -4439,7 +4444,7 @@
               {
                 "title": "复核白名单指标并记录下一步实验",
                 "ownerUserId": "usr_demo_owner",
-                "dueAt": "2026-09-29T17:04:58.798Z",
+                "dueAt": "2026-09-29T18:55:35.153Z",
                 "budgetMinor": 0,
                 "guardrails": [
                   "先确认 complete_through",
@@ -4447,9 +4452,9 @@
                   "未经审批不发送"
                 ],
                 "evidenceRefs": [
-                  "metric_a7e4a42cc9e12edc67682485",
-                  "metric_305937f80ce790a93cd5c503",
-                  "metric_b6a95840168bce981825fb8c"
+                  "metric_b73094e9e61ca56e83507f82",
+                  "metric_df9999ecd4b866d9ca7d1445",
+                  "metric_d726605c64660b3f2a2ad573"
                 ]
               }
             ],
@@ -4459,14 +4464,14 @@
                 "value": 4,
                 "numerator": null,
                 "denominator": null,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -4500,21 +4505,21 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_a7e4a42cc9e12edc67682485"
+                "id": "metric_b73094e9e61ca56e83507f82"
               },
               {
                 "metricKey": "net_revenue_minor",
                 "value": 64000,
                 "numerator": null,
                 "denominator": null,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -4548,21 +4553,21 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_305937f80ce790a93cd5c503"
+                "id": "metric_df9999ecd4b866d9ca7d1445"
               },
               {
                 "metricKey": "identity_coverage",
                 "value": 0.75,
                 "numerator": 3,
                 "denominator": 4,
-                "asOf": "2026-09-26T17:04:58.798Z",
-                "completeThrough": "2026-09-26T17:04:58.798Z",
+                "asOf": "2026-09-26T18:55:35.153Z",
+                "completeThrough": "2026-09-26T18:55:35.153Z",
                 "quality": "verified",
                 "sourceCoverage": [
                   {
                     "storeId": "sto_demo_01",
                     "source": "pos_demo",
-                    "completeThrough": "2026-09-26T17:04:58.798Z",
+                    "completeThrough": "2026-09-26T18:55:35.153Z",
                     "status": "complete"
                   }
                 ],
@@ -4596,7 +4601,7 @@
                     "member_sami"
                   ]
                 },
-                "id": "metric_b6a95840168bce981825fb8c"
+                "id": "metric_d726605c64660b3f2a2ad573"
               }
             ],
             "limits": {
@@ -4613,22 +4618,22 @@
       ],
       "events": [
         {
-          "at": "2026-09-26T17:04:58.798Z",
+          "at": "2026-09-26T18:55:35.153Z",
           "type": "created",
           "node": null
         },
         {
-          "at": "2026-09-26T17:04:59.798Z",
+          "at": "2026-09-26T18:55:36.153Z",
           "type": "node_completed",
           "node": 0
         },
         {
-          "at": "2026-09-26T17:05:00.798Z",
+          "at": "2026-09-26T18:55:37.153Z",
           "type": "node_completed",
           "node": 1
         }
       ],
-      "inputHash": "22278ab476bac9f6348eb439f66be046012669a6b7e39b1e751df47f02bc3d1c"
+      "inputHash": "573b1207129ef918ad0cd1289ea89098173476a7b242cd42722b2e418cd3104b"
     }
   ]
 }

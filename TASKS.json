@@ -216,10 +216,10 @@
       "exec_plan": ".agent/plans/G08.md",
       "evidence_dir": "artifacts/G08",
       "blockers": [
-        "internal_not_implemented: persisted background control-run worker remains deterministic_offline; live provider is currently exposed through the authenticated synchronous /api/control/route only",
+        "internal_not_implemented: model cost accounting, live-provider evaluation and production database-backed worker remain incomplete",
         "external_blocked: no client metric source freshness agreement or real daily-report/UAT dataset supplied"
       ],
-      "checkpoint": "2026-09-25: opt-in CodeBuddy CLI agent_planner is wired into /api/control/route with frozen evidence and output validation; synthetic live evidence is in artifacts/G08/codebuddy-agent-runtime.json",
+      "checkpoint": "2026-09-27: opt-in CodeBuddy CLI agent_planner is wired into /api/control/route and persisted background control-runs; worker claims under lock, calls provider outside lock, commits with version/permission/deadline/output checks. Synthetic fake-provider regression covers the durable path.",
       "delivery_level": "DEMO_READY"
     },
     {
