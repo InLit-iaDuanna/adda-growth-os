@@ -37,6 +37,12 @@ npm run demo:ready
 
 `npm test` 编译并运行所有原有与新增 TS 测试，以及原有 MJS 证据校验测试。`npm run test:compiled` 直接验证附带编译产物，无需 tsx。保留原有分组测试脚本；它们在安装锁定依赖后可单独执行。
 
+## 完整合成测试数据
+
+运行 `npm run data:seed` 会生成一套隔离的完整 demo 仓储和可导入 CSV，覆盖品牌、产品、内容审核、来源链接、注册领券、POS/退款、校园活动、CRM、顾客声音和 Agent 报表。账号、测试 token、启动参数与限制见 [测试数据说明](artifacts/test-data/README.md)；数据只属于合成租户，不代表客户经营数据。
+
+`npm run test:data` 会校验报表是否能被领域指标服务重算、内容审批事实是否可执行、优惠券与 CRM 审批哈希是否匹配、CSV 是否可导入；加上 `--server=http://127.0.0.1:3111` 可额外检查三个演示账号和顾客来源入口。
+
 ## 可选的 CodeBuddy 实际 AI
 
 离线演示默认不调用模型。已登录 CodeBuddy CLI 的本机可以显式开启：

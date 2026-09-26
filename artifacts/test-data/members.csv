@@ -1,0 +1,6 @@
+tenant_id,store_id,id,registered_at,display_name,language,contact,is_synthetic
+ten_demo_01,sto_demo_01,m_ana_001,2026-08-07T17:04:58.798Z,Ana Synthetic,en,ana.synthetic@example.invalid,true
+ten_demo_01,sto_demo_01,m_rina_001,2026-07-18T17:04:58.798Z,Rina Synthetic,bn,rina.synthetic@example.invalid,true
+ten_demo_01,sto_demo_01,m_zara_001,2026-08-17T17:04:58.798Z,Zara Synthetic,en,zara.synthetic@example.invalid,true
+ten_demo_01,sto_demo_01,m_noor_001,2026-09-21T17:04:58.798Z,Noor Synthetic,bn,noor.synthetic@example.invalid,true
+ten_demo_01,sto_demo_01,m_sami_001,2026-09-24T17:04:58.798Z,Sami Synthetic,en,sami.synthetic@example.invalid,true

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "login": [
+    {
+      "role": "OWNER",
+      "email": "owner@demo.adda.local",
+      "password": "demo-only-password"
+    },
+    {
+      "role": "GROWTH_MANAGER",
+      "email": "manager@demo.adda.local",
+      "password": "demo-only-password"
+    },
+    {
+      "role": "LOCAL_REVIEWER",
+      "email": "reviewer@demo.adda.local",
+      "password": "demo-only-password"
+    },
+    {
+      "role": "CASHIER",
+      "email": "cashier@demo.adda.local",
+      "password": "demo-only-password"
+    }
+  ],
+  "expected_metrics": {
+    "net_revenue_minor": 64000,
+    "qualified_order_count": 4,
+    "average_order_value_minor": 16000,
+    "identity_coverage": 0.75,
+    "repeat_30d_rate": 0.5,
+    "conversion_7d_rate": 0.3333333333333333
+  },
+  "content": {
+    "exportable_revision": "content_rev_approved",
+    "export_expected": "manual_ready",
+    "blocked_revision": "content_rev_draft",
+    "blocked_reason": "bn_local_review_required plus asset_rights_missing"
+  },
+  "public_member": {
+    "source_token_name": "campus",
+    "path_template": "/s/du-gate-demo/c/<source_token>",
+    "verification_code": "000000",
+    "coupon_token_names": [
+      "ana",
+      "rina",
+      "noor"
+    ]
+  },
+  "cashier": {
+    "pending_coupon": "coupon_noor_001",
+    "reserve_expected": "pending_pos_verification",
+    "unknown_order_match_expected": "pos_order_not_found",
+    "authoritative_order": "POS-1003"
+  },
+  "imports": {
+    "files": [
+      "members.csv",
+      "orders.csv",
+      "refunds.csv"
+    ],
+    "repeat_same_file_expected": "deduplicated"
+  },
+  "agent": {
+    "plans": [
+      "growth",
+      "content",
+      "campus",
+      "voice"
+    ],
+    "mode": "deterministic_offline",
+    "external_writes": false,
+    "actual_cost_minor": 0
+  }
+}

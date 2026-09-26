@@ -48,6 +48,8 @@ D040（2026-09-24 甲方素材）：SUIWU 随物作为母品牌，ADDA 作为子
 
 D041（2026-09-25 CodeBuddy CLI provider）：真实模型调用采用显式 `AI_PROVIDER=codebuddy_cli` 开关，默认仍为 `deterministic_offline`。CodeBuddy 每次以独立会话、单回合、无工具、超时和输出上限运行；内容写作与增长 Agent 使用不同角色提示词。服务端只把当前租户/门店的冻结批准事实和指标交给模型，并锁定来源、身份、预算、权限和孟语复核状态；JSON 或领域合同失败返回 `external_blocked`/`ai_output_invalid`，不回退成确定性假成功。真实冒烟只使用合成 demo 数据，证据保存在 `artifacts/G04/` 和 `artifacts/G08/`。持久化后台 control-run worker 仍保持离线确定性执行，待异步 provider bridge 单独验收。
 
+D042（2026-09-26 完整合成测试数据）：新增可重复的 `scripts/seed-complete-test-data.mjs` 与 `npm run data:seed`。生成器从干净 demo seed 构建完整 JSON 仓储，另写 members/orders/refunds CSV 与 manifest；所有记录使用合成租户、固定 demo 账号和明确的 bearer token，外部连接器 kill switch 保持开启。fixture 可以用于本地 UI、HTTP、POS、顾客和 Agent 流程检查，但不能作为客户数据、真实渠道验收或生产初始化。
+
 
 ## D2026-09-25 — Uploaded-source unified implementation
 

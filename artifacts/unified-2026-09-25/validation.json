@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "scope": "whole uploaded application / local file-dev integration",
-  "recorded_at": "2026-09-25T18:39:26.534Z",
+  "recorded_at": "2026-09-26T17:08:00.196Z",
   "toolchain": {
     "node": "v22.22.0",
     "npm": "10.9.4",
@@ -228,7 +228,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "0c8a5577284af407971a063be84b51e3172e4faa86413d845679407927ba7f7e"
+      "sha256": "c468a592f6b5fda16a3ba0a1b667f5feb03b2723b268a720be1b6a9371744276"
     },
     {
       "path": "packages/adapters/package.json",
@@ -407,6 +407,10 @@
       "sha256": "484036a7b7e53ef6d2650fc51ae46ebdfb1e0c14f58d0ec5ce21e781c342e5c2"
     },
     {
+      "path": "scripts/complete-demo.mjs",
+      "sha256": "d46aa7ba0e00266d44c09a8fd6507c2ac9a8cca3ac89da93f68cb0b25c7b414b"
+    },
+    {
       "path": "scripts/demo.mjs",
       "sha256": "ed8e3460d71693aef48eb06bc5a2f0e522576962115a4dccd65782bdcf758ec9"
     },
@@ -429,6 +433,10 @@
     {
       "path": "scripts/security-scan.mjs",
       "sha256": "e846e2d86d7fbdb6e74e8105bdcf3b458d23077b443d021eee437166e79426e3"
+    },
+    {
+      "path": "scripts/seed-complete-test-data.mjs",
+      "sha256": "5c509d3e6056af806da4820afbd7f0db70a07c8dd610637a254d04980a8aa90d"
     },
     {
       "path": "scripts/seed-demo.ts",
@@ -457,6 +465,10 @@
     {
       "path": "scripts/validation-evidence.mjs",
       "sha256": "57bc06306dc4265fa31bc294db11bee1ea0446b01cc4a83d405711a02c588678"
+    },
+    {
+      "path": "scripts/verify-complete-test-data.mjs",
+      "sha256": "2e03610d35aa2fc72f7998683f202d5aadaf7826ac797b8062051420cc17881c"
     },
     {
       "path": "scripts/verify-fixtures.mjs",
@@ -570,8 +582,8 @@
   "checks": [
     {
       "command": "npm run lint",
-      "started_at": "2026-09-25T18:39:00.003Z",
-      "finished_at": "2026-09-25T18:39:01.646Z",
+      "started_at": "2026-09-26T17:07:34.433Z",
+      "finished_at": "2026-09-26T17:07:36.088Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/lint.log",
@@ -579,8 +591,8 @@
     },
     {
       "command": "npm run typecheck",
-      "started_at": "2026-09-25T18:39:01.648Z",
-      "finished_at": "2026-09-25T18:39:03.289Z",
+      "started_at": "2026-09-26T17:07:36.089Z",
+      "finished_at": "2026-09-26T17:07:37.699Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/typecheck.log",
@@ -588,8 +600,8 @@
     },
     {
       "command": "npm run build",
-      "started_at": "2026-09-25T18:39:03.290Z",
-      "finished_at": "2026-09-25T18:39:05.219Z",
+      "started_at": "2026-09-26T17:07:37.699Z",
+      "finished_at": "2026-09-26T17:07:39.608Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/build.log",
@@ -597,12 +609,12 @@
     },
     {
       "command": "npm run test",
-      "started_at": "2026-09-25T18:39:05.220Z",
-      "finished_at": "2026-09-25T18:39:26.039Z",
+      "started_at": "2026-09-26T17:07:39.609Z",
+      "finished_at": "2026-09-26T17:07:59.721Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/test.log",
-      "log_sha256": "7d37e3113f374794935ca0b92060141fe4efc7cd84c49e4a000193e78b217d9e",
+      "log_sha256": "02535e12ed530e6023e71e3cd5fe492f4524b0750e79ffc55b04fc0eb423df1e",
       "tests": {
         "total": 147,
         "passed": 147,
@@ -613,8 +625,8 @@
     },
     {
       "command": "npm run test:ai",
-      "started_at": "2026-09-25T18:39:26.039Z",
-      "finished_at": "2026-09-25T18:39:26.202Z",
+      "started_at": "2026-09-26T17:07:59.721Z",
+      "finished_at": "2026-09-26T17:07:59.863Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/test-ai.log",
@@ -622,8 +634,8 @@
     },
     {
       "command": "npm run fixtures:verify",
-      "started_at": "2026-09-25T18:39:26.202Z",
-      "finished_at": "2026-09-25T18:39:26.372Z",
+      "started_at": "2026-09-26T17:07:59.863Z",
+      "finished_at": "2026-09-26T17:08:00.028Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/fixtures-verify.log",
@@ -631,12 +643,12 @@
     },
     {
       "command": "npm run security:scan",
-      "started_at": "2026-09-25T18:39:26.372Z",
-      "finished_at": "2026-09-25T18:39:26.529Z",
+      "started_at": "2026-09-26T17:08:00.028Z",
+      "finished_at": "2026-09-26T17:08:00.190Z",
       "exit_code": 0,
       "passed": true,
       "log": "artifacts/unified-2026-09-25/gates/security-scan.log",
-      "log_sha256": "5073eda3d10c0ef8eddc5ca0859dffbba01a65a01338aaaf8bd9eba4c0ef7d9f"
+      "log_sha256": "d77c3487384ddb5d429244ef205520b36fcecfad10ccbfd4b830abcf5645e334"
     }
   ],
   "limits": {

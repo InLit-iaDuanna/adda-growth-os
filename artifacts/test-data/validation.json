@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-09-26T17:08:30.473Z",
+  "fixture": "/Users/isduanna/Documents/agent_adda/artifacts/test-data/complete-demo.json",
+  "synthetic_only": true,
+  "server": "http://127.0.0.1:3111",
+  "checks": [
+    "single synthetic tenant and store",
+    "real calculated metric snapshot",
+    "content approval is executable and draft is blocked",
+    "coupon and outreach hashes match runtime contracts",
+    "CSV rows are parseable and hashes are bound to the snapshot",
+    "durable agent runs are completed read-only runs",
+    "no inherited environment secret is serialized",
+    "three role logins and HTTP surfaces"
+  ],
+  "notes": [
+    "Metrics are computed from the fixture snapshot.",
+    "No external connector or publication write was attempted."
+  ]
+}

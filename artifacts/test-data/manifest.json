@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-26T17:04:58.798Z",
+  "synthetic_only": true,
+  "tenant_id": "ten_demo_01",
+  "store_id": "sto_demo_01",
+  "app_start": {
+    "APP_MODE": "demo",
+    "ADDA_DATA_FILE": "./data/complete-demo.json",
+    "SESSION_SECRET": "local-complete-test-secret-change-me",
+    "AI_PROVIDER": "deterministic_offline",
+    "LIVE_EXTERNAL_WRITES": "false"
+  },
+  "accounts": [
+    {
+      "role": "OWNER",
+      "email": "owner@demo.adda.local",
+      "password": "demo-only-password"
+    },
+    {
+      "role": "GROWTH_MANAGER",
+      "email": "manager@demo.adda.local",
+      "password": "demo-only-password"
+    },
+    {
+      "role": "LOCAL_REVIEWER",
+      "email": "reviewer@demo.adda.local",
+      "password": "demo-only-password"
+    },
+    {
+      "role": "CASHIER",
+      "email": "cashier@demo.adda.local",
+      "password": "demo-only-password"
+    }
+  ],
+  "raw_tokens": {
+    "source_links": {
+      "instagram": "src-instagram-adda-synthetic-2026",
+      "campus": "src-campus-adda-synthetic-2026",
+      "staff": "src-staff-adda-synthetic-2026"
+    },
+    "member_tokens": {
+      "ana": "member-token-ana-synthetic",
+      "rina": "member-token-rina-synthetic",
+      "zara": "member-token-zara-synthetic",
+      "noor": "member-token-noor-synthetic",
+      "sami": "member-token-sami-synthetic"
+    },
+    "coupon_tokens": {
+      "ana": "fcvnuv62PfkDtNvvoausZBwlmQcquon-F8urxB8Rb1E",
+      "rina": "xmeps9TwkgVF5tK5PITexEHbug2C7x_FUjDvPBU3d2M",
+      "noor": "YuHOm26UXwCv0_W6Cllgkl0p2avipjGBsjSgFyORuwE"
+    },
+    "verification_code": "000000"
+  },
+  "ids": {
+    "campaign": "camp_spring_wellness",
+    "offer": "offer_first_cup_01",
+    "approved_content_revision": "content_rev_approved",
+    "draft_content_revision": "content_rev_draft",
+    "event": "event_study_break_01",
+    "outreach": "outreach_reengage_01",
+    "urgent_case": "case_urgent_01"
+  },
+  "coverage": {
+    "brand": 4,
+    "products": 3,
+    "assets": 3,
+    "members": 5,
+    "paid_orders": 5,
+    "refunds": 2,
+    "coupons": 3,
+    "content_revisions": 2,
+    "events": 1,
+    "feedback": 2,
+    "reports": 1
+  },
+  "source_assets": [
+    "4da38778134ae0fc6f4fb0046521903b.jpg",
+    "7846e5a3d39a673b230a47f52f4532ca.jpg",
+    "99b0b4ec1602cc2760ffed5944b53444.jpg",
+    "f78fd9085f6bde2ab8101aac1de72da9.jpg"
+  ],
+  "limits": [
+    "All names, contacts, orders and feedback are synthetic.",
+    "No WhatsApp, payment, publishing or other external write is enabled.",
+    "The public source/member tokens are demo bearer tokens; never reuse them outside local testing."
+  ]
+}
